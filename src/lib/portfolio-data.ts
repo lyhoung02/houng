@@ -76,12 +76,24 @@ export const education: EducationItem[] = [
   },
 ];
 
-export const experience = [
+export type ExperienceItem = {
+  role: string;
+  company: string;
+  period: string;
+  location: string;
+  bullets: string[];
+  logo: string;
+  logoMode: "image" | "wordmark";
+};
+
+export const experience: ExperienceItem[] = [
   {
     role: "Software Engineer",
     company: "E-Power CCL",
     period: "Dec 2023 — Present",
     location: "Phnom Penh",
+    logo: "/assets/projects/epower.png",
+    logoMode: "wordmark",
     bullets: [
       "Backend engineer on the Solar rooftop platform and ePower Maps services — designing APIs, modeling data, and shipping features end-to-end.",
       "Frontend engineer on Solar, EAC App, ePower Maps, and Mobile Billing — building cross-platform UI with Flutter and modern web stacks.",
@@ -94,6 +106,8 @@ export const experience = [
     company: "Max Freelance Team",
     period: "Jun — Dec 2025",
     location: "Remote · Phnom Penh",
+    logo: "/assets/work/max-freelance.svg",
+    logoMode: "image",
     bullets: [
       "Joined Max's freelance team to build a House IoT product — smart-home device control, telemetry, and a companion mobile experience.",
       "Worked on the developer side end-to-end: device integration, data pipelines from sensors, and feature flows in the app.",
@@ -105,6 +119,8 @@ export const experience = [
     company: "Freelance Team · RUPP Students",
     period: "Feb — Apr 2024",
     location: "Phnom Penh",
+    logo: "/assets/work/rupp-design.svg",
+    logoMode: "image",
     bullets: [
       "Joined a freelance team of RUPP (Royal University of Phnom Penh) students to design an Online Coffee Shop website.",
       "Led UX flows and high-fidelity UI: home, menu, product detail, cart, and checkout — including responsive behavior.",

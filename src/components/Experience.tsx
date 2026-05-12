@@ -24,18 +24,30 @@ export default function Experience() {
             <div className="space-y-4">
               {experience.map((job) => (
                 <div
-                  key={job.company}
+                  key={`${job.company}-${job.period}`}
                   className="glass card-hover rounded-2xl p-5 sm:p-6"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <Image
-                        src="/assets/projects/epower.png"
-                        alt="E-Power"
-                        width={64}
-                        height={16}
-                        className="opacity-90"
-                      />
+                      {job.logoMode === "wordmark" ? (
+                        <Image
+                          src={job.logo}
+                          alt={job.company}
+                          width={84}
+                          height={20}
+                          className="opacity-90 shrink-0"
+                        />
+                      ) : (
+                        <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-xl bg-white/[0.04] border border-white/10 overflow-hidden flex items-center justify-center">
+                          <Image
+                            src={job.logo}
+                            alt={`${job.company} logo`}
+                            fill
+                            sizes="56px"
+                            className="object-contain p-1.5"
+                          />
+                        </div>
+                      )}
                       <div>
                         <h4 className="font-semibold text-white">
                           {job.role}
