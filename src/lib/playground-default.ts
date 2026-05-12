@@ -197,14 +197,17 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
     top: calc(var(--u) * -5);
     transform: translateX(-50%);
   }
-  /* Arm bloom — sits at the tip of the arm, counter-rotated to stay upright */
+  /* Arm bloom — sits at the tip of the arm, counter-rotated to stay upright.
+     Use --bs (bloom-size multiplier) so each arm can carry a slightly
+     different-sized head — looks like blooms at different ages. */
   .arm .bloom {
     top: 0; left: 50%;
-    width: calc(var(--u) * 7.5); height: calc(var(--u) * 7.5);
-    min-width: 56px; min-height: 56px;
+    width: calc(var(--u) * var(--bs, 7));
+    height: calc(var(--u) * var(--bs, 7));
+    min-width: 50px; min-height: 50px;
     transform: translate(-50%, -50%);
     rotate: calc(var(--an, 0deg) * -1);
-    animation-delay: 2.7s;
+    animation-delay: var(--bd, 2.7s);
   }
 
   /* Aura backing each bloom */
@@ -540,74 +543,126 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
       </defs>
     </svg>
 
-    <!-- ============ PLANTS ============ -->
-    <!-- p1 (pink) — main + 1 right arm -->
+    <!-- ============ PLANTS ============
+         Each plant: 1 main trunk-top flower + 4 angled arms ("ទង") = 5 flowers.
+         Arms vary in angle / position / size / bloom delay so the bush
+         feels organic, not symmetric. -->
+
+    <!-- p1 (pink) — 5 flowers -->
     <div class="plant p1 pink">
       <div class="trunk"></div>
       <div class="ground-shadow"></div>
       <div class="leaf l1"><div class="leaf-body"></div></div>
       <div class="leaf l2"><div class="leaf-body"></div></div>
-      <div class="arm" style="--an: 32deg; --ab: 52%; --ah: 30%;">
+      <div class="arm" style="--an: -32deg; --ab: 42%; --ah: 28%; --bs: 6.5; --bd: 2.7s;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-pink"/></svg></div>
+      </div>
+      <div class="arm" style="--an: 32deg; --ab: 48%; --ah: 26%; --bs: 6.5; --bd: 2.9s;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-pink"/></svg></div>
+      </div>
+      <div class="arm" style="--an: -18deg; --ab: 64%; --ah: 22%; --bs: 5.5; --bd: 3.1s;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-pink"/></svg></div>
+      </div>
+      <div class="arm" style="--an: 20deg; --ab: 70%; --ah: 20%; --bs: 5; --bd: 3.3s;">
         <div class="arm-stem"></div>
         <div class="bloom"><div class="aura"></div><svg><use href="#bloom-pink"/></svg></div>
       </div>
       <div class="bloom main"><div class="aura"></div><svg><use href="#bloom-pink"/></svg></div>
     </div>
 
-    <!-- p2 (violet) — main + 2 arms (tallest plant) -->
+    <!-- p2 (violet) — 5 flowers, tallest -->
     <div class="plant p2 violet">
       <div class="trunk"></div>
       <div class="ground-shadow"></div>
       <div class="leaf l1"><div class="leaf-body"></div></div>
       <div class="leaf l2"><div class="leaf-body"></div></div>
-      <div class="arm" style="--an: -28deg; --ab: 45%; --ah: 32%;">
+      <div class="arm" style="--an: -34deg; --ab: 38%; --ah: 30%; --bs: 6.5; --bd: 2.7s;">
         <div class="arm-stem"></div>
         <div class="bloom"><div class="aura"></div><svg><use href="#bloom-violet"/></svg></div>
       </div>
-      <div class="arm" style="--an: 26deg; --ab: 58%; --ah: 28%;">
+      <div class="arm" style="--an: 30deg; --ab: 44%; --ah: 28%; --bs: 6.5; --bd: 2.9s;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-violet"/></svg></div>
+      </div>
+      <div class="arm" style="--an: -22deg; --ab: 60%; --ah: 24%; --bs: 5.5; --bd: 3.1s;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-violet"/></svg></div>
+      </div>
+      <div class="arm" style="--an: 22deg; --ab: 66%; --ah: 22%; --bs: 5; --bd: 3.3s;">
         <div class="arm-stem"></div>
         <div class="bloom"><div class="aura"></div><svg><use href="#bloom-violet"/></svg></div>
       </div>
       <div class="bloom main"><div class="aura"></div><svg><use href="#bloom-violet"/></svg></div>
     </div>
 
-    <!-- p3 (sun) — main + 1 left arm -->
+    <!-- p3 (sun) — 5 flowers -->
     <div class="plant p3 sun">
       <div class="trunk"></div>
       <div class="ground-shadow"></div>
       <div class="leaf l1"><div class="leaf-body"></div></div>
       <div class="leaf l2"><div class="leaf-body"></div></div>
-      <div class="arm" style="--an: -30deg; --ab: 50%; --ah: 30%;">
+      <div class="arm" style="--an: -30deg; --ab: 42%; --ah: 28%; --bs: 7; --bd: 2.7s;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-sun"/></svg></div>
+      </div>
+      <div class="arm" style="--an: 30deg; --ab: 46%; --ah: 26%; --bs: 6.5; --bd: 2.9s;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-sun"/></svg></div>
+      </div>
+      <div class="arm" style="--an: -18deg; --ab: 62%; --ah: 22%; --bs: 5.5; --bd: 3.1s;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-sun"/></svg></div>
+      </div>
+      <div class="arm" style="--an: 22deg; --ab: 70%; --ah: 18%; --bs: 5; --bd: 3.3s;">
         <div class="arm-stem"></div>
         <div class="bloom"><div class="aura"></div><svg><use href="#bloom-sun"/></svg></div>
       </div>
       <div class="bloom main"><div class="aura"></div><svg><use href="#bloom-sun"/></svg></div>
     </div>
 
-    <!-- p4 (sky) — main + 2 arms -->
+    <!-- p4 (sky) — 5 flowers -->
     <div class="plant p4 sky">
       <div class="trunk"></div>
       <div class="ground-shadow"></div>
       <div class="leaf l1"><div class="leaf-body"></div></div>
       <div class="leaf l2"><div class="leaf-body"></div></div>
-      <div class="arm" style="--an: 30deg; --ab: 42%; --ah: 32%;">
+      <div class="arm" style="--an: -32deg; --ab: 38%; --ah: 30%; --bs: 6.5; --bd: 2.7s;">
         <div class="arm-stem"></div>
         <div class="bloom"><div class="aura"></div><svg><use href="#bloom-sky"/></svg></div>
       </div>
-      <div class="arm" style="--an: -25deg; --ab: 55%; --ah: 28%;">
+      <div class="arm" style="--an: 30deg; --ab: 44%; --ah: 28%; --bs: 6.5; --bd: 2.9s;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-sky"/></svg></div>
+      </div>
+      <div class="arm" style="--an: -20deg; --ab: 60%; --ah: 24%; --bs: 5.5; --bd: 3.1s;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-sky"/></svg></div>
+      </div>
+      <div class="arm" style="--an: 22deg; --ab: 67%; --ah: 22%; --bs: 5; --bd: 3.3s;">
         <div class="arm-stem"></div>
         <div class="bloom"><div class="aura"></div><svg><use href="#bloom-sky"/></svg></div>
       </div>
       <div class="bloom main"><div class="aura"></div><svg><use href="#bloom-sky"/></svg></div>
     </div>
 
-    <!-- p5 (ruby) — main + 1 right arm -->
+    <!-- p5 (ruby) — 4 flowers (smallest plant) -->
     <div class="plant p5 ruby">
       <div class="trunk"></div>
       <div class="ground-shadow"></div>
       <div class="leaf l1"><div class="leaf-body"></div></div>
       <div class="leaf l2"><div class="leaf-body"></div></div>
-      <div class="arm" style="--an: 28deg; --ab: 48%; --ah: 30%;">
+      <div class="arm" style="--an: -30deg; --ab: 44%; --ah: 26%; --bs: 6.5; --bd: 2.7s;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-ruby"/></svg></div>
+      </div>
+      <div class="arm" style="--an: 30deg; --ab: 50%; --ah: 24%; --bs: 6; --bd: 2.9s;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-ruby"/></svg></div>
+      </div>
+      <div class="arm" style="--an: 18deg; --ab: 70%; --ah: 18%; --bs: 5; --bd: 3.1s;">
         <div class="arm-stem"></div>
         <div class="bloom"><div class="aura"></div><svg><use href="#bloom-ruby"/></svg></div>
       </div>
