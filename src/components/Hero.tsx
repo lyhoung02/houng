@@ -16,13 +16,16 @@ export default function Hero() {
   return (
     <section
       id="top"
-      className="relative overflow-hidden pt-16 pb-24 sm:pt-24 sm:pb-32"
+      className="relative overflow-hidden pt-16 pb-20 sm:pt-24 sm:pb-28"
     >
-      <div className="absolute inset-0 -z-10 bg-grid opacity-60" />
-      <div className="absolute -top-32 left-1/2 -translate-x-1/2 h-[480px] w-[480px] rounded-full bg-indigo-500/25 blur-3xl -z-10" />
+      <div className="absolute inset-0 -z-10 bg-grid opacity-50" />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[480px] w-[680px] rounded-full bg-indigo-500/15 blur-3xl -z-10"
+      />
 
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <div className="grid lg:grid-cols-[1.3fr_1fr] gap-10 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-[1.25fr_1fr] gap-12 lg:gap-16 items-center">
           <div>
             <div className="reveal inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-white/70 mb-6">
               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400 text-emerald-400 pulse-dot" />
@@ -30,13 +33,16 @@ export default function Hero() {
             </div>
 
             <h1 className="reveal reveal-delay-1 text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.05]">
-              {t.hero.greeting}{" "}
+              <span className="block text-white/70 text-xl sm:text-2xl font-medium mb-1">
+                {t.hero.greeting}
+              </span>
               <span className="gradient-text">{profile.name}</span>
-              <br />
-              <span className="text-white/80">{t.hero.tagline}</span>
+              <span className="block mt-3 text-white/85 text-2xl sm:text-3xl lg:text-4xl font-medium leading-tight">
+                {t.hero.tagline}
+              </span>
             </h1>
 
-            <p className="reveal reveal-delay-2 mt-6 text-base sm:text-lg text-white/70 max-w-2xl leading-relaxed">
+            <p className="reveal reveal-delay-2 mt-6 text-base sm:text-lg text-white/65 max-w-2xl leading-relaxed">
               {profile.pitch}
             </p>
 
@@ -70,7 +76,7 @@ export default function Hero() {
               </a>
               <a
                 href={`mailto:${profile.email}`}
-                className="text-sm text-white/60 hover:text-white transition underline-offset-4 hover:underline"
+                className="text-sm text-white/55 hover:text-white transition underline-offset-4 hover:underline"
               >
                 {profile.email}
               </a>
@@ -78,11 +84,14 @@ export default function Hero() {
 
             <dl className="reveal reveal-delay-4 mt-10 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl">
               {stats.map((s) => (
-                <div key={s.label} className="glass rounded-xl p-3 sm:p-4">
-                  <dt className="text-[11px] uppercase tracking-wider text-white/50">
+                <div
+                  key={s.label}
+                  className="glass card-hover rounded-2xl p-3 sm:p-4"
+                >
+                  <dt className="text-[10px] uppercase tracking-[0.15em] text-white/50">
                     {s.label}
                   </dt>
-                  <dd className="mt-1 text-sm sm:text-base font-medium text-white">
+                  <dd className="mt-1.5 text-sm sm:text-base font-semibold text-white">
                     {s.value}
                   </dd>
                 </div>
@@ -90,17 +99,16 @@ export default function Hero() {
             </dl>
           </div>
 
-          <div className="reveal reveal-delay-2 relative mx-auto lg:mx-0">
-            <div className="relative h-72 w-72 sm:h-80 sm:w-80 lg:h-[360px] lg:w-[360px] float">
-              <div className="absolute inset-0 rounded-3xl glow-ring bg-gradient-to-br from-indigo-500/20 via-cyan-400/15 to-amber-400/20" />
-              <div className="absolute inset-3 rounded-2xl glass overflow-hidden">
+          <div className="reveal reveal-delay-2 relative mx-auto lg:mx-0 w-full max-w-[360px]">
+            <div className="relative aspect-square float">
+              <div className="absolute inset-0 rounded-3xl glass overflow-hidden">
                 <div
                   aria-hidden
-                  className="absolute inset-0 bg-gradient-to-br from-indigo-500/25 via-cyan-400/15 to-amber-400/25"
+                  className="absolute inset-0 bg-gradient-to-br from-indigo-500/18 via-cyan-400/10 to-amber-400/14"
                 />
                 <div
                   aria-hidden
-                  className="absolute -bottom-10 left-1/2 -translate-x-1/2 h-40 w-40 rounded-full bg-indigo-500/40 blur-3xl"
+                  className="absolute -bottom-12 left-1/2 -translate-x-1/2 h-44 w-44 rounded-full bg-indigo-500/30 blur-3xl"
                 />
                 <Image
                   src="/profile-nobg.png"
@@ -110,39 +118,35 @@ export default function Hero() {
                   sizes="(max-width: 1024px) 320px, 360px"
                   className="relative z-10 object-contain object-bottom drop-shadow-[0_20px_40px_rgba(0,0,0,0.45)]"
                 />
+
+                <div className="absolute bottom-3 left-3 right-3 z-20 inline-flex items-center justify-center gap-2 rounded-full glass border border-white/12 px-3 py-1.5 text-[11px] text-white/75">
+                  <Image
+                    src="/assets/projects/epower.png"
+                    alt="E-Power"
+                    width={56}
+                    height={14}
+                    className="opacity-90"
+                  />
+                  <span>{t.hero.buildingAt}</span>
+                </div>
               </div>
 
               <FloatingBadge
-                className="absolute -left-6 top-10"
+                className="absolute -left-3 top-6 sm:-left-6"
                 label="Flutter"
-                tone="cyan"
               />
               <FloatingBadge
-                className="absolute -right-4 top-24"
+                className="absolute -right-2 top-20 sm:-right-4"
                 label="Next.js"
-                tone="indigo"
               />
               <FloatingBadge
-                className="absolute -left-2 bottom-8"
+                className="absolute -left-1 bottom-16 sm:-left-3"
                 label="Node.js"
-                tone="emerald"
               />
               <FloatingBadge
-                className="absolute -right-8 bottom-24"
+                className="absolute -right-3 bottom-32 sm:-right-6"
                 label="PostgreSQL"
-                tone="amber"
               />
-            </div>
-
-            <div className="mt-6 flex items-center justify-center gap-2 text-xs text-white/50">
-              <Image
-                src="/assets/projects/epower.png"
-                alt="E-Power"
-                width={84}
-                height={20}
-                className="opacity-80"
-              />
-              <span>{t.hero.buildingAt}</span>
             </div>
           </div>
         </div>
@@ -154,21 +158,13 @@ export default function Hero() {
 function FloatingBadge({
   className,
   label,
-  tone,
 }: {
   className?: string;
   label: string;
-  tone: "indigo" | "cyan" | "emerald" | "amber";
 }) {
-  const tones: Record<string, string> = {
-    indigo: "from-indigo-500/30 to-indigo-500/10 text-indigo-200",
-    cyan: "from-cyan-400/30 to-cyan-400/10 text-cyan-200",
-    emerald: "from-emerald-400/30 to-emerald-400/10 text-emerald-200",
-    amber: "from-amber-400/30 to-amber-400/10 text-amber-200",
-  };
   return (
     <div
-      className={`glass rounded-full px-3 py-1.5 text-xs font-medium bg-gradient-to-br ${tones[tone]} shadow-lg ${className}`}
+      className={`glass rounded-full px-3 py-1.5 text-[11px] font-medium text-white/85 border border-white/12 shadow-lg shadow-slate-950/30 ${className}`}
     >
       {label}
     </div>
