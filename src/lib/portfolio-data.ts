@@ -30,13 +30,30 @@ export const profile = {
   ],
 };
 
-export const education = [
+export type EducationItem = {
+  title: string;
+  org: string;
+  period: string;
+  detail: string;
+  logo: string;
+};
+
+export const education: EducationItem[] = [
+  {
+    title: "English Level 6 (Part-time)",
+    org: "Pannasastra University of Cambodia (PUC)",
+    period: "Feb 2026 — Present",
+    detail:
+      "Advanced English program at PUC — academic writing, professional communication, and technical reading.",
+    logo: "/assets/puc-nobg.png",
+  },
   {
     title: "Bachelor of Software Development",
     org: "Norton University",
     period: "2022 — 2025",
     detail:
       "Four-year program covering software engineering fundamentals, databases, networking, and project management.",
+    logo: "/assets/norton.png",
   },
   {
     title: "Flutter & Dart 3.0 (Part-time)",
@@ -44,6 +61,7 @@ export const education = [
     period: "Feb — Jul 2024",
     detail:
       "Cross-platform mobile development with Dart 3.0, state management, REST integration, and production deployment.",
+    logo: "/assets/instinct-nobg.png",
   },
   {
     title: "C / C++ Programming (Part-time)",
@@ -51,6 +69,7 @@ export const education = [
     period: "Jul — Nov 2023",
     detail:
       "Memory model, pointers, data structures, and systems-level problem solving with C and C++.",
+    logo: "/assets/etec.png",
   },
 ];
 

@@ -69,18 +69,31 @@ export default function Experience() {
                 <li key={e.title} className="relative">
                   <span className="absolute -left-[18px] top-2 inline-block h-3 w-3 rounded-full bg-gradient-to-br from-indigo-400 to-cyan-300 ring-4 ring-slate-950" />
                   <div className="glass card-hover rounded-2xl p-4 sm:p-5">
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <h4 className="text-sm sm:text-base font-semibold text-white">
-                        {e.title}
-                      </h4>
-                      <span className="text-[11px] text-white/55">
-                        {e.period}
-                      </span>
+                    <div className="flex items-start gap-3">
+                      <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-xl bg-white/[0.04] border border-white/10 overflow-hidden flex items-center justify-center">
+                        <Image
+                          src={e.logo}
+                          alt={`${e.org} logo`}
+                          fill
+                          sizes="56px"
+                          className="object-contain p-1.5"
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <h4 className="text-sm sm:text-base font-semibold text-white">
+                            {e.title}
+                          </h4>
+                          <span className="text-[11px] text-white/55 shrink-0">
+                            {e.period}
+                          </span>
+                        </div>
+                        <p className="mt-1 text-sm text-white/60">{e.org}</p>
+                        <p className="mt-2 text-sm text-white/65 leading-relaxed">
+                          {e.detail}
+                        </p>
+                      </div>
                     </div>
-                    <p className="mt-1 text-sm text-white/60">{e.org}</p>
-                    <p className="mt-2 text-sm text-white/65 leading-relaxed">
-                      {e.detail}
-                    </p>
                   </div>
                 </li>
               ))}
