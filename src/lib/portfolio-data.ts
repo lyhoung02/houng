@@ -14,14 +14,15 @@ export const profile = {
   name: "Pov Lyhoung",
   initials: "PL",
   age: 21,
-  title: "Junior Software Engineer",
+  title: "Software Engineer",
   subtitle: "Full-Stack · Mobile · AI-Augmented Builder",
   location: "Phnom Penh, Cambodia",
-  email: "minhkhun.koan@oone.bz",
+  email: "povlyhoung02@gmail.com",
+  workEmail: "pov.lyhoung@e-power.com.kh",
   pitch:
-    "I'm a hands-on junior software engineer shipping production-grade backend, web, and mobile apps for the energy sector. I love clean systems, fast iterations, and shipping things people actually use.",
+    "I'm a hands-on software engineer shipping production-grade backend, web, and mobile apps for the energy sector. I love clean systems, fast iterations, and shipping things people actually use.",
   longPitch:
-    "Since December 2024 I've been part of the engineering team at E-Power CCL, working across four real-world products — Solar, EAC App, Mobile Billing, and ePower Maps — owning slices of backend, frontend, and ongoing maintenance. I learn fast, write practical code, and stay calm under deadlines.",
+    "Since December 2023 I've been part of the engineering team at E-Power CCL, working across four real-world products — Solar, EAC App, Mobile Billing, and ePower Maps — owning slices of backend, frontend, and ongoing maintenance. I learn fast, write practical code, and stay calm under deadlines.",
   stats: [
     { label: "Production projects", value: "4+" },
     { label: "Years coding", value: "3+" },
@@ -75,9 +76,9 @@ export const education: EducationItem[] = [
 
 export const experience = [
   {
-    role: "Junior Software Engineer",
+    role: "Software Engineer",
     company: "E-Power CCL",
-    period: "Dec 2024 — Present",
+    period: "Dec 2023 — Present",
     location: "Phnom Penh",
     bullets: [
       "Backend engineer on the Solar rooftop platform and ePower Maps services — designing APIs, modeling data, and shipping features end-to-end.",

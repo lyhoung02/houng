@@ -23,7 +23,7 @@ export default function Hero() {
               <span className="gradient-text">{profile.name}</span>
               <br />
               <span className="text-white/80">
-                a junior engineer who actually ships.
+                an engineer who actually ships.
               </span>
             </h1>
 

@@ -47,7 +47,7 @@ export default function About() {
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <SectionHeader
           eyebrow="About"
-          title="A junior engineer wired for shipping."
+          title="An engineer wired for shipping."
           description={profile.longPitch}
         />
 

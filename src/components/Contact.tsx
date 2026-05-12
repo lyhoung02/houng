@@ -19,8 +19,8 @@ export default function Contact() {
             <div>
               <SectionHeader
                 eyebrow="Let's Work"
-                title="Hire a junior who already ships."
-                description="I'm open to junior full-time roles, mobile/web outsourcing, and short-term builds. If you need someone who can move fast across backend, frontend, and mobile — let's talk."
+                title="Hire an engineer who already ships."
+                description="I'm open to full-time roles, mobile/web outsourcing, and short-term builds. If you need someone who can move fast across backend, frontend, and mobile — let's talk."
               />
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -64,7 +64,7 @@ export default function Contact() {
               <h3 className="text-sm uppercase tracking-[0.15em] text-white/50">
                 Quick Facts
               </h3>
-              <dl className="mt-4 space-y-3 text-sm">
+              <div className="mt-4 space-y-3 text-sm">
                 <Row k="Name" v={profile.name} />
                 <Row k="Age" v={`${profile.age}`} />
                 <Row k="Location" v={profile.location} />
@@ -79,7 +79,19 @@ export default function Contact() {
                   }
                 />
                 <Row k="Email" v={profile.email} mono />
-              </dl>
+                <Row
+                  k="Work email"
+                  v={
+                    <a
+                      href={`mailto:${profile.workEmail}`}
+                      className="hover:text-white transition"
+                    >
+                      {profile.workEmail}
+                    </a>
+                  }
+                  mono
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -99,10 +111,12 @@ function Row({
 }) {
   return (
     <div className="flex items-start justify-between gap-4 border-b border-white/5 pb-3 last:border-b-0 last:pb-0">
-      <dt className="text-white/55">{k}</dt>
-      <dd className={`text-white ${mono ? "font-mono text-xs sm:text-sm" : ""}`}>
+      <span className="text-white/55">{k}</span>
+      <span
+        className={`text-white text-right ${mono ? "font-mono text-xs sm:text-sm" : ""}`}
+      >
         {v}
-      </dd>
+      </span>
     </div>
   );
 }

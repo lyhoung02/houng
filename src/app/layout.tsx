@@ -13,12 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pov Lyhoung — Junior Software Engineer",
+  title: "Pov Lyhoung — Software Engineer",
   description:
     "Portfolio of Pov Lyhoung — full-stack & mobile engineer building production apps at E-Power CCL. Backend, frontend, Flutter, Next.js, Node.js, and AI-augmented engineering.",
   keywords: [
     "Pov Lyhoung",
-    "Junior Software Engineer",
+    "Software Engineer",
     "Full Stack Developer",
     "Flutter Developer",
     "Next.js",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Pov Lyhoung" }],
   openGraph: {
-    title: "Pov Lyhoung — Junior Software Engineer",
+    title: "Pov Lyhoung — Software Engineer",
     description:
       "Full-stack & mobile engineer shipping real products at E-Power CCL.",
     type: "website",
