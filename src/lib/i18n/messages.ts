@@ -154,6 +154,39 @@ const en = {
       contact: "Contact",
       printedFrom: "Printed from houng.pages.dev",
     },
+    chat: {
+      open: "Chat with me",
+      close: "Close chat",
+      title: "Pov Lyhoung",
+      subtitle: "Usually replies in a few hours",
+      status: "Online",
+      placeholder: "Type a message…",
+      send: "Send",
+      demoNote: "Demo chat · sample replies until backend is connected",
+      typing: "typing…",
+      welcome:
+        "Hey 👋 thanks for stopping by! I'm Lyhoung. Ask me anything — about my projects, stack, or hiring me.",
+      suggestions: ["Are you available for hire?", "Show me your projects", "What's your stack?"],
+      replies: {
+        greeting:
+          "Hey! Glad you said hi. What brings you here today? Looking to hire, or just curious about my work?",
+        hire:
+          "Yes — I'm open to full-time roles and outsourcing. Drop me an email at povlyhoung02@gmail.com or scroll down to the Contact section.",
+        projects:
+          "I'm shipping four products at E-Power CCL — Solar, EAC App, ePower Maps, Mobile Billing. Side projects: JRMS, E-Commerce, SS Garage. See the Projects section above 👆",
+        stack:
+          "Mostly Flutter, Next.js, Node.js, .NET, PostgreSQL, Docker. Full list in the Skills section.",
+        phone:
+          "Sure — call or message me at +855 15-357 776 or +855 89-826 667.",
+        resume:
+          "You can see my full résumé at /resume — it's printable as a PDF too.",
+        email:
+          "Public: povlyhoung02@gmail.com · Work: pov.lyhoung@e-power.com.kh",
+        thanks: "Anytime! Let me know if you want a deeper dive on anything.",
+        default:
+          "Thanks for the message — I'll get back to you ASAP. Meanwhile feel free to email povlyhoung02@gmail.com.",
+      },
+    },
     settings: {
       theme: "Theme",
       themeDark: "Dark",
@@ -320,6 +353,38 @@ const km: Messages = {
       skills: "ជំនាញ",
       contact: "ទំនាក់ទំនង",
       printedFrom: "បោះពុម្ពពី houng.pages.dev",
+    },
+    chat: {
+      open: "ជជែកជាមួយខ្ញុំ",
+      close: "បិទ",
+      title: "Pov Lyhoung",
+      subtitle: "ឆ្លើយជាធម្មតាក្នុងពេលប៉ុន្មានម៉ោង",
+      status: "នៅលើបណ្តាញ",
+      placeholder: "សរសេរសារ…",
+      send: "ផ្ញើ",
+      demoNote: "ការសាកល្បង · ឆ្លើយតបជាគំរូ មុនពេលភ្ជាប់ backend",
+      typing: "កំពុងវាយ…",
+      welcome:
+        "សួស្តី 👋 អរគុណដែលបានមកលេង! ខ្ញុំឈ្មោះ Lyhoung។ សួរអ្វីក៏បាន — អំពីគម្រោងរបស់ខ្ញុំ បច្ចេកវិទ្យាដែលខ្ញុំប្រើ ឬការងារ។",
+      suggestions: ["តើអ្នកអាចទទួលការងារទេ?", "បង្ហាញគម្រោងរបស់អ្នក", "Stack អ្វីខ្លះ?"],
+      replies: {
+        greeting:
+          "សួស្តី! រីករាយដែលបានជួប។ តើមានអ្វីដែលអាចជួយបាន? កំពុងស្វែងរកជួល ឬគ្រាន់តែចង់ដឹង?",
+        hire:
+          "បាទ — ខ្ញុំបើកសម្រាប់ការងារពេញម៉ោង និង outsourcing។ ផ្ញើអ៊ីមែលមក povlyhoung02@gmail.com ឬមើលផ្នែក Contact ខាងក្រោម។",
+        projects:
+          "ខ្ញុំកំពុងធ្វើផលិតផលបួននៅ E-Power CCL — Solar, EAC App, ePower Maps, Mobile Billing។ គម្រោងផ្ទាល់ខ្លួន៖ JRMS, E-Commerce, SS Garage។ មើលផ្នែក Projects ខាងលើ 👆",
+        stack:
+          "ភាគច្រើន Flutter, Next.js, Node.js, .NET, PostgreSQL, Docker។ បញ្ជីពេញមួយនៅផ្នែក Skills។",
+        phone: "បាន — ហៅទូរសព្ទមកលេខ +855 15-357 776 ឬ +855 89-826 667។",
+        resume:
+          "មើល CV ពេញនៅ /resume — អាចបោះពុម្ពជា PDF ដែរ។",
+        email:
+          "សាធារណៈ៖ povlyhoung02@gmail.com · ការងារ៖ pov.lyhoung@e-power.com.kh",
+        thanks: "មិនអីទេ! ប្រាប់បើចង់ដឹងលម្អិតបន្ថែម។",
+        default:
+          "អរគុណសម្រាប់សារ — ខ្ញុំនឹងឆ្លើយតបក្នុងពេលឆាប់ៗ។ ផ្ញើអ៊ីមែលមក povlyhoung02@gmail.com បានដែរ។",
+      },
     },
     settings: {
       theme: "របៀប",
