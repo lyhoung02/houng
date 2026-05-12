@@ -10,13 +10,14 @@ export default function Nav() {
   const [open, setOpen] = useState(false);
 
   const links = [
-    { href: "#about", label: t.nav.about },
-    { href: "#experience", label: t.nav.experience },
-    { href: "#projects", label: t.nav.projects },
-    { href: "#internal", label: t.nav.internal },
-    { href: "#personal", label: t.nav.personal },
-    { href: "#skills", label: t.nav.skills },
-    { href: "#contact", label: t.nav.contact },
+    { href: "/#about", label: t.nav.about },
+    { href: "/#experience", label: t.nav.experience },
+    { href: "/#projects", label: t.nav.projects },
+    { href: "/#internal", label: t.nav.internal },
+    { href: "/#personal", label: t.nav.personal },
+    { href: "/#skills", label: t.nav.skills },
+    { href: "/resume", label: t.nav.resume },
+    { href: "/#contact", label: t.nav.contact },
   ];
 
   useEffect(() => {
