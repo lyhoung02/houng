@@ -192,9 +192,8 @@ a, button { outline-offset: 4px; }
 .resume-page {
   width: 210mm;
   min-height: 297mm;
-  padding: 16mm 16mm 18mm;
   background: #ffffff;
-  color: #0b1220;
+  color: #0f172a;
   margin: 0 auto;
   box-shadow:
     0 1px 0 rgba(0, 0, 0, 0.04),
@@ -203,6 +202,82 @@ a, button { outline-offset: 4px; }
   line-height: 1.45;
   font-size: 10.5pt;
   box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.resume-grid {
+  display: grid;
+  grid-template-columns: 70mm 1fr;
+  flex: 1;
+  min-height: 0;
+}
+
+.resume-sidebar {
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 16mm 9mm 12mm;
+}
+
+.resume-main {
+  padding: 16mm 12mm 12mm;
+}
+
+.resume-avatar {
+  position: relative;
+  width: 30mm;
+  height: 30mm;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #4338ca, #0e7490);
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.resume-section-title {
+  font-size: 10.5pt;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #0f172a;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+  position: relative;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.resume-section-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 2px;
+  width: 28px;
+  background: #1e3a8a;
+}
+
+.resume-body {
+  font-size: 9.75pt;
+  color: #1f2937;
+  line-height: 1.5;
+}
+
+.resume-date {
+  font-size: 8.75pt;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #1e3a8a;
+  white-space: nowrap;
+}
+
+.resume-footer {
+  border-top: 1px solid #e2e8f0;
+  padding: 6mm 12mm 8mm;
+  font-size: 8pt;
+  color: #64748b;
+  display: flex;
+  justify-content: space-between;
 }
 
 .km .resume-page,
@@ -223,9 +298,12 @@ a, button { outline-offset: 4px; }
   .resume-page {
     box-shadow: none !important;
     margin: 0 !important;
-    padding: 0 !important;
     width: 100% !important;
     min-height: 0 !important;
+  }
+  .resume-sidebar {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
   a { color: inherit; text-decoration: none; }
   .print-keep { break-inside: avoid; page-break-inside: avoid; }
