@@ -101,35 +101,22 @@ export default function Hero() {
 
           <div className="reveal reveal-delay-2 relative mx-auto lg:mx-0 w-full max-w-[360px]">
             <div className="relative aspect-square float">
-              <div className="absolute inset-0 rounded-3xl glass overflow-hidden">
-                <div
-                  aria-hidden
-                  className="absolute inset-0 bg-gradient-to-br from-indigo-500/18 via-cyan-400/10 to-amber-400/14"
-                />
-                <div
-                  aria-hidden
-                  className="absolute -bottom-12 left-1/2 -translate-x-1/2 h-44 w-44 rounded-full bg-indigo-500/30 blur-3xl"
-                />
-                <Image
-                  src="/profile-nobg.png"
-                  alt={`${profile.name} portrait`}
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 320px, 360px"
-                  className="relative z-10 object-contain object-bottom drop-shadow-[0_20px_40px_rgba(0,0,0,0.45)]"
-                />
-
-                <div className="absolute bottom-3 left-3 right-3 z-20 inline-flex items-center justify-center gap-2 rounded-full glass border border-white/12 px-3 py-1.5 text-[11px] text-white/75">
-                  <Image
-                    src="/assets/projects/epower.png"
-                    alt="E-Power"
-                    width={56}
-                    height={14}
-                    className="opacity-90"
-                  />
-                  <span>{t.hero.buildingAt}</span>
-                </div>
-              </div>
+              <div
+                aria-hidden
+                className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-500/35 via-violet-500/25 to-cyan-400/30 blur-3xl"
+              />
+              <div
+                aria-hidden
+                className="absolute inset-6 sm:inset-8 rounded-[36%] bg-gradient-to-br from-indigo-400/25 via-violet-400/15 to-cyan-300/20 border border-white/15 shadow-[0_25px_60px_-20px_rgba(99,102,241,0.4)]"
+              />
+              <Image
+                src="/profile-nobg.png"
+                alt={`${profile.name} portrait`}
+                fill
+                priority
+                sizes="(max-width: 1024px) 320px, 360px"
+                className="relative z-10 object-contain object-bottom drop-shadow-[0_25px_45px_rgba(0,0,0,0.45)]"
+              />
 
               <FloatingBadge
                 className="absolute -left-3 top-6 sm:-left-6"
@@ -140,13 +127,26 @@ export default function Hero() {
                 label="Next.js"
               />
               <FloatingBadge
-                className="absolute -left-1 bottom-16 sm:-left-3"
+                className="absolute -left-1 bottom-20 sm:-left-3"
                 label="Node.js"
               />
               <FloatingBadge
-                className="absolute -right-3 bottom-32 sm:-right-6"
+                className="absolute -right-3 bottom-36 sm:-right-6"
                 label="PostgreSQL"
               />
+            </div>
+
+            <div className="mt-5 flex items-center justify-center">
+              <div className="glass inline-flex items-center gap-2 rounded-full border border-white/12 px-3 py-1.5 text-[11px] text-white/75">
+                <Image
+                  src="/assets/projects/epower.png"
+                  alt="E-Power"
+                  width={64}
+                  height={16}
+                  className="opacity-90"
+                />
+                <span>{t.hero.buildingAt}</span>
+              </div>
             </div>
           </div>
         </div>
