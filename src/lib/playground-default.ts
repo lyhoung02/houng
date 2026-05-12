@@ -4,56 +4,22 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
 <meta charset="utf-8" />
 <style>
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
   body {
     background:
+      radial-gradient(ellipse 80% 50% at 50% 22%, rgba(165,180,252,0.20), transparent 60%),
       linear-gradient(to bottom,
-        #050118 0%,
-        #1e1b4b 28%,
-        #312e81 55%,
-        #312e3d 78%,
-        #0b3a2a 100%);
-    overflow: hidden;
+        #02030f 0%,
+        #0b1029 18%,
+        #1e1b4b 42%,
+        #312e81 62%,
+        #0f3a3a 80%,
+        #0a2a1a 100%);
     font-family: system-ui, sans-serif;
     position: relative;
   }
 
-  /* ===== Soft world glow / moonlight ===== */
-  .world {
-    position: absolute;
-    top: 12%;
-    left: 50%;
-    width: 75%;
-    height: 55%;
-    transform: translateX(-50%);
-    border-radius: 50%;
-    background:
-      radial-gradient(circle at 50% 50%,
-        rgba(99,102,241,0.45) 0%,
-        rgba(34,211,238,0.28) 35%,
-        rgba(245,158,11,0.14) 60%,
-        transparent 75%);
-    filter: blur(30px);
-    animation: world-pulse 9s ease-in-out infinite;
-  }
-  @keyframes world-pulse {
-    0%,100% { opacity: 0.85; transform: translateX(-50%) scale(1); }
-    50%     { opacity: 1;    transform: translateX(-50%) scale(1.05); }
-  }
-
-  /* ===== Moon ===== */
-  .moon {
-    position: absolute;
-    top: 9%;
-    right: 14%;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #fff7d6, #fcd34d 70%, #f59e0b);
-    box-shadow:
-      0 0 24px rgba(252,211,77,0.55),
-      0 0 60px rgba(252,211,77,0.25);
-  }
+  .stage { position: absolute; inset: 0; }
 
   /* ===== Stars ===== */
   .star {
@@ -61,266 +27,578 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
     width: 2px; height: 2px;
     background: #fff;
     border-radius: 50%;
-    box-shadow: 0 0 4px #fff;
-    animation: twinkle 3s ease-in-out infinite;
+    box-shadow: 0 0 4px #fff, 0 0 8px rgba(255,255,255,0.5);
+    animation: twinkle 3.5s ease-in-out infinite;
   }
+  .star.big { width: 3px; height: 3px; box-shadow: 0 0 6px #fff, 0 0 14px rgba(255,255,255,0.7); }
   @keyframes twinkle {
-    0%,100% { opacity: 0.25; }
-    50%     { opacity: 1; }
+    0%,100% { opacity: 0.25; transform: scale(0.85); }
+    50%     { opacity: 1;    transform: scale(1); }
   }
 
-  /* ===== Ground / garden ===== */
+  /* ===== Moon with halo + light rays ===== */
+  .moon-stage {
+    position: absolute;
+    top: 8%;
+    right: 12%;
+    width: 90px;
+    height: 90px;
+  }
+  .moon-halo {
+    position: absolute;
+    inset: -60px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(254,243,199,0.45) 0%, rgba(252,211,77,0.18) 30%, transparent 60%);
+    animation: halo-pulse 6s ease-in-out infinite;
+  }
+  .moon {
+    position: absolute;
+    inset: 18px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 32% 32%, #fffbeb 0%, #fef3c7 35%, #fbbf24 75%, #d97706 100%);
+    box-shadow:
+      inset -4px -6px 12px rgba(146,64,14,0.3),
+      0 0 24px rgba(252,211,77,0.55),
+      0 0 60px rgba(252,211,77,0.25);
+  }
+  .moon::before, .moon::after {
+    content: "";
+    position: absolute;
+    background: rgba(180,83,9,0.18);
+    border-radius: 50%;
+  }
+  .moon::before { width: 10px; height: 10px; top: 28%; left: 22%; }
+  .moon::after  { width: 6px;  height: 6px;  bottom: 30%; right: 30%; box-shadow: -10px -4px 0 rgba(180,83,9,0.15); }
+  @keyframes halo-pulse {
+    0%,100% { opacity: 0.85; transform: scale(1); }
+    50%     { opacity: 1;    transform: scale(1.08); }
+  }
+
+  /* ===== Mountain silhouettes (depth) ===== */
+  .mountains {
+    position: absolute;
+    bottom: 28%;
+    left: 0; right: 0;
+    height: 30%;
+    z-index: 1;
+  }
+  .mountains svg { width: 100%; height: 100%; display: block; }
+
+  /* ===== Mist drifting along the ground ===== */
+  .mist {
+    position: absolute;
+    bottom: 24%;
+    left: -10%; right: -10%;
+    height: 14%;
+    background:
+      radial-gradient(ellipse 30% 100% at 20% 50%, rgba(186,230,253,0.18), transparent 70%),
+      radial-gradient(ellipse 35% 100% at 55% 70%, rgba(165,180,252,0.15), transparent 70%),
+      radial-gradient(ellipse 28% 100% at 85% 50%, rgba(186,230,253,0.18), transparent 70%);
+    filter: blur(8px);
+    animation: drift-mist 18s ease-in-out infinite alternate;
+    z-index: 2;
+  }
+  @keyframes drift-mist {
+    0%   { transform: translateX(-25px); }
+    100% { transform: translateX(25px); }
+  }
+
+  /* ===== Garden ground ===== */
   .ground {
     position: absolute;
     bottom: 0; left: 0; right: 0;
     height: 28%;
     background:
       linear-gradient(to bottom,
-        rgba(6,78,59,0.0) 0%,
-        rgba(6,78,59,0.85) 20%,
-        rgba(3,55,42,1) 70%,
-        rgba(2,40,30,1) 100%);
+        rgba(6,78,59,0)   0%,
+        rgba(6,78,59,0.7) 8%,
+        rgba(3,55,42,0.95) 35%,
+        rgba(2,30,22,1)   100%);
+    z-index: 2;
   }
-  .grass-row {
+  .ground::before {
+    content: "";
     position: absolute;
-    left: 0; right: 0; bottom: 28%;
-    height: 14px;
+    inset: 0;
     background:
-      radial-gradient(ellipse 5px 12px at 4% 100%,  #166534, transparent),
-      radial-gradient(ellipse 4px 10px at 10% 100%, #15803d, transparent),
-      radial-gradient(ellipse 6px 14px at 16% 100%, #166534, transparent),
-      radial-gradient(ellipse 4px 9px  at 22% 100%, #15803d, transparent),
-      radial-gradient(ellipse 5px 13px at 28% 100%, #166534, transparent),
-      radial-gradient(ellipse 4px 11px at 34% 100%, #15803d, transparent),
-      radial-gradient(ellipse 5px 12px at 42% 100%, #166534, transparent),
-      radial-gradient(ellipse 6px 15px at 48% 100%, #15803d, transparent),
-      radial-gradient(ellipse 4px 10px at 56% 100%, #166534, transparent),
-      radial-gradient(ellipse 5px 12px at 64% 100%, #15803d, transparent),
-      radial-gradient(ellipse 5px 14px at 72% 100%, #166534, transparent),
-      radial-gradient(ellipse 4px 9px  at 80% 100%, #15803d, transparent),
-      radial-gradient(ellipse 6px 13px at 88% 100%, #166534, transparent),
-      radial-gradient(ellipse 4px 11px at 95% 100%, #15803d, transparent);
+      radial-gradient(ellipse 60% 14% at 50% 0%, rgba(34,197,94,0.18), transparent 70%);
   }
 
-  /* ===== Flower stem (ដើម) ===== */
-  .plant {
+  /* Multi-layer grass */
+  .grass {
     position: absolute;
-    bottom: 28%;
-    transform-origin: bottom center;
-    animation: sway 6s ease-in-out infinite;
+    left: 0; right: 0;
+    pointer-events: none;
+    z-index: 3;
   }
-  .plant.p1 { left: 12%; height: 58%; animation-delay: 0s;   }
-  .plant.p2 { left: 30%; height: 70%; animation-delay: 1.1s; }
-  .plant.p3 { left: 50%; height: 62%; animation-delay: 0.4s; }
-  .plant.p4 { left: 70%; height: 76%; animation-delay: 1.6s; }
-  .plant.p5 { left: 86%; height: 52%; animation-delay: 0.8s; }
+  .grass.back  { bottom: 26%; height: 18px; opacity: 0.85; filter: blur(0.4px); }
+  .grass.front { bottom: 25%; height: 24px; }
 
-  @keyframes sway {
-    0%,100% { transform: rotate(-1.8deg); }
-    50%     { transform: rotate(1.8deg); }
-  }
-
-  .stem {
+  .blade {
     position: absolute;
     bottom: 0;
+    width: 3px;
+    background: linear-gradient(to top, #052e1a, #166534, #22c55e);
+    border-radius: 50% 50% 30% 30% / 80% 80% 20% 20%;
+    transform-origin: bottom center;
+    animation: blade-sway 4s ease-in-out infinite;
+  }
+  @keyframes blade-sway {
+    0%,100% { transform: rotate(-3deg); }
+    50%     { transform: rotate(3deg); }
+  }
+
+  /* ===== Flower plants ===== */
+  .plant {
+    position: absolute;
+    bottom: 26%;
+    transform-origin: bottom center;
+    animation: sway 7s ease-in-out infinite;
+    z-index: 4;
+  }
+  .plant.p1 { left: 10%; height: 56%; animation-delay: 0s;   }
+  .plant.p2 { left: 26%; height: 68%; animation-delay: 1.2s; --hue: violet; }
+  .plant.p3 { left: 44%; height: 60%; animation-delay: 0.5s; }
+  .plant.p4 { left: 62%; height: 72%; animation-delay: 1.8s; }
+  .plant.p5 { left: 80%; height: 54%; animation-delay: 0.9s; }
+  .plant.tall { z-index: 5; }
+  .plant.short { z-index: 4; }
+
+  @keyframes sway {
+    0%,100% { transform: rotate(-1.6deg); }
+    50%     { transform: rotate(1.6deg); }
+  }
+
+  .stem-wrap {
+    position: absolute;
     left: 50%;
-    width: 4px;
+    bottom: 0;
+    transform: translateX(-50%);
     height: 100%;
-    background: linear-gradient(to top, #14532d 0%, #166534 35%, #16a34a 80%, #22c55e 100%);
-    border-radius: 2px;
+    width: 6px;
+  }
+  .stem {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 5px;
+    height: 100%;
+    background:
+      linear-gradient(90deg, rgba(0,0,0,0.25) 0%, transparent 35%, rgba(255,255,255,0.18) 60%, transparent 80%),
+      linear-gradient(to top, #052e1a 0%, #14532d 35%, #15803d 70%, #22c55e 100%);
+    border-radius: 3px;
     transform: translateX(-50%) scaleY(0);
     transform-origin: bottom center;
-    animation: grow 1.8s cubic-bezier(.2,.7,.2,1) forwards;
-    box-shadow: 0 0 4px rgba(34,197,94,0.3);
+    animation: grow 2.2s cubic-bezier(.2,.7,.2,1) forwards;
+    box-shadow: 0 0 6px rgba(34,197,94,0.35);
   }
   @keyframes grow { to { transform: translateX(-50%) scaleY(1); } }
 
+  /* Detailed leaves with vein */
   .leaf {
     position: absolute;
-    width: 22px; height: 12px;
-    background: linear-gradient(135deg, #22c55e, #166534);
-    transform-origin: 100% 50%;
+    width: 36px;
+    height: 18px;
+    transform-origin: 0 50%;
     opacity: 0;
-    animation: leaf-pop 1s ease-out forwards;
-    animation-delay: 1.5s;
+    animation: leaf-pop 1.4s cubic-bezier(.2,.7,.2,1) forwards;
   }
-  .leaf.left  { right: 50%; bottom: 35%; border-radius: 100% 0 0 100%; transform: rotate(-35deg) scale(0); }
-  .leaf.right { left:  50%; bottom: 52%; border-radius: 0 100% 100% 0; transform: rotate(35deg)  scale(0); background: linear-gradient(225deg, #22c55e, #166534); }
-
+  .leaf-shape {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 100% at 0% 50%, #22c55e 0%, #166534 70%, #052e1a 100%);
+    border-radius: 100% 70% 60% 100% / 100% 60% 100% 100%;
+    box-shadow: inset 0 -2px 4px rgba(0,0,0,0.3);
+  }
+  .leaf-shape::before {
+    content: "";
+    position: absolute;
+    left: 4%;
+    top: 50%;
+    width: 75%;
+    height: 1px;
+    background: linear-gradient(to right, rgba(255,255,255,0.4), transparent);
+    transform: translateY(-50%);
+  }
+  .leaf.l1 { left: 52%; bottom: 38%; transform: rotate(28deg) scale(0); animation-delay: 1.6s; }
+  .leaf.l2 { right: 52%; bottom: 55%; transform: rotate(152deg) scale(0); animation-delay: 1.9s; }
+  .leaf.l2 .leaf-shape { transform: scaleX(-1); }
   @keyframes leaf-pop {
-    to { opacity: 1; transform: var(--final, rotate(-35deg) scale(1)); }
+    to { opacity: 1; transform: rotate(var(--lr, 28deg)) scale(1); }
   }
-  .leaf.left  { --final: rotate(-35deg) scale(1); }
-  .leaf.right { --final: rotate(35deg)  scale(1); }
+  .leaf.l1 { --lr: 28deg; }
+  .leaf.l2 { --lr: 152deg; }
 
   /* ===== Flower head ===== */
   .bloom {
     position: absolute;
-    top: -32px;
     left: 50%;
-    width: 90px;
-    height: 90px;
+    top: -52px;
+    width: 120px;
+    height: 120px;
     transform: translateX(-50%);
-  }
-  .plant.p3 .bloom { width: 110px; height: 110px; top: -42px; }
-  .plant.p4 .bloom { width: 96px;  height: 96px;  top: -36px; }
-  .plant.p5 .bloom { width: 78px;  height: 78px;  top: -28px; }
-
-  .petal {
-    position: absolute;
-    width: 28px; height: 50px;
-    bottom: 50%;
-    left: calc(50% - 14px);
-    border-radius: 50% 50% 30% 30% / 70% 70% 30% 30%;
-    transform-origin: 50% 100%;
     opacity: 0;
-    transform: rotate(var(--r,0deg)) scale(0);
-    animation: bloom 1.6s cubic-bezier(.2,.7,.2,1) forwards;
-    animation-delay: calc(2.2s + var(--d, 0s));
+    animation: bloom-fade 1.2s ease-out forwards;
+    animation-delay: 2.3s;
+    filter: drop-shadow(0 4px 14px rgba(0,0,0,0.4));
   }
-  @keyframes bloom {
-    to { opacity: 1; transform: rotate(var(--r,0deg)) scale(1); }
-  }
+  .plant.p3 .bloom { width: 134px; height: 134px; top: -60px; }
+  .plant.p4 .bloom { width: 124px; height: 124px; top: -56px; }
+  .plant.p5 .bloom { width: 100px; height: 100px; top: -44px; }
+  @keyframes bloom-fade { to { opacity: 1; } }
 
-  .core {
+  .bloom svg { width: 100%; height: 100%; display: block; overflow: visible; }
+
+  /* Backing aura behind each flower */
+  .aura {
     position: absolute;
-    top: calc(50% - 13px);
-    left: calc(50% - 13px);
-    width: 26px; height: 26px;
+    inset: -20%;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #fef3c7, #f59e0b 65%, #b45309);
-    box-shadow: 0 0 14px rgba(252,211,77,0.8);
     opacity: 0;
-    animation: fade-in 1.1s ease-out forwards;
-    animation-delay: 3.2s;
-    z-index: 2;
+    filter: blur(18px);
+    animation: aura-in 2s ease-out forwards, aura-pulse 4.5s ease-in-out infinite;
+    animation-delay: 2.5s, 4.5s;
+    z-index: -1;
   }
-  @keyframes fade-in { to { opacity: 1; } }
+  @keyframes aura-in { to { opacity: 0.85; } }
+  @keyframes aura-pulse {
+    0%,100% { transform: scale(1); }
+    50%     { transform: scale(1.12); }
+  }
 
   /* Per-flower palettes */
-  .pink   .petal { background: linear-gradient(180deg, #f9a8d4 0%, #fb7185 50%, #f97316 100%); filter: drop-shadow(0 0 10px rgba(251,113,133,0.55)); }
-  .violet .petal { background: linear-gradient(180deg, #d8b4fe 0%, #a855f7 50%, #6366f1 100%); filter: drop-shadow(0 0 10px rgba(168,85,247,0.55)); }
-  .sun    .petal { background: linear-gradient(180deg, #fde68a 0%, #fbbf24 50%, #ea580c 100%); filter: drop-shadow(0 0 10px rgba(251,191,36,0.55)); }
-  .sky    .petal { background: linear-gradient(180deg, #bae6fd 0%, #38bdf8 50%, #6366f1 100%); filter: drop-shadow(0 0 10px rgba(56,189,248,0.55)); }
-  .ruby   .petal { background: linear-gradient(180deg, #fda4af 0%, #ef4444 50%, #b91c1c 100%); filter: drop-shadow(0 0 10px rgba(239,68,68,0.55)); }
+  .pink   .aura { background: radial-gradient(circle, rgba(251,113,133,0.55), transparent 70%); }
+  .violet .aura { background: radial-gradient(circle, rgba(168,85,247,0.55), transparent 70%); }
+  .sun    .aura { background: radial-gradient(circle, rgba(251,191,36,0.65), transparent 70%); }
+  .sky    .aura { background: radial-gradient(circle, rgba(56,189,248,0.55), transparent 70%); }
+  .ruby   .aura { background: radial-gradient(circle, rgba(239,68,68,0.55),  transparent 70%); }
 
-  /* Drifting sparkles / fireflies */
+  /* ===== Fireflies ===== */
   .firefly {
     position: absolute;
     width: 4px; height: 4px;
     border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 0 10px #fef3c7, 0 0 20px rgba(252,211,77,0.6);
+    background: #fef3c7;
+    box-shadow: 0 0 10px #fef3c7, 0 0 24px rgba(252,211,77,0.7);
     opacity: 0;
-    animation: drift 6s ease-in-out infinite;
+    z-index: 6;
+    animation: fly 7s ease-in-out infinite;
   }
-  @keyframes drift {
-    0%   { transform: translate(0, 0) scale(0.7); opacity: 0; }
-    20%  { opacity: 1; }
-    80%  { opacity: 1; }
-    100% { transform: translate(var(--mx,30px), var(--my,-80px)) scale(1.1); opacity: 0; }
+  @keyframes fly {
+    0%   { transform: translate(0,0) scale(0.7); opacity: 0; }
+    15%  { opacity: 1; }
+    50%  { transform: translate(var(--fmx, 30px), var(--fmy, -50px)) scale(1.1); }
+    85%  { opacity: 1; }
+    100% { transform: translate(var(--fmx2, -10px), var(--fmy2, -110px)) scale(0.8); opacity: 0; }
+  }
+
+  /* ===== Pollen / light particles drifting ===== */
+  .pollen {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: rgba(254,243,199,0.85);
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(252,211,77,0.6);
+    opacity: 0;
+    animation: pollen-rise 9s linear infinite;
+    z-index: 5;
+  }
+  @keyframes pollen-rise {
+    0%   { transform: translateY(0) translateX(0); opacity: 0; }
+    20%  { opacity: 0.9; }
+    100% { transform: translateY(-100vh) translateX(var(--px, 40px)); opacity: 0; }
   }
 </style>
 </head>
 <body>
-  <!-- Sky / world -->
-  <div class="world"></div>
-  <div class="moon"></div>
+  <div class="stage">
 
-  <!-- Stars -->
-  <span class="star" style="left:  6%; top:  6%;"></span>
-  <span class="star" style="left: 18%; top: 12%; animation-delay: 0.6s;"></span>
-  <span class="star" style="left: 30%; top:  4%; animation-delay: 1.2s;"></span>
-  <span class="star" style="left: 44%; top:  9%; animation-delay: 1.8s;"></span>
-  <span class="star" style="left: 60%; top:  5%; animation-delay: 0.3s;"></span>
-  <span class="star" style="left: 78%; top: 16%; animation-delay: 1.4s;"></span>
-  <span class="star" style="left: 92%; top:  8%; animation-delay: 0.9s;"></span>
+    <!-- Stars -->
+    <span class="star big" style="left:  6%; top:  6%;"></span>
+    <span class="star"     style="left: 16%; top: 12%; animation-delay: 0.6s;"></span>
+    <span class="star"     style="left: 26%; top:  5%; animation-delay: 1.2s;"></span>
+    <span class="star big" style="left: 36%; top: 14%; animation-delay: 1.8s;"></span>
+    <span class="star"     style="left: 48%; top:  4%; animation-delay: 0.3s;"></span>
+    <span class="star"     style="left: 56%; top: 18%; animation-delay: 1.4s;"></span>
+    <span class="star big" style="left: 70%; top:  3%; animation-delay: 0.9s;"></span>
+    <span class="star"     style="left: 82%; top: 14%; animation-delay: 2.2s;"></span>
+    <span class="star"     style="left: 92%; top:  7%; animation-delay: 1.6s;"></span>
 
-  <!-- Garden -->
-  <div class="ground"></div>
-  <div class="grass-row"></div>
-
-  <!-- Flowers blooming in the garden -->
-  <div class="plant p1 pink">
-    <div class="stem"></div>
-    <div class="leaf left"></div>
-    <div class="leaf right"></div>
-    <div class="bloom">
-      <span class="petal" style="--r:   0deg; --d: 0.00s"></span>
-      <span class="petal" style="--r:  60deg; --d: 0.08s"></span>
-      <span class="petal" style="--r: 120deg; --d: 0.16s"></span>
-      <span class="petal" style="--r: 180deg; --d: 0.24s"></span>
-      <span class="petal" style="--r: 240deg; --d: 0.32s"></span>
-      <span class="petal" style="--r: 300deg; --d: 0.40s"></span>
-      <span class="core"></span>
+    <!-- Moon -->
+    <div class="moon-stage">
+      <div class="moon-halo"></div>
+      <div class="moon"></div>
     </div>
-  </div>
 
-  <div class="plant p2 violet">
-    <div class="stem"></div>
-    <div class="leaf left"></div>
-    <div class="leaf right"></div>
-    <div class="bloom">
-      <span class="petal" style="--r:   0deg; --d: 0.10s"></span>
-      <span class="petal" style="--r:  45deg; --d: 0.18s"></span>
-      <span class="petal" style="--r:  90deg; --d: 0.26s"></span>
-      <span class="petal" style="--r: 135deg; --d: 0.34s"></span>
-      <span class="petal" style="--r: 180deg; --d: 0.42s"></span>
-      <span class="petal" style="--r: 225deg; --d: 0.50s"></span>
-      <span class="petal" style="--r: 270deg; --d: 0.58s"></span>
-      <span class="petal" style="--r: 315deg; --d: 0.66s"></span>
-      <span class="core"></span>
+    <!-- Mountains (depth) -->
+    <div class="mountains">
+      <svg viewBox="0 0 1000 200" preserveAspectRatio="none">
+        <!-- Distant range -->
+        <path d="M0 200 L0 130 L80 90 L160 110 L240 70 L320 100 L400 60 L480 95 L560 75 L640 110 L720 80 L800 100 L880 70 L960 105 L1000 90 L1000 200 Z"
+              fill="rgba(15,23,42,0.65)" />
+        <!-- Mid range -->
+        <path d="M0 200 L0 160 L60 130 L140 150 L220 120 L300 145 L380 115 L460 140 L540 110 L620 145 L700 125 L780 140 L860 115 L940 145 L1000 130 L1000 200 Z"
+              fill="rgba(15,23,42,0.85)" />
+      </svg>
     </div>
-  </div>
 
-  <div class="plant p3 sun">
-    <div class="stem"></div>
-    <div class="leaf left"></div>
-    <div class="leaf right"></div>
-    <div class="bloom">
-      <span class="petal" style="--r:   0deg; --d: 0.00s"></span>
-      <span class="petal" style="--r:  60deg; --d: 0.08s"></span>
-      <span class="petal" style="--r: 120deg; --d: 0.16s"></span>
-      <span class="petal" style="--r: 180deg; --d: 0.24s"></span>
-      <span class="petal" style="--r: 240deg; --d: 0.32s"></span>
-      <span class="petal" style="--r: 300deg; --d: 0.40s"></span>
-      <span class="core"></span>
+    <!-- Mist -->
+    <div class="mist"></div>
+
+    <!-- Ground -->
+    <div class="ground"></div>
+
+    <!-- Grass blades (back layer) -->
+    <div class="grass back">
+      <span class="blade" style="left: 4%;  height: 12px; animation-delay: 0.1s;"></span>
+      <span class="blade" style="left: 9%;  height: 16px; animation-delay: 0.4s;"></span>
+      <span class="blade" style="left: 14%; height: 11px; animation-delay: 0.7s;"></span>
+      <span class="blade" style="left: 19%; height: 14px; animation-delay: 1.0s;"></span>
+      <span class="blade" style="left: 24%; height: 10px; animation-delay: 1.3s;"></span>
+      <span class="blade" style="left: 32%; height: 13px; animation-delay: 1.6s;"></span>
+      <span class="blade" style="left: 38%; height: 11px; animation-delay: 1.9s;"></span>
+      <span class="blade" style="left: 46%; height: 14px; animation-delay: 2.2s;"></span>
+      <span class="blade" style="left: 54%; height: 12px; animation-delay: 2.5s;"></span>
+      <span class="blade" style="left: 60%; height: 16px; animation-delay: 0.5s;"></span>
+      <span class="blade" style="left: 66%; height: 10px; animation-delay: 0.8s;"></span>
+      <span class="blade" style="left: 72%; height: 13px; animation-delay: 1.1s;"></span>
+      <span class="blade" style="left: 78%; height: 15px; animation-delay: 1.4s;"></span>
+      <span class="blade" style="left: 84%; height: 11px; animation-delay: 1.7s;"></span>
+      <span class="blade" style="left: 91%; height: 14px; animation-delay: 2.0s;"></span>
+      <span class="blade" style="left: 97%; height: 12px; animation-delay: 2.3s;"></span>
     </div>
-  </div>
-
-  <div class="plant p4 sky">
-    <div class="stem"></div>
-    <div class="leaf left"></div>
-    <div class="leaf right"></div>
-    <div class="bloom">
-      <span class="petal" style="--r:   0deg; --d: 0.05s"></span>
-      <span class="petal" style="--r:  72deg; --d: 0.15s"></span>
-      <span class="petal" style="--r: 144deg; --d: 0.25s"></span>
-      <span class="petal" style="--r: 216deg; --d: 0.35s"></span>
-      <span class="petal" style="--r: 288deg; --d: 0.45s"></span>
-      <span class="core"></span>
+    <!-- Grass blades (front layer, taller, brighter) -->
+    <div class="grass front">
+      <span class="blade" style="left: 6%;  height: 22px; animation-delay: 0.2s;"></span>
+      <span class="blade" style="left: 12%; height: 18px; animation-delay: 0.5s;"></span>
+      <span class="blade" style="left: 21%; height: 24px; animation-delay: 0.8s;"></span>
+      <span class="blade" style="left: 29%; height: 20px; animation-delay: 1.1s;"></span>
+      <span class="blade" style="left: 37%; height: 22px; animation-delay: 1.4s;"></span>
+      <span class="blade" style="left: 49%; height: 18px; animation-delay: 1.7s;"></span>
+      <span class="blade" style="left: 57%; height: 24px; animation-delay: 2.0s;"></span>
+      <span class="blade" style="left: 65%; height: 20px; animation-delay: 2.3s;"></span>
+      <span class="blade" style="left: 75%; height: 22px; animation-delay: 0.6s;"></span>
+      <span class="blade" style="left: 87%; height: 19px; animation-delay: 0.9s;"></span>
+      <span class="blade" style="left: 94%; height: 24px; animation-delay: 1.2s;"></span>
     </div>
-  </div>
 
-  <div class="plant p5 ruby">
-    <div class="stem"></div>
-    <div class="leaf left"></div>
-    <div class="leaf right"></div>
-    <div class="bloom">
-      <span class="petal" style="--r:   0deg; --d: 0.00s"></span>
-      <span class="petal" style="--r:  60deg; --d: 0.08s"></span>
-      <span class="petal" style="--r: 120deg; --d: 0.16s"></span>
-      <span class="petal" style="--r: 180deg; --d: 0.24s"></span>
-      <span class="petal" style="--r: 240deg; --d: 0.32s"></span>
-      <span class="petal" style="--r: 300deg; --d: 0.40s"></span>
-      <span class="core"></span>
+    <!-- Flowers -->
+    <div class="plant p1 pink short">
+      <div class="stem-wrap"><div class="stem"></div></div>
+      <div class="leaf l1"><div class="leaf-shape"></div></div>
+      <div class="leaf l2"><div class="leaf-shape"></div></div>
+      <div class="bloom">
+        <div class="aura"></div>
+        <svg viewBox="0 0 120 120">
+          <defs>
+            <radialGradient id="pinkPetal" cx="50%" cy="35%">
+              <stop offset="0%"  stop-color="#fbcfe8"/>
+              <stop offset="55%" stop-color="#fb7185"/>
+              <stop offset="100%" stop-color="#9f1239"/>
+            </radialGradient>
+            <radialGradient id="coreSun" cx="35%" cy="35%">
+              <stop offset="0%"  stop-color="#fff7ed"/>
+              <stop offset="40%" stop-color="#fcd34d"/>
+              <stop offset="85%" stop-color="#d97706"/>
+              <stop offset="100%" stop-color="#7c2d12"/>
+            </radialGradient>
+          </defs>
+          <!-- back petals (offset for depth) -->
+          <g transform="translate(60 60)">
+            <g>
+              <ellipse cx="0" cy="-32" rx="18" ry="32" fill="url(#pinkPetal)" opacity="0.85" transform="rotate(30)"/>
+              <ellipse cx="0" cy="-32" rx="18" ry="32" fill="url(#pinkPetal)" opacity="0.85" transform="rotate(90)"/>
+              <ellipse cx="0" cy="-32" rx="18" ry="32" fill="url(#pinkPetal)" opacity="0.85" transform="rotate(150)"/>
+              <ellipse cx="0" cy="-32" rx="18" ry="32" fill="url(#pinkPetal)" opacity="0.85" transform="rotate(210)"/>
+              <ellipse cx="0" cy="-32" rx="18" ry="32" fill="url(#pinkPetal)" opacity="0.85" transform="rotate(270)"/>
+              <ellipse cx="0" cy="-32" rx="18" ry="32" fill="url(#pinkPetal)" opacity="0.85" transform="rotate(330)"/>
+            </g>
+            <!-- front petals -->
+            <g>
+              <ellipse cx="0" cy="-28" rx="15" ry="28" fill="url(#pinkPetal)"/>
+              <ellipse cx="0" cy="-28" rx="15" ry="28" fill="url(#pinkPetal)" transform="rotate(60)"/>
+              <ellipse cx="0" cy="-28" rx="15" ry="28" fill="url(#pinkPetal)" transform="rotate(120)"/>
+              <ellipse cx="0" cy="-28" rx="15" ry="28" fill="url(#pinkPetal)" transform="rotate(180)"/>
+              <ellipse cx="0" cy="-28" rx="15" ry="28" fill="url(#pinkPetal)" transform="rotate(240)"/>
+              <ellipse cx="0" cy="-28" rx="15" ry="28" fill="url(#pinkPetal)" transform="rotate(300)"/>
+            </g>
+            <circle r="14" fill="url(#coreSun)"/>
+            <circle r="4" cx="-4" cy="-4" fill="rgba(255,255,255,0.7)"/>
+          </g>
+        </svg>
+      </div>
     </div>
-  </div>
 
-  <!-- Fireflies drifting through the garden -->
-  <span class="firefly" style="left: 25%; top: 60%; --mx:  40px; --my: -100px; animation-delay: 0s;"></span>
-  <span class="firefly" style="left: 55%; top: 70%; --mx: -50px; --my: -120px; animation-delay: 2s;"></span>
-  <span class="firefly" style="left: 78%; top: 55%; --mx:  20px; --my: -90px;  animation-delay: 3.5s;"></span>
-  <span class="firefly" style="left: 12%; top: 75%; --mx:  60px; --my: -110px; animation-delay: 4.5s;"></span>
+    <div class="plant p2 violet tall">
+      <div class="stem-wrap"><div class="stem"></div></div>
+      <div class="leaf l1"><div class="leaf-shape"></div></div>
+      <div class="leaf l2"><div class="leaf-shape"></div></div>
+      <div class="bloom">
+        <div class="aura"></div>
+        <svg viewBox="0 0 120 120">
+          <defs>
+            <radialGradient id="violetPetal" cx="50%" cy="35%">
+              <stop offset="0%"  stop-color="#e9d5ff"/>
+              <stop offset="55%" stop-color="#a855f7"/>
+              <stop offset="100%" stop-color="#4c1d95"/>
+            </radialGradient>
+          </defs>
+          <g transform="translate(60 60)">
+            <g>
+              <ellipse cx="0" cy="-34" rx="14" ry="34" fill="url(#violetPetal)" opacity="0.85" transform="rotate(22.5)"/>
+              <ellipse cx="0" cy="-34" rx="14" ry="34" fill="url(#violetPetal)" opacity="0.85" transform="rotate(67.5)"/>
+              <ellipse cx="0" cy="-34" rx="14" ry="34" fill="url(#violetPetal)" opacity="0.85" transform="rotate(112.5)"/>
+              <ellipse cx="0" cy="-34" rx="14" ry="34" fill="url(#violetPetal)" opacity="0.85" transform="rotate(157.5)"/>
+              <ellipse cx="0" cy="-34" rx="14" ry="34" fill="url(#violetPetal)" opacity="0.85" transform="rotate(202.5)"/>
+              <ellipse cx="0" cy="-34" rx="14" ry="34" fill="url(#violetPetal)" opacity="0.85" transform="rotate(247.5)"/>
+              <ellipse cx="0" cy="-34" rx="14" ry="34" fill="url(#violetPetal)" opacity="0.85" transform="rotate(292.5)"/>
+              <ellipse cx="0" cy="-34" rx="14" ry="34" fill="url(#violetPetal)" opacity="0.85" transform="rotate(337.5)"/>
+            </g>
+            <g>
+              <ellipse cx="0" cy="-28" rx="12" ry="28" fill="url(#violetPetal)" transform="rotate(0)"/>
+              <ellipse cx="0" cy="-28" rx="12" ry="28" fill="url(#violetPetal)" transform="rotate(45)"/>
+              <ellipse cx="0" cy="-28" rx="12" ry="28" fill="url(#violetPetal)" transform="rotate(90)"/>
+              <ellipse cx="0" cy="-28" rx="12" ry="28" fill="url(#violetPetal)" transform="rotate(135)"/>
+              <ellipse cx="0" cy="-28" rx="12" ry="28" fill="url(#violetPetal)" transform="rotate(180)"/>
+              <ellipse cx="0" cy="-28" rx="12" ry="28" fill="url(#violetPetal)" transform="rotate(225)"/>
+              <ellipse cx="0" cy="-28" rx="12" ry="28" fill="url(#violetPetal)" transform="rotate(270)"/>
+              <ellipse cx="0" cy="-28" rx="12" ry="28" fill="url(#violetPetal)" transform="rotate(315)"/>
+            </g>
+            <circle r="14" fill="url(#coreSun)"/>
+            <circle r="4" cx="-4" cy="-4" fill="rgba(255,255,255,0.7)"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="plant p3 sun short">
+      <div class="stem-wrap"><div class="stem"></div></div>
+      <div class="leaf l1"><div class="leaf-shape"></div></div>
+      <div class="leaf l2"><div class="leaf-shape"></div></div>
+      <div class="bloom">
+        <div class="aura"></div>
+        <svg viewBox="0 0 120 120">
+          <defs>
+            <radialGradient id="sunPetal" cx="50%" cy="40%">
+              <stop offset="0%"  stop-color="#fef9c3"/>
+              <stop offset="40%" stop-color="#fbbf24"/>
+              <stop offset="100%" stop-color="#9a3412"/>
+            </radialGradient>
+          </defs>
+          <g transform="translate(60 60)">
+            <g>
+              <path d="M0 -42 Q14 -28 0 -10 Q-14 -28 0 -42 Z" fill="url(#sunPetal)" opacity="0.85" transform="rotate(30)"/>
+              <path d="M0 -42 Q14 -28 0 -10 Q-14 -28 0 -42 Z" fill="url(#sunPetal)" opacity="0.85" transform="rotate(90)"/>
+              <path d="M0 -42 Q14 -28 0 -10 Q-14 -28 0 -42 Z" fill="url(#sunPetal)" opacity="0.85" transform="rotate(150)"/>
+              <path d="M0 -42 Q14 -28 0 -10 Q-14 -28 0 -42 Z" fill="url(#sunPetal)" opacity="0.85" transform="rotate(210)"/>
+              <path d="M0 -42 Q14 -28 0 -10 Q-14 -28 0 -42 Z" fill="url(#sunPetal)" opacity="0.85" transform="rotate(270)"/>
+              <path d="M0 -42 Q14 -28 0 -10 Q-14 -28 0 -42 Z" fill="url(#sunPetal)" opacity="0.85" transform="rotate(330)"/>
+            </g>
+            <g>
+              <path d="M0 -38 Q12 -24 0 -8 Q-12 -24 0 -38 Z" fill="url(#sunPetal)"/>
+              <path d="M0 -38 Q12 -24 0 -8 Q-12 -24 0 -38 Z" fill="url(#sunPetal)" transform="rotate(60)"/>
+              <path d="M0 -38 Q12 -24 0 -8 Q-12 -24 0 -38 Z" fill="url(#sunPetal)" transform="rotate(120)"/>
+              <path d="M0 -38 Q12 -24 0 -8 Q-12 -24 0 -38 Z" fill="url(#sunPetal)" transform="rotate(180)"/>
+              <path d="M0 -38 Q12 -24 0 -8 Q-12 -24 0 -38 Z" fill="url(#sunPetal)" transform="rotate(240)"/>
+              <path d="M0 -38 Q12 -24 0 -8 Q-12 -24 0 -38 Z" fill="url(#sunPetal)" transform="rotate(300)"/>
+            </g>
+            <circle r="14" fill="url(#coreSun)"/>
+            <circle r="4" cx="-4" cy="-4" fill="rgba(255,255,255,0.85)"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="plant p4 sky tall">
+      <div class="stem-wrap"><div class="stem"></div></div>
+      <div class="leaf l1"><div class="leaf-shape"></div></div>
+      <div class="leaf l2"><div class="leaf-shape"></div></div>
+      <div class="bloom">
+        <div class="aura"></div>
+        <svg viewBox="0 0 120 120">
+          <defs>
+            <radialGradient id="skyPetal" cx="50%" cy="35%">
+              <stop offset="0%"  stop-color="#e0f2fe"/>
+              <stop offset="55%" stop-color="#38bdf8"/>
+              <stop offset="100%" stop-color="#1e3a8a"/>
+            </radialGradient>
+          </defs>
+          <g transform="translate(60 60)">
+            <g>
+              <ellipse cx="0" cy="-34" rx="17" ry="34" fill="url(#skyPetal)" opacity="0.85" transform="rotate(36)"/>
+              <ellipse cx="0" cy="-34" rx="17" ry="34" fill="url(#skyPetal)" opacity="0.85" transform="rotate(108)"/>
+              <ellipse cx="0" cy="-34" rx="17" ry="34" fill="url(#skyPetal)" opacity="0.85" transform="rotate(180)"/>
+              <ellipse cx="0" cy="-34" rx="17" ry="34" fill="url(#skyPetal)" opacity="0.85" transform="rotate(252)"/>
+              <ellipse cx="0" cy="-34" rx="17" ry="34" fill="url(#skyPetal)" opacity="0.85" transform="rotate(324)"/>
+            </g>
+            <g>
+              <ellipse cx="0" cy="-28" rx="14" ry="28" fill="url(#skyPetal)" transform="rotate(0)"/>
+              <ellipse cx="0" cy="-28" rx="14" ry="28" fill="url(#skyPetal)" transform="rotate(72)"/>
+              <ellipse cx="0" cy="-28" rx="14" ry="28" fill="url(#skyPetal)" transform="rotate(144)"/>
+              <ellipse cx="0" cy="-28" rx="14" ry="28" fill="url(#skyPetal)" transform="rotate(216)"/>
+              <ellipse cx="0" cy="-28" rx="14" ry="28" fill="url(#skyPetal)" transform="rotate(288)"/>
+            </g>
+            <circle r="13" fill="url(#coreSun)"/>
+            <circle r="4" cx="-4" cy="-4" fill="rgba(255,255,255,0.75)"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="plant p5 ruby short">
+      <div class="stem-wrap"><div class="stem"></div></div>
+      <div class="leaf l1"><div class="leaf-shape"></div></div>
+      <div class="leaf l2"><div class="leaf-shape"></div></div>
+      <div class="bloom">
+        <div class="aura"></div>
+        <svg viewBox="0 0 120 120">
+          <defs>
+            <radialGradient id="rubyPetal" cx="50%" cy="35%">
+              <stop offset="0%"  stop-color="#fecaca"/>
+              <stop offset="55%" stop-color="#ef4444"/>
+              <stop offset="100%" stop-color="#7f1d1d"/>
+            </radialGradient>
+          </defs>
+          <g transform="translate(60 60)">
+            <g>
+              <ellipse cx="0" cy="-32" rx="16" ry="32" fill="url(#rubyPetal)" opacity="0.85" transform="rotate(30)"/>
+              <ellipse cx="0" cy="-32" rx="16" ry="32" fill="url(#rubyPetal)" opacity="0.85" transform="rotate(90)"/>
+              <ellipse cx="0" cy="-32" rx="16" ry="32" fill="url(#rubyPetal)" opacity="0.85" transform="rotate(150)"/>
+              <ellipse cx="0" cy="-32" rx="16" ry="32" fill="url(#rubyPetal)" opacity="0.85" transform="rotate(210)"/>
+              <ellipse cx="0" cy="-32" rx="16" ry="32" fill="url(#rubyPetal)" opacity="0.85" transform="rotate(270)"/>
+              <ellipse cx="0" cy="-32" rx="16" ry="32" fill="url(#rubyPetal)" opacity="0.85" transform="rotate(330)"/>
+            </g>
+            <g>
+              <ellipse cx="0" cy="-26" rx="13" ry="26" fill="url(#rubyPetal)"/>
+              <ellipse cx="0" cy="-26" rx="13" ry="26" fill="url(#rubyPetal)" transform="rotate(60)"/>
+              <ellipse cx="0" cy="-26" rx="13" ry="26" fill="url(#rubyPetal)" transform="rotate(120)"/>
+              <ellipse cx="0" cy="-26" rx="13" ry="26" fill="url(#rubyPetal)" transform="rotate(180)"/>
+              <ellipse cx="0" cy="-26" rx="13" ry="26" fill="url(#rubyPetal)" transform="rotate(240)"/>
+              <ellipse cx="0" cy="-26" rx="13" ry="26" fill="url(#rubyPetal)" transform="rotate(300)"/>
+            </g>
+            <circle r="13" fill="url(#coreSun)"/>
+            <circle r="4" cx="-4" cy="-4" fill="rgba(255,255,255,0.75)"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Fireflies -->
+    <span class="firefly" style="left: 18%; top: 60%; --fmx:  40px; --fmy: -60px; --fmx2:  10px; --fmy2: -130px; animation-delay: 0s;"></span>
+    <span class="firefly" style="left: 36%; top: 70%; --fmx: -30px; --fmy: -80px; --fmx2:  30px; --fmy2: -140px; animation-delay: 1.5s;"></span>
+    <span class="firefly" style="left: 55%; top: 55%; --fmx:  50px; --fmy: -50px; --fmx2: -20px; --fmy2: -120px; animation-delay: 3s;"></span>
+    <span class="firefly" style="left: 74%; top: 65%; --fmx: -40px; --fmy: -70px; --fmx2:  20px; --fmy2: -130px; animation-delay: 4.5s;"></span>
+    <span class="firefly" style="left: 88%; top: 58%; --fmx:  20px; --fmy: -90px; --fmx2: -30px; --fmy2: -140px; animation-delay: 6s;"></span>
+
+    <!-- Pollen -->
+    <span class="pollen" style="left: 12%; bottom: 28%; --px:  60px; animation-delay: 0.5s;"></span>
+    <span class="pollen" style="left: 30%; bottom: 28%; --px: -40px; animation-delay: 2.5s;"></span>
+    <span class="pollen" style="left: 48%; bottom: 28%; --px:  50px; animation-delay: 4.5s;"></span>
+    <span class="pollen" style="left: 66%; bottom: 28%; --px: -30px; animation-delay: 6.5s;"></span>
+    <span class="pollen" style="left: 82%; bottom: 28%; --px:  40px; animation-delay: 1.5s;"></span>
+
+  </div>
 </body>
 </html>`;
