@@ -48,12 +48,12 @@ export default function Nav() {
           </span>
         </a>
 
-        <nav className="hidden lg:flex items-center gap-5 text-sm text-white/70">
+        <nav className="hidden lg:flex items-center gap-1 text-sm">
           {links.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="hover:text-white transition-colors"
+              className="nav-link"
             >
               {l.label}
             </a>
@@ -95,7 +95,7 @@ export default function Nav() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="py-2 text-white/80 hover:text-white"
+                className="nav-link nav-link-mobile"
               >
                 {l.label}
               </a>
