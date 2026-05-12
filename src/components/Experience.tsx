@@ -1,20 +1,25 @@
+"use client";
+
 import Image from "next/image";
 import { experience, education } from "@/lib/portfolio-data";
 import { SectionHeader } from "./About";
+import { useT } from "./providers/LanguageProvider";
 
 export default function Experience() {
+  const t = useT();
+
   return (
     <section id="experience" className="py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <SectionHeader
-          eyebrow="Experience & Education"
-          title="From classroom fundamentals to production code."
+          eyebrow={t.experience.eyebrow}
+          title={t.experience.title}
         />
 
         <div className="mt-12 grid lg:grid-cols-[1.2fr_1fr] gap-8">
           <div>
             <h3 className="text-sm uppercase tracking-[0.15em] text-white/50 mb-5">
-              Work Experience
+              {t.experience.work}
             </h3>
             <div className="space-y-4">
               {experience.map((job) => (
@@ -62,7 +67,7 @@ export default function Experience() {
 
           <div>
             <h3 className="text-sm uppercase tracking-[0.15em] text-white/50 mb-5">
-              Education & Training
+              {t.experience.education}
             </h3>
             <ol className="relative space-y-4 pl-5 before:absolute before:left-1.5 before:top-2 before:bottom-2 before:w-px before:bg-gradient-to-b before:from-indigo-400/60 before:via-cyan-400/40 before:to-amber-400/30">
               {education.map((e) => (

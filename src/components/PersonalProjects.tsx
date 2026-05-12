@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import { personalProjects } from "@/lib/portfolio-data";
 import { SectionHeader } from "./About";
+import { useT } from "./providers/LanguageProvider";
 
 const statusTone: Record<string, string> = {
   Research: "border-violet-400/30 text-violet-200 bg-violet-400/10",
@@ -9,13 +12,14 @@ const statusTone: Record<string, string> = {
 };
 
 export default function PersonalProjects() {
+  const t = useT();
   return (
     <section id="personal" className="py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <SectionHeader
-          eyebrow="Personal · Research"
-          title="Side projects I build to keep sharp."
-          description="Self-initiated builds and research projects — exploring product ideas, stacks, and patterns outside of day-job work."
+          eyebrow={t.personal.eyebrow}
+          title={t.personal.title}
+          description={t.personal.description}
         />
 
         <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -42,7 +46,7 @@ export default function PersonalProjects() {
                 <span
                   className={`text-[10px] tracking-wider uppercase rounded-full px-2 py-1 border ${statusTone[p.status]}`}
                 >
-                  {p.status}
+                  {t.personal.status[p.status]}
                 </span>
               </div>
 
@@ -56,10 +60,7 @@ export default function PersonalProjects() {
 
               <ul className="mt-4 space-y-1.5">
                 {p.highlights.map((h, i) => (
-                  <li
-                    key={i}
-                    className="flex gap-2 text-sm text-white/65"
-                  >
+                  <li key={i} className="flex gap-2 text-sm text-white/65">
                     <svg
                       width="14"
                       height="14"

@@ -19,6 +19,8 @@ export const profile = {
   location: "Phnom Penh, Cambodia",
   email: "povlyhoung02@gmail.com",
   workEmail: "pov.lyhoung@e-power.com.kh",
+  phones: ["+855 15-357 776", "+855 89-826 667"],
+  address: "468 St, Toul Tom Pong II, Chamkar Mon, Phnom Penh",
   pitch:
     "I'm a hands-on software engineer shipping production-grade backend, web, and mobile apps for the energy sector. I love clean systems, fast iterations, and shipping things people actually use.",
   longPitch:

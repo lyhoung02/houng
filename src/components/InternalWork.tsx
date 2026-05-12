@@ -1,22 +1,24 @@
+"use client";
+
 import { internalProjects } from "@/lib/portfolio-data";
 import { SectionHeader } from "./About";
+import { useT } from "./providers/LanguageProvider";
 
 const difficultyTone: Record<string, string> = {
-  Challenging:
-    "border-amber-400/30 text-amber-200 bg-amber-400/10",
+  Challenging: "border-amber-400/30 text-amber-200 bg-amber-400/10",
   Hard: "border-rose-400/30 text-rose-200 bg-rose-400/10",
-  Foundational:
-    "border-indigo-400/30 text-indigo-200 bg-indigo-400/10",
+  Foundational: "border-indigo-400/30 text-indigo-200 bg-indigo-400/10",
 };
 
 export default function InternalWork() {
+  const t = useT();
   return (
     <section id="internal" className="py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <SectionHeader
-          eyebrow="Internal · E-Power CCL"
-          title="The hard, challenging builds behind the scenes."
-          description="Internal systems, integrations, and SDK work — the kind of code customers never see, but the business runs on."
+          eyebrow={t.internal.eyebrow}
+          title={t.internal.title}
+          description={t.internal.description}
         />
 
         <ol className="mt-12 relative space-y-5 pl-6 sm:pl-8 before:absolute before:left-2 sm:before:left-3 before:top-3 before:bottom-3 before:w-px before:bg-gradient-to-b before:from-indigo-400/60 before:via-cyan-400/40 before:to-amber-400/40">
@@ -40,7 +42,7 @@ export default function InternalWork() {
                       <span
                         className={`rounded-full px-2 py-0.5 border ${difficultyTone[p.difficulty]}`}
                       >
-                        {p.difficulty}
+                        {t.internal.difficulty[p.difficulty]}
                       </span>
                     </div>
                     <h3 className="mt-2 text-lg font-semibold text-white">

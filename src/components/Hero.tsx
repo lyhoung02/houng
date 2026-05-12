@@ -1,7 +1,18 @@
+"use client";
+
 import Image from "next/image";
 import { profile } from "@/lib/portfolio-data";
+import { useT } from "./providers/LanguageProvider";
 
 export default function Hero() {
+  const t = useT();
+  const stats = [
+    { label: t.hero.stats.projects, value: "4+" },
+    { label: t.hero.stats.years, value: "3+" },
+    { label: t.hero.stats.roles, value: t.hero.stats.rolesValue },
+    { label: t.hero.stats.openTo, value: t.hero.stats.openToValue },
+  ];
+
   return (
     <section
       id="top"
@@ -15,16 +26,14 @@ export default function Hero() {
           <div>
             <div className="reveal inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-white/70 mb-6">
               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400 text-emerald-400 pulse-dot" />
-              <span>Available for hire · Remote / Phnom Penh</span>
+              <span>{t.hero.availability}</span>
             </div>
 
             <h1 className="reveal reveal-delay-1 text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.05]">
-              Hi, I&apos;m{" "}
+              {t.hero.greeting}{" "}
               <span className="gradient-text">{profile.name}</span>
               <br />
-              <span className="text-white/80">
-                an engineer who actually ships.
-              </span>
+              <span className="text-white/80">{t.hero.tagline}</span>
             </h1>
 
             <p className="reveal reveal-delay-2 mt-6 text-base sm:text-lg text-white/70 max-w-2xl leading-relaxed">
@@ -36,7 +45,7 @@ export default function Hero() {
                 href="#projects"
                 className="group inline-flex items-center gap-2 rounded-full bg-white text-slate-950 px-5 py-2.5 text-sm font-medium hover:bg-white/90 transition"
               >
-                See my work
+                {t.hero.seeWork}
                 <svg
                   width="16"
                   height="16"
@@ -57,7 +66,7 @@ export default function Hero() {
                 href="#contact"
                 className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-medium text-white/90 hover:bg-white/10 transition"
               >
-                Get in touch
+                {t.hero.getInTouch}
               </a>
               <a
                 href={`mailto:${profile.email}`}
@@ -68,11 +77,8 @@ export default function Hero() {
             </div>
 
             <dl className="reveal reveal-delay-4 mt-10 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl">
-              {profile.stats.map((s) => (
-                <div
-                  key={s.label}
-                  className="glass rounded-xl p-3 sm:p-4"
-                >
+              {stats.map((s) => (
+                <div key={s.label} className="glass rounded-xl p-3 sm:p-4">
                   <dt className="text-[11px] uppercase tracking-wider text-white/50">
                     {s.label}
                   </dt>
@@ -136,7 +142,7 @@ export default function Hero() {
                 height={20}
                 className="opacity-80"
               />
-              <span>· currently building @ E-Power CCL</span>
+              <span>{t.hero.buildingAt}</span>
             </div>
           </div>
         </div>

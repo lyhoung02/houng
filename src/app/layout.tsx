@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Noto_Sans_Khmer } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider, themeBootScript } from "@/components/providers/ThemeProvider";
+import { LanguageProvider } from "@/components/providers/LanguageProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -10,6 +12,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const notoKhmer = Noto_Sans_Khmer({
+  variable: "--font-noto-khmer",
+  subsets: ["khmer"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -43,10 +51,16 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${notoKhmer.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+      </head>
       <body className="min-h-full flex flex-col selection:bg-indigo-500/40 selection:text-white">
-        {children}
+        <ThemeProvider>
+          <LanguageProvider>{children}</LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

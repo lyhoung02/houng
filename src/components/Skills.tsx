@@ -1,14 +1,19 @@
+"use client";
+
 import { skillGroups } from "@/lib/portfolio-data";
 import { SectionHeader } from "./About";
+import { useT } from "./providers/LanguageProvider";
 
 export default function Skills() {
+  const t = useT();
+  type GroupKey = keyof typeof t.skills.groups;
   return (
     <section id="skills" className="py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <SectionHeader
-          eyebrow="Skills & Toolbox"
-          title="A practical full-stack + mobile toolkit."
-          description="The stack I use every day to design, build, ship, and keep things running."
+          eyebrow={t.skills.eyebrow}
+          title={t.skills.title}
+          description={t.skills.description}
         />
 
         <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -18,7 +23,7 @@ export default function Skills() {
               className="glass card-hover rounded-2xl p-5 sm:p-6"
             >
               <h3 className="text-sm uppercase tracking-[0.15em] text-white/55">
-                {g.title}
+                {t.skills.groups[g.title as GroupKey] ?? g.title}
               </h3>
               <div className="mt-4 flex flex-wrap gap-2">
                 {g.items.map((it) => (

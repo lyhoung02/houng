@@ -1,15 +1,19 @@
+"use client";
+
 import Image from "next/image";
 import { projects } from "@/lib/portfolio-data";
 import { SectionHeader } from "./About";
+import { useT } from "./providers/LanguageProvider";
 
 export default function Projects() {
+  const t = useT();
   return (
     <section id="projects" className="py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <SectionHeader
-          eyebrow="Selected Work"
-          title="Real products. Real users. Live in production."
-          description="Four products I helped build and keep running at E-Power CCL — covering backend, frontend, and ongoing maintenance."
+          eyebrow={t.projects.eyebrow}
+          title={t.projects.title}
+          description={t.projects.description}
         />
 
         <div className="mt-12 grid md:grid-cols-2 gap-5">
@@ -53,7 +57,7 @@ export default function Projects() {
                             : "border-amber-400/30 text-amber-200 bg-amber-400/10"
                       }`}
                     >
-                      {r}
+                      {t.projects.roles[r]}
                     </span>
                   ))}
                 </div>
@@ -65,10 +69,7 @@ export default function Projects() {
 
               <ul className="mt-4 space-y-1.5">
                 {p.highlights.map((h, i) => (
-                  <li
-                    key={i}
-                    className="flex gap-2 text-sm text-white/65"
-                  >
+                  <li key={i} className="flex gap-2 text-sm text-white/65">
                     <svg
                       width="14"
                       height="14"
@@ -105,19 +106,14 @@ export default function Projects() {
 
         <div className="mt-8 glass rounded-2xl p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-sm text-white/80">
-              Every product above is in production today — and I&apos;m still
-              maintaining all four.
-            </p>
-            <p className="text-xs text-white/50 mt-1">
-              Want a deeper walkthrough or a code sample? Reach out below.
-            </p>
+            <p className="text-sm text-white/80">{t.projects.cta}</p>
+            <p className="text-xs text-white/50 mt-1">{t.projects.ctaSub}</p>
           </div>
           <a
             href="#contact"
             className="rounded-full bg-white text-slate-950 px-5 py-2 text-sm font-medium hover:bg-white/90 transition"
           >
-            Let&apos;s talk
+            {t.projects.ctaButton}
           </a>
         </div>
       </div>
