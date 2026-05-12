@@ -453,7 +453,7 @@ const km: Messages = {
       },
     },
     settings: {
-      theme: "ស្បែក",
+      theme: "ទម្រង់",
       themeDark: "ងងឹត",
       themeLight: "ភ្លឺ",
       themeSystem: "តាមប្រព័ន្ធ",
