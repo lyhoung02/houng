@@ -174,6 +174,19 @@ const en = {
       contact: "Contact",
       printedFrom: "Printed from houng.pages.dev",
     },
+    playground: {
+      eyebrow: "Live · Playground",
+      title: "Edit code. Watch it bloom.",
+      description:
+        "A tiny in-browser HTML / CSS / JS sandbox — tweak the snippet on the left, the preview on the right updates instantly. The default scene is a blooming flower over a soft glowing world.",
+      filename: "index.html",
+      preview: "Preview",
+      copy: "Copy",
+      copied: "Copied!",
+      reset: "Reset",
+      run: "Run",
+      hint: "Tip: changes apply automatically — press Reset to restore the original.",
+    },
     chat: {
       open: "Chat with me",
       close: "Close chat",
@@ -393,6 +406,19 @@ const km: Messages = {
       skills: "ជំនាញ",
       contact: "ទំនាក់ទំនង",
       printedFrom: "បោះពុម្ពពី houng.pages.dev",
+    },
+    playground: {
+      eyebrow: "ផ្ទាល់ · ការសាកល្បង",
+      title: "កែកូដ។ មើលផ្ការីករាយ។",
+      description:
+        "កន្លែងសាកល្បង HTML / CSS / JS តូចមួយ — កែកូដនៅខាងឆ្វេង ការមើលជាមុននៅខាងស្តាំធ្វើបច្ចុប្បន្នភាពភ្លាមៗ។ ឈុតលំនាំដើមគឺផ្ការីកនៅលើពិភពលោកដែលភ្លឺស្រាល។",
+      filename: "index.html",
+      preview: "មើលជាមុន",
+      copy: "ចម្លង",
+      copied: "បានចម្លង!",
+      reset: "កំណត់ឡើងវិញ",
+      run: "ដំណើរការ",
+      hint: "ចំណាំ៖ ការផ្លាស់ប្តូរនឹងធ្វើដោយស្វ័យប្រវត្តិ — ចុច Reset ដើម្បីត្រឡប់ទៅដើម។",
     },
     chat: {
       open: "ជជែកជាមួយខ្ញុំ",

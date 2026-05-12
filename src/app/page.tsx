@@ -7,6 +7,7 @@ import InternalWork from "@/components/InternalWork";
 import PersonalProjects from "@/components/PersonalProjects";
 import Skills from "@/components/Skills";
 import Contact from "@/components/Contact";
+import Playground from "@/components/Playground";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -24,6 +25,7 @@ export default function Home() {
         <PersonalProjects />
         <Skills />
         <Contact />
+        <Playground />
       </main>
       <Footer />
       <ScrollToTop />
