@@ -363,6 +363,7 @@ export const skillGroups = [
     items: [
       "C / C++",
       "C#",
+      "Java",
       "Dart 3.0",
       "JavaScript",
       "TypeScript",
