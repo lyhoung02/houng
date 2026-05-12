@@ -26,7 +26,7 @@ const en = {
         roles: "Roles covered",
         rolesValue: "Backend · Frontend · Mobile",
         openTo: "Open to",
-        openToValue: "Full-time / Outsourcing",
+        openToValue: "Full-time · Part-time · Outsourcing",
       },
     },
     about: {
@@ -226,7 +226,7 @@ const km: Messages = {
         roles: "តួនាទីដែលធ្វើ",
         rolesValue: "Backend · Frontend · Mobile",
         openTo: "បើកទទួល",
-        openToValue: "ពេញម៉ោង / ដៃគូ outsourcing",
+        openToValue: "ពេញម៉ោង · ក្រៅម៉ោង · outsourcing",
       },
     },
     about: {
