@@ -70,36 +70,45 @@ export default function Resume() {
           </SidebarSection>
 
           <SidebarSection label={t.resume.skills}>
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               {skillGroups.map((g) => (
                 <div key={g.title} className="print-keep">
-                  <h4 className="text-[8.5pt] font-semibold uppercase tracking-[0.08em] opacity-80">
-                    {g.title}
-                  </h4>
-                  <p className="mt-0.5 text-[9pt] leading-snug opacity-95">
-                    {g.items.join(" · ")}
-                  </p>
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <span className="h-px w-3 bg-cyan-300" />
+                    <h4 className="text-[8pt] font-bold uppercase tracking-[0.14em] text-cyan-200">
+                      {g.title}
+                    </h4>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {g.items.map((it) => (
+                      <span
+                        key={it}
+                        className="resume-chip"
+                      >
+                        {it}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
           </SidebarSection>
 
           <SidebarSection label={t.resume.education}>
-            <div className="space-y-2.5">
+            <ol className="resume-edu">
               {education.map((e) => (
-                <div key={e.title} className="print-keep">
+                <li key={e.title} className="print-keep">
+                  <span className="resume-edu-dot" aria-hidden />
                   <p className="text-[9.5pt] font-semibold leading-snug">
                     {e.title}
                   </p>
-                  <p className="text-[8.5pt] opacity-85 leading-snug">
+                  <p className="text-[8.75pt] opacity-90 leading-snug">
                     {e.org}
                   </p>
-                  <p className="text-[8pt] opacity-70 leading-snug">
-                    {e.period}
-                  </p>
-                </div>
+                  <span className="resume-edu-period">{e.period}</span>
+                </li>
               ))}
-            </div>
+            </ol>
           </SidebarSection>
         </aside>
 

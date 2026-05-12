@@ -280,6 +280,71 @@ a, button { outline-offset: 4px; }
   justify-content: space-between;
 }
 
+/* Sidebar — skill chips */
+.resume-chip {
+  display: inline-block;
+  font-size: 8.25pt;
+  line-height: 1.2;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #f1f5f9;
+  white-space: nowrap;
+}
+
+/* Sidebar — education timeline */
+.resume-edu {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 11px;
+}
+.resume-edu::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 5px;
+  bottom: 5px;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    rgba(165, 180, 252, 0.7),
+    rgba(103, 232, 249, 0.55),
+    rgba(252, 211, 77, 0.45)
+  );
+}
+.resume-edu > li {
+  position: relative;
+  padding: 0 0 7px;
+}
+.resume-edu > li + li { padding-top: 4px; }
+.resume-edu > li:last-child { padding-bottom: 0; }
+
+.resume-edu-dot {
+  position: absolute;
+  left: -12px;
+  top: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #a5b4fc, #67e8f9);
+  box-shadow: 0 0 0 2px #0f172a;
+}
+
+.resume-edu-period {
+  display: inline-block;
+  margin-top: 3px;
+  font-size: 8pt;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #67e8f9;
+  background: rgba(103, 232, 249, 0.1);
+  border: 1px solid rgba(103, 232, 249, 0.25);
+  border-radius: 9999px;
+  padding: 1px 7px;
+}
+
 .km .resume-page,
 :lang(km) .resume-page {
   font-family: var(--font-noto-khmer), "Noto Sans Khmer", var(--font-sans), ui-sans-serif, system-ui, sans-serif;
@@ -301,7 +366,10 @@ a, button { outline-offset: 4px; }
     width: 100% !important;
     min-height: 0 !important;
   }
-  .resume-sidebar {
+  .resume-sidebar,
+  .resume-chip,
+  .resume-edu-dot,
+  .resume-edu-period {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
