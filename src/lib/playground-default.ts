@@ -4,9 +4,7 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
 <meta charset="utf-8" />
 <style>
   :root {
-    --scene-w: min(100vw, 1200px);
-    --scene-h: 100vh;
-    --u: min(1vw, 12px);          /* responsive base unit */
+    --u: min(1vw, 12px);   /* responsive base unit */
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; overflow: hidden; }
@@ -23,15 +21,13 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
         #062017 100%);
     position: relative;
   }
-
   .stage { position: absolute; inset: 0; }
 
-  /* ============== Stars ============== */
+  /* ============ Stars ============ */
   .star {
     position: absolute;
     width: 2px; height: 2px;
-    background: #fff;
-    border-radius: 50%;
+    background: #fff; border-radius: 50%;
     box-shadow: 0 0 4px #fff, 0 0 10px rgba(255,255,255,0.6);
     animation: twinkle 3.5s ease-in-out infinite;
   }
@@ -41,16 +37,14 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
     50%     { opacity: 1;    transform: scale(1); }
   }
 
-  /* ============== Moon ============== */
+  /* ============ Moon ============ */
   .moon-stage {
-    position: absolute;
-    top: 7%; right: 13%;
-    width: calc(var(--u) * 8); height: calc(var(--u) * 8);
-    min-width: 60px; min-height: 60px;
+    position: absolute; top: 6%; right: 12%;
+    width: calc(var(--u) * 7); height: calc(var(--u) * 7);
+    min-width: 54px; min-height: 54px;
   }
   .moon-halo {
-    position: absolute;
-    inset: -55%;
+    position: absolute; inset: -55%;
     border-radius: 50%;
     background: radial-gradient(circle, rgba(254,243,199,0.45) 0%, rgba(252,211,77,0.18) 35%, transparent 65%);
     animation: halo 6s ease-in-out infinite;
@@ -66,18 +60,16 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
   }
   @keyframes halo { 0%,100% { opacity: 0.9; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } }
 
-  /* ============== Mountains ============== */
+  /* ============ Mountains ============ */
   .mountains {
     position: absolute; left: 0; right: 0;
-    bottom: 28%; height: 18%;
+    bottom: 32%; height: 16%;
   }
   .mountains svg { width: 100%; height: 100%; display: block; }
 
-  /* ============== Mist ============== */
+  /* ============ Mist ============ */
   .mist {
-    position: absolute;
-    left: -10%; right: -10%; bottom: 26%;
-    height: 12%;
+    position: absolute; left: -10%; right: -10%; bottom: 30%; height: 11%;
     background:
       radial-gradient(ellipse 30% 100% at 15% 50%, rgba(186,230,253,0.22), transparent 70%),
       radial-gradient(ellipse 32% 100% at 55% 70%, rgba(165,180,252,0.18), transparent 70%),
@@ -87,15 +79,13 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
   }
   @keyframes drift { 0% { transform: translateX(-25px); } 100% { transform: translateX(25px); } }
 
-  /* ============== Ground ============== */
+  /* ============ Ground ============ */
   .ground {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 28%;
+    position: absolute; bottom: 0; left: 0; right: 0; height: 32%;
     background: linear-gradient(to bottom,
       rgba(6,78,59,0)   0%,
-      rgba(6,78,59,0.65) 10%,
-      rgba(4,55,42,0.95) 35%,
+      rgba(6,78,59,0.65) 8%,
+      rgba(4,55,42,0.95) 32%,
       rgba(2,28,21,1)   100%);
   }
   .ground::before {
@@ -103,14 +93,12 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
     background: radial-gradient(ellipse 60% 16% at 50% 0%, rgba(34,197,94,0.22), transparent 70%);
   }
 
-  /* ============== Grass blades ============== */
+  /* ============ Grass blades ============ */
   .grass { position: absolute; left: 0; right: 0; pointer-events: none; }
-  .grass.back  { bottom: 25%; height: 16px; opacity: 0.7; filter: blur(0.4px); }
-  .grass.front { bottom: 24%; height: 22px; }
+  .grass.back  { bottom: 29%; height: 14px; opacity: 0.7; filter: blur(0.4px); }
+  .grass.front { bottom: 28%; height: 20px; }
   .blade {
-    position: absolute;
-    bottom: 0;
-    width: 3px;
+    position: absolute; bottom: 0; width: 3px;
     background: linear-gradient(to top, #052e1a, #166534, #22c55e);
     border-radius: 50% 50% 30% 30% / 80% 80% 20% 20%;
     transform-origin: bottom center;
@@ -118,87 +106,108 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
   }
   @keyframes bladeSway { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
 
-  /* ============== Plant / flower stem & leaves ============== */
+  /* ============ Plant ============ */
   .plant {
-    position: absolute;
-    bottom: 25%;
+    position: absolute; bottom: 28%;
     transform-origin: bottom center;
     animation: plantSway 7s ease-in-out infinite;
   }
   @keyframes plantSway { 0%,100% { transform: rotate(-1.4deg); } 50% { transform: rotate(1.4deg); } }
 
-  .stem {
-    position: absolute;
-    bottom: 0; left: 50%;
-    width: 4px; height: 100%;
+  /* Main trunk — vertical, thicker */
+  .trunk {
+    position: absolute; bottom: 0; left: 50%;
+    width: 5px; height: 100%;
     background:
       linear-gradient(90deg, rgba(0,0,0,0.35) 0%, transparent 35%, rgba(255,255,255,0.18) 60%, transparent 80%),
-      linear-gradient(to top, #052e1a 0%, #14532d 35%, #15803d 70%, #22c55e 100%);
+      linear-gradient(to top, #052e1a 0%, #14532d 35%, #166534 70%, #22c55e 100%);
     border-radius: 3px;
     transform: translateX(-50%) scaleY(0);
     transform-origin: bottom center;
-    animation: grow 2.2s cubic-bezier(.2,.7,.2,1) forwards;
+    animation: grow 2s cubic-bezier(.2,.7,.2,1) forwards;
     box-shadow: 0 0 6px rgba(34,197,94,0.35);
   }
   @keyframes grow { to { transform: translateX(-50%) scaleY(1); } }
 
-  /* Leaves are anchored along the stem (centre 50%) so they sway with the plant */
+  /* Arm — a branch that rotates outward; trunk-to-bloom */
+  .arm {
+    position: absolute; left: 50%;
+    bottom: var(--ab, 55%);
+    height: var(--ah, 24%);
+    width: 0;
+    transform: translateX(-50%) rotate(var(--an, 25deg));
+    transform-origin: bottom center;
+  }
+  .arm-stem {
+    position: absolute; bottom: 0; left: -1.5px;
+    width: 3px; height: 100%;
+    background:
+      linear-gradient(90deg, rgba(0,0,0,0.3) 0%, transparent 40%, rgba(255,255,255,0.12) 60%, transparent 85%),
+      linear-gradient(to top, #14532d 0%, #166534 50%, #22c55e 100%);
+    border-radius: 2px;
+    transform: scaleY(0);
+    transform-origin: bottom center;
+    animation: grow 1.5s cubic-bezier(.2,.7,.2,1) forwards;
+    animation-delay: 1.2s;
+  }
+
+  /* Leaves anchored to trunk axis */
   .leaf {
-    position: absolute;
-    left: 50%;
-    width: calc(var(--u) * 3); height: calc(var(--u) * 1.4);
-    min-width: 22px; min-height: 10px;
+    position: absolute; left: 50%;
+    width: calc(var(--u) * 2.6); height: calc(var(--u) * 1.2);
+    min-width: 20px; min-height: 9px;
     transform-origin: 0 50%;
     opacity: 0;
     animation: leafPop 1.3s cubic-bezier(.2,.7,.2,1) forwards;
   }
   .leaf-body {
     position: absolute; inset: 0;
-    background:
-      linear-gradient(180deg, #4ade80 0%, #16a34a 45%, #052e1a 100%);
+    background: linear-gradient(180deg, #4ade80 0%, #16a34a 45%, #052e1a 100%);
     border-radius: 100% 70% 60% 100% / 100% 60% 100% 100%;
     box-shadow:
       inset -2px -2px 4px rgba(0,0,0,0.45),
       inset 2px 2px 3px rgba(255,255,255,0.18);
   }
   .leaf-body::after {
-    content: "";
-    position: absolute; left: 6%; top: 50%;
+    content: ""; position: absolute; left: 6%; top: 50%;
     width: 80%; height: 1px;
     background: linear-gradient(to right, rgba(255,255,255,0.5), transparent);
     transform: translateY(-50%);
   }
-  .leaf.l1 { bottom: 38%; transform: rotate(28deg) scale(0);  animation-delay: 1.5s; }
-  .leaf.l2 { bottom: 55%; transform: rotate(-28deg) scale(0); animation-delay: 1.8s; }
+  .leaf.l1 { bottom: 26%; transform: rotate(28deg) scale(0);  animation-delay: 1.6s; --lr: 28deg;  }
+  .leaf.l2 { bottom: 40%; transform: rotate(-28deg) scale(0); animation-delay: 1.9s; --lr: -28deg; }
   .leaf.l2 .leaf-body { transform: scaleX(-1); }
-  @keyframes leafPop {
-    to { opacity: 1; transform: rotate(var(--lr)) scale(1); }
-  }
-  .leaf.l1 { --lr: 28deg; }
-  .leaf.l2 { --lr: -28deg; }
+  @keyframes leafPop { to { opacity: 1; transform: rotate(var(--lr)) scale(1); } }
 
-  /* ============== Flower head ============== */
+  /* ============ Bloom (flower head) ============ */
   .bloom {
-    position: absolute; left: 50%;
-    width: calc(var(--u) * 11);
-    height: calc(var(--u) * 11);
-    min-width: 88px; min-height: 88px;
-    transform: translateX(-50%);
+    position: absolute;
+    width: calc(var(--u) * 9); height: calc(var(--u) * 9);
+    min-width: 70px; min-height: 70px;
     opacity: 0;
     animation: bloomFade 1.2s ease-out forwards;
-    animation-delay: 2.3s;
+    animation-delay: 2.4s;
   }
-  @keyframes bloomFade { to { opacity: 1; } }
   .bloom svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  @keyframes bloomFade { to { opacity: 1; } }
 
-  /* Flower sizes per plant */
-  .plant.p1 .bloom { top: calc(var(--u) * -6); }
-  .plant.p2 .bloom { width: calc(var(--u) * 12); height: calc(var(--u) * 12); top: calc(var(--u) * -7); min-width: 96px; min-height: 96px; }
-  .plant.p3 .bloom { width: calc(var(--u) * 13); height: calc(var(--u) * 13); top: calc(var(--u) * -7.5); min-width: 104px; min-height: 104px; }
-  .plant.p4 .bloom { width: calc(var(--u) * 11.5); height: calc(var(--u) * 11.5); top: calc(var(--u) * -6.5); min-width: 92px; min-height: 92px; }
-  .plant.p5 .bloom { width: calc(var(--u) * 10); height: calc(var(--u) * 10); top: calc(var(--u) * -5.5); min-width: 80px; min-height: 80px; }
+  /* Main bloom (top of trunk) */
+  .bloom.main {
+    left: 50%;
+    top: calc(var(--u) * -5);
+    transform: translateX(-50%);
+  }
+  /* Arm bloom — sits at the tip of the arm, counter-rotated to stay upright */
+  .arm .bloom {
+    top: 0; left: 50%;
+    width: calc(var(--u) * 7.5); height: calc(var(--u) * 7.5);
+    min-width: 56px; min-height: 56px;
+    transform: translate(-50%, -50%);
+    rotate: calc(var(--an, 0deg) * -1);
+    animation-delay: 2.7s;
+  }
 
-  /* Aura glow behind the flower */
+  /* Aura backing each bloom */
   .aura {
     position: absolute; inset: -25%;
     border-radius: 50%;
@@ -215,29 +224,24 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
   .sky    .aura { background: radial-gradient(circle, rgba(56,189,248,0.55), transparent 70%); }
   .ruby   .aura { background: radial-gradient(circle, rgba(239,68,68,0.55),  transparent 70%); }
 
-  /* Ground shadow under each plant */
   .ground-shadow {
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    width: calc(var(--u) * 6);
-    height: 8px;
+    position: absolute; bottom: -8px; left: 50%;
+    width: calc(var(--u) * 5); height: 8px;
     transform: translateX(-50%);
     background: radial-gradient(ellipse at center, rgba(0,0,0,0.4), transparent 70%);
     filter: blur(2px);
   }
 
-  /* Plant positions */
-  .plant.p1 { left: 12%; height: 50%; animation-delay: 0s;   }
-  .plant.p2 { left: 28%; height: 60%; animation-delay: 1.2s; }
-  .plant.p3 { left: 48%; height: 56%; animation-delay: 0.5s; }
-  .plant.p4 { left: 68%; height: 64%; animation-delay: 1.8s; }
-  .plant.p5 { left: 86%; height: 46%; animation-delay: 0.9s; }
+  /* Plant positions + heights (shorter, more natural proportions) */
+  .plant.p1 { left: 12%; height: 38%; animation-delay: 0s;   }
+  .plant.p2 { left: 30%; height: 44%; animation-delay: 1.2s; }
+  .plant.p3 { left: 50%; height: 40%; animation-delay: 0.5s; }
+  .plant.p4 { left: 68%; height: 46%; animation-delay: 1.8s; }
+  .plant.p5 { left: 86%; height: 36%; animation-delay: 0.9s; }
 
-  /* ============== Particles ============== */
+  /* ============ Particles ============ */
   .firefly {
-    position: absolute;
-    width: 4px; height: 4px;
+    position: absolute; width: 4px; height: 4px;
     border-radius: 50%;
     background: #fef3c7;
     box-shadow: 0 0 10px #fef3c7, 0 0 24px rgba(252,211,77,0.7);
@@ -252,8 +256,7 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
     100% { transform: translate(var(--fmx2,-10px), var(--fmy2,-110px)) scale(0.8); opacity: 0; }
   }
   .pollen {
-    position: absolute;
-    width: 2px; height: 2px;
+    position: absolute; width: 2px; height: 2px;
     background: rgba(254,243,199,0.85);
     border-radius: 50%;
     box-shadow: 0 0 4px rgba(252,211,77,0.6);
@@ -295,7 +298,6 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
       </svg>
     </div>
 
-    <!-- Mist + ground + grass -->
     <div class="mist"></div>
     <div class="ground"></div>
 
@@ -314,40 +316,34 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
       <span class="blade" style="left: 92%; height: 12px; animation-delay: 1.4s;"></span>
     </div>
     <div class="grass front">
-      <span class="blade" style="left: 6%;  height: 20px; animation-delay: 0.2s;"></span>
-      <span class="blade" style="left: 14%; height: 18px; animation-delay: 0.5s;"></span>
-      <span class="blade" style="left: 22%; height: 22px; animation-delay: 0.8s;"></span>
-      <span class="blade" style="left: 32%; height: 19px; animation-delay: 1.1s;"></span>
-      <span class="blade" style="left: 42%; height: 21px; animation-delay: 1.4s;"></span>
-      <span class="blade" style="left: 52%; height: 18px; animation-delay: 1.7s;"></span>
-      <span class="blade" style="left: 62%; height: 22px; animation-delay: 2.0s;"></span>
-      <span class="blade" style="left: 74%; height: 19px; animation-delay: 0.6s;"></span>
-      <span class="blade" style="left: 88%; height: 20px; animation-delay: 0.9s;"></span>
+      <span class="blade" style="left: 6%;  height: 18px; animation-delay: 0.2s;"></span>
+      <span class="blade" style="left: 14%; height: 16px; animation-delay: 0.5s;"></span>
+      <span class="blade" style="left: 22%; height: 20px; animation-delay: 0.8s;"></span>
+      <span class="blade" style="left: 32%; height: 17px; animation-delay: 1.1s;"></span>
+      <span class="blade" style="left: 42%; height: 19px; animation-delay: 1.4s;"></span>
+      <span class="blade" style="left: 52%; height: 16px; animation-delay: 1.7s;"></span>
+      <span class="blade" style="left: 62%; height: 20px; animation-delay: 2.0s;"></span>
+      <span class="blade" style="left: 74%; height: 17px; animation-delay: 0.6s;"></span>
+      <span class="blade" style="left: 88%; height: 18px; animation-delay: 0.9s;"></span>
     </div>
 
-    <!-- Shared SVG defs (gradients + filters) — reused by each flower below -->
+    <!-- Shared SVG defs -->
     <svg width="0" height="0" style="position:absolute">
       <defs>
-        <!-- Drop shadow + glow filter for the flower head -->
         <filter id="petalShadow" x="-30%" y="-30%" width="160%" height="160%">
           <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
           <feOffset dx="0" dy="3" result="off"/>
           <feFlood flood-color="#000" flood-opacity="0.45"/>
           <feComposite in2="off" operator="in"/>
-          <feMerge>
-            <feMergeNode/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
+          <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
 
-        <!-- Specular sheen overlay -->
         <radialGradient id="sheen" cx="35%" cy="25%" r="55%">
           <stop offset="0%"  stop-color="rgba(255,255,255,0.85)"/>
           <stop offset="40%" stop-color="rgba(255,255,255,0.18)"/>
           <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
         </radialGradient>
 
-        <!-- Petal palettes — each has a top highlight, mid body and dark base for 3D feel -->
         <linearGradient id="g-pink-front" x1="50%" y1="0%" x2="50%" y2="100%">
           <stop offset="0%"  stop-color="#fff1f5"/>
           <stop offset="18%" stop-color="#fbcfe8"/>
@@ -413,7 +409,6 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
           <stop offset="100%" stop-color="#220404"/>
         </linearGradient>
 
-        <!-- 3D sun-core gradient (used by every flower's center) -->
         <radialGradient id="g-core" cx="32%" cy="32%" r="70%">
           <stop offset="0%"  stop-color="#ffffff"/>
           <stop offset="20%" stop-color="#fef3c7"/>
@@ -422,22 +417,12 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
           <stop offset="100%" stop-color="#451a03"/>
         </radialGradient>
 
-        <!-- Petal shape — a teardrop that reads as 3D when paired with the gradients above -->
+        <!-- Petal shape -->
         <path id="petalShape" d="M0 -42 C 12 -38, 14 -18, 0 -6 C -14 -18, -12 -38, 0 -42 Z"/>
-      </defs>
-    </svg>
 
-    <!-- ============== FLOWERS ============== -->
-    <div class="plant p1 pink">
-      <div class="stem"></div>
-      <div class="ground-shadow"></div>
-      <div class="leaf l1"><div class="leaf-body"></div></div>
-      <div class="leaf l2"><div class="leaf-body"></div></div>
-      <div class="bloom">
-        <div class="aura"></div>
-        <svg viewBox="-60 -60 120 120">
+        <!-- Reusable bloom SYMBOLS so each plant can put multiple flowers cheaply -->
+        <symbol id="bloom-pink" viewBox="-60 -60 120 120">
           <g filter="url(#petalShadow)">
-            <!-- back row (slightly rotated, darker, slightly larger) -->
             <g opacity="0.92">
               <use href="#petalShape" fill="url(#g-pink-back)" transform="rotate(30) scale(1.1)"/>
               <use href="#petalShape" fill="url(#g-pink-back)" transform="rotate(90) scale(1.1)"/>
@@ -446,7 +431,6 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
               <use href="#petalShape" fill="url(#g-pink-back)" transform="rotate(270) scale(1.1)"/>
               <use href="#petalShape" fill="url(#g-pink-back)" transform="rotate(330) scale(1.1)"/>
             </g>
-            <!-- front row -->
             <g>
               <use href="#petalShape" fill="url(#g-pink-front)" transform="rotate(0)"/>
               <use href="#petalShape" fill="url(#g-pink-front)" transform="rotate(60)"/>
@@ -456,21 +440,11 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
               <use href="#petalShape" fill="url(#g-pink-front)" transform="rotate(300)"/>
             </g>
           </g>
-          <!-- center sphere with 3D lighting -->
           <circle r="13" fill="url(#g-core)" filter="url(#petalShadow)"/>
           <circle r="13" fill="url(#sheen)"/>
-        </svg>
-      </div>
-    </div>
+        </symbol>
 
-    <div class="plant p2 violet">
-      <div class="stem"></div>
-      <div class="ground-shadow"></div>
-      <div class="leaf l1"><div class="leaf-body"></div></div>
-      <div class="leaf l2"><div class="leaf-body"></div></div>
-      <div class="bloom">
-        <div class="aura"></div>
-        <svg viewBox="-60 -60 120 120">
+        <symbol id="bloom-violet" viewBox="-60 -60 120 120">
           <g filter="url(#petalShadow)">
             <g opacity="0.92">
               <use href="#petalShape" fill="url(#g-violet-back)" transform="rotate(22.5) scale(1.1)"/>
@@ -495,18 +469,9 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
           </g>
           <circle r="13" fill="url(#g-core)" filter="url(#petalShadow)"/>
           <circle r="13" fill="url(#sheen)"/>
-        </svg>
-      </div>
-    </div>
+        </symbol>
 
-    <div class="plant p3 sun">
-      <div class="stem"></div>
-      <div class="ground-shadow"></div>
-      <div class="leaf l1"><div class="leaf-body"></div></div>
-      <div class="leaf l2"><div class="leaf-body"></div></div>
-      <div class="bloom">
-        <div class="aura"></div>
-        <svg viewBox="-60 -60 120 120">
+        <symbol id="bloom-sun" viewBox="-60 -60 120 120">
           <g filter="url(#petalShadow)">
             <g opacity="0.92">
               <use href="#petalShape" fill="url(#g-sun-back)" transform="rotate(30) scale(1.12)"/>
@@ -527,18 +492,9 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
           </g>
           <circle r="14" fill="url(#g-core)" filter="url(#petalShadow)"/>
           <circle r="14" fill="url(#sheen)"/>
-        </svg>
-      </div>
-    </div>
+        </symbol>
 
-    <div class="plant p4 sky">
-      <div class="stem"></div>
-      <div class="ground-shadow"></div>
-      <div class="leaf l1"><div class="leaf-body"></div></div>
-      <div class="leaf l2"><div class="leaf-body"></div></div>
-      <div class="bloom">
-        <div class="aura"></div>
-        <svg viewBox="-60 -60 120 120">
+        <symbol id="bloom-sky" viewBox="-60 -60 120 120">
           <g filter="url(#petalShadow)">
             <g opacity="0.92">
               <use href="#petalShape" fill="url(#g-sky-back)" transform="rotate(36) scale(1.1)"/>
@@ -557,18 +513,9 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
           </g>
           <circle r="12" fill="url(#g-core)" filter="url(#petalShadow)"/>
           <circle r="12" fill="url(#sheen)"/>
-        </svg>
-      </div>
-    </div>
+        </symbol>
 
-    <div class="plant p5 ruby">
-      <div class="stem"></div>
-      <div class="ground-shadow"></div>
-      <div class="leaf l1"><div class="leaf-body"></div></div>
-      <div class="leaf l2"><div class="leaf-body"></div></div>
-      <div class="bloom">
-        <div class="aura"></div>
-        <svg viewBox="-60 -60 120 120">
+        <symbol id="bloom-ruby" viewBox="-60 -60 120 120">
           <g filter="url(#petalShadow)">
             <g opacity="0.92">
               <use href="#petalShape" fill="url(#g-ruby-back)" transform="rotate(30) scale(1.1)"/>
@@ -589,8 +536,82 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
           </g>
           <circle r="12" fill="url(#g-core)" filter="url(#petalShadow)"/>
           <circle r="12" fill="url(#sheen)"/>
-        </svg>
+        </symbol>
+      </defs>
+    </svg>
+
+    <!-- ============ PLANTS ============ -->
+    <!-- p1 (pink) — main + 1 right arm -->
+    <div class="plant p1 pink">
+      <div class="trunk"></div>
+      <div class="ground-shadow"></div>
+      <div class="leaf l1"><div class="leaf-body"></div></div>
+      <div class="leaf l2"><div class="leaf-body"></div></div>
+      <div class="arm" style="--an: 32deg; --ab: 52%; --ah: 30%;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-pink"/></svg></div>
       </div>
+      <div class="bloom main"><div class="aura"></div><svg><use href="#bloom-pink"/></svg></div>
+    </div>
+
+    <!-- p2 (violet) — main + 2 arms (tallest plant) -->
+    <div class="plant p2 violet">
+      <div class="trunk"></div>
+      <div class="ground-shadow"></div>
+      <div class="leaf l1"><div class="leaf-body"></div></div>
+      <div class="leaf l2"><div class="leaf-body"></div></div>
+      <div class="arm" style="--an: -28deg; --ab: 45%; --ah: 32%;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-violet"/></svg></div>
+      </div>
+      <div class="arm" style="--an: 26deg; --ab: 58%; --ah: 28%;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-violet"/></svg></div>
+      </div>
+      <div class="bloom main"><div class="aura"></div><svg><use href="#bloom-violet"/></svg></div>
+    </div>
+
+    <!-- p3 (sun) — main + 1 left arm -->
+    <div class="plant p3 sun">
+      <div class="trunk"></div>
+      <div class="ground-shadow"></div>
+      <div class="leaf l1"><div class="leaf-body"></div></div>
+      <div class="leaf l2"><div class="leaf-body"></div></div>
+      <div class="arm" style="--an: -30deg; --ab: 50%; --ah: 30%;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-sun"/></svg></div>
+      </div>
+      <div class="bloom main"><div class="aura"></div><svg><use href="#bloom-sun"/></svg></div>
+    </div>
+
+    <!-- p4 (sky) — main + 2 arms -->
+    <div class="plant p4 sky">
+      <div class="trunk"></div>
+      <div class="ground-shadow"></div>
+      <div class="leaf l1"><div class="leaf-body"></div></div>
+      <div class="leaf l2"><div class="leaf-body"></div></div>
+      <div class="arm" style="--an: 30deg; --ab: 42%; --ah: 32%;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-sky"/></svg></div>
+      </div>
+      <div class="arm" style="--an: -25deg; --ab: 55%; --ah: 28%;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-sky"/></svg></div>
+      </div>
+      <div class="bloom main"><div class="aura"></div><svg><use href="#bloom-sky"/></svg></div>
+    </div>
+
+    <!-- p5 (ruby) — main + 1 right arm -->
+    <div class="plant p5 ruby">
+      <div class="trunk"></div>
+      <div class="ground-shadow"></div>
+      <div class="leaf l1"><div class="leaf-body"></div></div>
+      <div class="leaf l2"><div class="leaf-body"></div></div>
+      <div class="arm" style="--an: 28deg; --ab: 48%; --ah: 30%;">
+        <div class="arm-stem"></div>
+        <div class="bloom"><div class="aura"></div><svg><use href="#bloom-ruby"/></svg></div>
+      </div>
+      <div class="bloom main"><div class="aura"></div><svg><use href="#bloom-ruby"/></svg></div>
     </div>
 
     <!-- Fireflies -->
@@ -601,11 +622,11 @@ export const DEFAULT_PLAYGROUND_CODE = `<!doctype html>
     <span class="firefly" style="left: 88%; top: 58%; --fmx:  20px; --fmy: -90px; --fmx2: -30px; --fmy2: -140px; animation-delay: 6s;"></span>
 
     <!-- Pollen -->
-    <span class="pollen" style="left: 12%; bottom: 28%; --px:  60px; animation-delay: 0.5s;"></span>
-    <span class="pollen" style="left: 30%; bottom: 28%; --px: -40px; animation-delay: 2.5s;"></span>
-    <span class="pollen" style="left: 48%; bottom: 28%; --px:  50px; animation-delay: 4.5s;"></span>
-    <span class="pollen" style="left: 66%; bottom: 28%; --px: -30px; animation-delay: 6.5s;"></span>
-    <span class="pollen" style="left: 82%; bottom: 28%; --px:  40px; animation-delay: 1.5s;"></span>
+    <span class="pollen" style="left: 12%; bottom: 32%; --px:  60px; animation-delay: 0.5s;"></span>
+    <span class="pollen" style="left: 30%; bottom: 32%; --px: -40px; animation-delay: 2.5s;"></span>
+    <span class="pollen" style="left: 48%; bottom: 32%; --px:  50px; animation-delay: 4.5s;"></span>
+    <span class="pollen" style="left: 66%; bottom: 32%; --px: -30px; animation-delay: 6.5s;"></span>
+    <span class="pollen" style="left: 82%; bottom: 32%; --px:  40px; animation-delay: 1.5s;"></span>
 
   </div>
 </body>
