@@ -28,12 +28,7 @@ export default function InternalWork() {
                 aria-hidden
                 className={`absolute -left-[14px] sm:-left-[10px] top-5 inline-block h-3.5 w-3.5 rounded-full bg-gradient-to-br ${p.accent} ring-4 ring-slate-950 shadow-lg`}
               />
-              <article className="group glass card-hover relative overflow-hidden rounded-2xl p-5 sm:p-6">
-                <div
-                  aria-hidden
-                  className={`pointer-events-none absolute -inset-px -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br ${p.accent} blur-2xl`}
-                />
-
+              <article className="glass card-hover relative overflow-hidden rounded-2xl p-5 sm:p-6">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.15em] text-white/50">

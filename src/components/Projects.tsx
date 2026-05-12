@@ -20,13 +20,8 @@ export default function Projects() {
           {projects.map((p) => (
             <article
               key={p.slug}
-              className="group glass card-hover relative overflow-hidden rounded-2xl p-6"
+              className="glass card-hover relative overflow-hidden rounded-2xl p-6"
             >
-              <div
-                aria-hidden
-                className={`pointer-events-none absolute -inset-px -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br ${p.accent} blur-2xl`}
-              />
-
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-xl bg-white/[0.04] border border-white/10 overflow-hidden flex items-center justify-center">

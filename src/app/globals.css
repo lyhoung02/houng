@@ -153,12 +153,28 @@ body {
 .scroll-x::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 9999px; }
 
 .card-hover {
-  transition: transform 0.35s cubic-bezier(.2,.7,.2,1), box-shadow 0.35s ease, border-color 0.35s ease;
+  transition: transform 0.4s cubic-bezier(.2,.7,.2,1), box-shadow 0.4s ease, border-color 0.4s ease, background-color 0.4s ease;
 }
 .card-hover:hover {
-  transform: translateY(-4px);
-  border-color: rgba(165, 180, 252, 0.4);
-  box-shadow: 0 20px 60px -20px rgba(99, 102, 241, 0.45);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.45);
+}
+.light .card-hover:hover {
+  border-color: rgba(15, 23, 42, 0.18);
+  box-shadow: 0 10px 30px -18px rgba(15, 23, 42, 0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-hover,
+  .card-hover:hover,
+  .reveal,
+  .float,
+  .pulse-dot::before {
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
 
 a, button { outline-offset: 4px; }
