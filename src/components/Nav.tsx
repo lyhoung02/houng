@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useT } from "./providers/LanguageProvider";
-import { LanguageToggle, ThemeToggle } from "./ThemeLangToggles";
+import PreferencesMenu from "./PreferencesMenu";
 
 export default function Nav() {
   const t = useT();
@@ -61,10 +61,7 @@ export default function Nav() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <div className="hidden sm:flex items-center gap-2">
-            <LanguageToggle />
-            <ThemeToggle compact />
-          </div>
+          <PreferencesMenu />
           <a
             href="#contact"
             className="hidden md:inline-flex rounded-full bg-white text-slate-950 px-4 py-1.5 text-sm font-medium hover:bg-white/90 transition"
@@ -103,10 +100,6 @@ export default function Nav() {
                 {l.label}
               </a>
             ))}
-            <div className="mt-1 flex flex-wrap items-center gap-2 sm:hidden">
-              <LanguageToggle />
-              <ThemeToggle />
-            </div>
             <a
               href="#contact"
               onClick={() => setOpen(false)}
