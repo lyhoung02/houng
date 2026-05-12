@@ -89,6 +89,28 @@ export const experience = [
       "Collaborating across backend, mobile, and ops — using GitLab, Docker, and Sentry to keep deliveries predictable.",
     ],
   },
+  {
+    role: "Developer (Freelance)",
+    company: "Max Freelance Team",
+    period: "Jun — Dec 2025",
+    location: "Remote · Phnom Penh",
+    bullets: [
+      "Joined Max's freelance team to build a House IoT product — smart-home device control, telemetry, and a companion mobile experience.",
+      "Worked on the developer side end-to-end: device integration, data pipelines from sensors, and feature flows in the app.",
+      "Coordinated with a distributed freelance team on delivery cadence, code reviews, and shared environments.",
+    ],
+  },
+  {
+    role: "UX / UI Designer (Freelance)",
+    company: "Freelance Team · RUPP Students",
+    period: "Feb — Apr 2024",
+    location: "Phnom Penh",
+    bullets: [
+      "Joined a freelance team of RUPP (Royal University of Phnom Penh) students to design an Online Coffee Shop website.",
+      "Led UX flows and high-fidelity UI: home, menu, product detail, cart, and checkout — including responsive behavior.",
+      "Produced design specs and handed off assets to the engineering side of the team.",
+    ],
+  },
 ];
 
 export const projects: Project[] = [
