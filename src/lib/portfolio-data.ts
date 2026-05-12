@@ -29,7 +29,7 @@ export const profile = {
     { label: "Production projects", value: "4+" },
     { label: "Years coding", value: "3+" },
     { label: "Roles covered", value: "Backend · Frontend · Mobile" },
-    { label: "Open to", value: "Full-time / Outsourcing" },
+    { label: "Open to", value: "Full-time · Part-time · Outsourcing" },
   ],
 };
 

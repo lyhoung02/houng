@@ -83,7 +83,7 @@ const en = {
       eyebrow: "Internal · E-Power CCL",
       title: "The hard, challenging builds behind the scenes.",
       description:
-        "Internal systems, integrations, and SDK work — the kind of code customers never see, but the business runs on.",
+        "Internal systems, integrations, and SDK work — the kind of code customers never see, but that the business depends on.",
       difficulty: {
         Challenging: "Challenging",
         Hard: "Hard",
@@ -94,7 +94,7 @@ const en = {
       eyebrow: "Personal · Research",
       title: "Side projects I build to keep sharp.",
       description:
-        "Self-initiated builds and research projects — exploring product ideas, stacks, and patterns outside of day-job work.",
+        "Self-initiated builds and research projects — exploring product ideas, stacks, and patterns outside the day job.",
       status: {
         Research: "Research",
         Active: "Active",
@@ -169,7 +169,7 @@ const en = {
       suggestions: ["Are you available for hire?", "Show me your projects", "What's your stack?"],
       replies: {
         greeting:
-          "Hey! Glad you said hi. What brings you here today? Looking to hire, or just curious about my work?",
+          "Hey! Thanks for saying hi. What brings you here today — looking to hire, or just curious about my work?",
         hire:
           "Yes — I'm open to full-time roles and outsourcing. Drop me an email at povlyhoung02@gmail.com or scroll down to the Contact section.",
         projects:
@@ -214,28 +214,28 @@ const km: Messages = {
       menu: "ម៉ឺនុយ",
     },
     hero: {
-      availability: "ត្រៀមរួចសម្រាប់ការងារ · ពីចម្ងាយ / ភ្នំពេញ",
+      availability: "បើកទទួលការងារ · ពីចម្ងាយ / ភ្នំពេញ",
       greeting: "សួស្តី ខ្ញុំឈ្មោះ",
-      tagline: "វិស្វករដែលផ្តោតលើការដឹកនាំផលិតផលឲ្យចេញដំណើរការ។",
+      tagline: "វិស្វករដែលដឹកនាំការងារឲ្យចេញដំណើរការមែនទែន។",
       seeWork: "មើលការងាររបស់ខ្ញុំ",
       getInTouch: "ទាក់ទងមកខ្ញុំ",
       buildingAt: "· កំពុងធ្វើការនៅ E-Power CCL",
       stats: {
         projects: "គម្រោងផលិតផល",
         years: "ឆ្នាំសរសេរកូដ",
-        roles: "តួនាទីដែលធ្វើ",
+        roles: "តួនាទីដែលបានធ្វើ",
         rolesValue: "Backend · Frontend · Mobile",
         openTo: "បើកទទួល",
-        openToValue: "ពេញម៉ោង · ក្រៅម៉ោង · outsourcing",
+        openToValue: "ពេញម៉ោង · ក្រៅម៉ោង · Outsourcing",
       },
     },
     about: {
       eyebrow: "អំពីខ្ញុំ",
-      title: "វិស្វករដែលផ្តោតលើការដឹកនាំផលិតផលឲ្យចេញ។",
+      title: "វិស្វករដែលដឹកនាំការងារឲ្យចេញដំណើរការ។",
       services: {
         backend: {
           title: "Backend Engineering",
-          desc: "សាងសង់ REST API, រចនាមូលដ្ឋានទិន្នន័យ និង​ប្រព័ន្ធជាមួយ Node.js, .NET, និង SQL / PostgreSQL។",
+          desc: "បង្កើត REST API, រចនាមូលដ្ឋានទិន្នន័យ និងប្រព័ន្ធជាមួយ Node.js, .NET, និង SQL / PostgreSQL។",
         },
         frontend: {
           title: "Frontend & Web",
@@ -243,34 +243,34 @@ const km: Messages = {
         },
         mobile: {
           title: "Mobile (Flutter)",
-          desc: "សាងសង់កម្មវិធី iOS និង Android ឆ្លងវេទិកាជាមួយ Dart 3, REST API និង offline flow។",
+          desc: "បង្កើតកម្មវិធី iOS និង Android cross-platform ជាមួយ Dart 3, REST API និង offline flow។",
         },
         devops: {
           title: "DevOps & Cloud",
-          desc: "Docker, Kubernetes, AWS, Render, Supabase, Firebase — ដឹកនាំការដាក់ឲ្យដំណើរការ និងថែទាំ។",
+          desc: "Docker, Kubernetes, AWS, Render, Supabase, Firebase — ការដាក់ឲ្យដំណើរការ និងថែទាំ។",
         },
         ai: {
           title: "បង្កើតជាមួយ AI",
-          desc: "ធ្វើការគូជាមួយ Claude, ChatGPT, Gemini, Codex និង Grok ដើម្បីផលិតការងារលឿន។",
+          desc: "ធ្វើការជាគូជាមួយ Claude, ChatGPT, Gemini, Codex និង Grok ដើម្បីផលិតការងារកាន់តែលឿន។",
         },
         leadership: {
           title: "ដឹកនាំ & គ្រប់គ្រងគម្រោង",
-          desc: "គ្រប់គ្រងគម្រោង និងដឹកនាំក្រុមសម្រាប់ outsourcing — រៀបចំ ផែនការ ប្រគល់។",
+          desc: "គ្រប់គ្រងគម្រោង និងដឹកនាំក្រុមសម្រាប់ Outsourcing — កំណត់វិសាលភាព ផែនការ និងប្រគល់ការងារ។",
         },
       },
     },
     experience: {
       eyebrow: "បទពិសោធន៍ & ការអប់រំ",
-      title: "ចាប់ពីគ្រឹះក្នុងថ្នាក់រៀន ដល់​ផលិតផលផលិតកម្ម។",
+      title: "ពីគ្រឹះក្នុងថ្នាក់រៀន ដល់កូដនៅផលិតកម្ម។",
       work: "បទពិសោធន៍ការងារ",
       education: "ការអប់រំ & បណ្តុះបណ្តាល",
     },
     projects: {
-      eyebrow: "ការងារបានជ្រើសរើស",
-      title: "ផលិតផលពិត។ អ្នកប្រើពិត។ នៅផលិតកម្ម។",
+      eyebrow: "ការងារដែលបានជ្រើសរើស",
+      title: "ផលិតផលពិត។ អ្នកប្រើពិត។ កំពុងដំណើរការក្នុងផលិតកម្ម។",
       description:
-        "ផលិតផលបួនដែលខ្ញុំជួយសាងសង់ និងថែទាំនៅ E-Power CCL — គ្របដណ្តប់ Backend, Frontend និងការថែទាំ។",
-      cta: "ផលិតផលទាំងអស់ខាងលើនៅផលិតកម្ម — ហើយខ្ញុំនៅតែថែទាំទាំងបួន។",
+        "ផលិតផលបួនដែលខ្ញុំជួយបង្កើត និងថែទាំនៅ E-Power CCL — គ្របដណ្តប់ Backend, Frontend និងការថែទាំ។",
+      cta: "ផលិតផលទាំងអស់ខាងលើកំពុងដំណើរការក្នុងផលិតកម្ម — ហើយខ្ញុំនៅតែថែទាំទាំងបួន។",
       ctaSub: "ចង់ឃើញការពន្យល់លម្អិត ឬគំរូកូដ? ទាក់ទងខាងក្រោម។",
       ctaButton: "មកនិយាយគ្នា",
       roles: {
@@ -283,7 +283,7 @@ const km: Messages = {
       eyebrow: "ផ្ទៃក្នុង · E-Power CCL",
       title: "ការងារពិបាក និងប្រឈមនៅពីក្រោយឆាក។",
       description:
-        "ប្រព័ន្ធផ្ទៃក្នុង ការផ្សំ និង SDK — កូដដែលអ្នកប្រើមិនឃើញ ប៉ុន្តែអាជីវកម្មពឹងលើ។",
+        "ប្រព័ន្ធផ្ទៃក្នុង ការភ្ជាប់ និង SDK — កូដដែលអ្នកប្រើមិនឃើញ ប៉ុន្តែអាជីវកម្មពឹងផ្អែកលើ។",
       difficulty: {
         Challenging: "ប្រឈម",
         Hard: "ពិបាក",
@@ -292,9 +292,9 @@ const km: Messages = {
     },
     personal: {
       eyebrow: "ផ្ទាល់ខ្លួន · ការស្រាវជ្រាវ",
-      title: "គម្រោងផ្ទាល់ខ្លួនដើម្បីរក្សាជំនាញ។",
+      title: "គម្រោងផ្ទាល់ខ្លួនដែលខ្ញុំធ្វើដើម្បីរក្សាជំនាញ។",
       description:
-        "គម្រោងផ្តើមដោយខ្លួនឯង និងការស្រាវជ្រាវ — ស្វែងយល់គំនិតផលិតផល, stack និង pattern ក្រៅពីការងារប្រចាំថ្ងៃ។",
+        "គម្រោងផ្តួចផ្តើមដោយខ្លួនឯង និងការស្រាវជ្រាវ — ស្វែងយល់គំនិតផលិតផល, stack និង pattern ក្រៅពីការងារប្រចាំថ្ងៃ។",
       status: {
         Research: "ស្រាវជ្រាវ",
         Active: "កំពុងធ្វើ",
@@ -303,24 +303,24 @@ const km: Messages = {
     },
     skills: {
       eyebrow: "ជំនាញ & ឧបករណ៍",
-      title: "ឧបករណ៍ full-stack និង mobile សម្រាប់ការប្រើពិត។",
+      title: "ឧបករណ៍ full-stack និង mobile សម្រាប់ការប្រើប្រាស់ជាក់ស្តែង។",
       description:
-        "Stack ដែលខ្ញុំប្រើជារៀងរាល់ថ្ងៃ ដើម្បីរចនា សាងសង់ ប្រគល់ និងថែទាំ។",
+        "Stack ដែលខ្ញុំប្រើជារៀងរាល់ថ្ងៃ ដើម្បីរចនា បង្កើត ប្រគល់ និងថែទាំ។",
       groups: {
         Languages: "ភាសាសរសេរកម្មវិធី",
         "Frontend & Mobile": "Frontend & Mobile",
         "Backend & APIs": "Backend & API",
         Databases: "មូលដ្ឋានទិន្នន័យ",
         "DevOps & Cloud": "DevOps & Cloud",
-        "Tooling & Collaboration": "ឧបករណ៍ & សហការ",
+        "Tooling & Collaboration": "ឧបករណ៍ & ការសហការ",
         "Design & AI": "រចនា & AI",
       },
     },
     contact: {
       eyebrow: "មកធ្វើការជាមួយគ្នា",
-      title: "ជួលវិស្វករដែលដឹកនាំផលិតផលចេញ។",
+      title: "ជួលវិស្វករដែលដឹកនាំការងារឲ្យចេញដំណើរការរួចហើយ។",
       description:
-        "ខ្ញុំបើកសម្រាប់ការងារពេញម៉ោង, outsourcing mobile / web, និងគម្រោងខ្លី។ បើអ្នកត្រូវការអ្នករហ័សពេញ Backend, Frontend និង Mobile — សូមនិយាយគ្នា។",
+        "ខ្ញុំបើកទទួលការងារពេញម៉ោង, Outsourcing mobile / web, និងគម្រោងខ្លី។ បើអ្នកត្រូវការអ្នកដែលអាចធ្វើការរហ័សលើ Backend, Frontend និង Mobile — សូមមកនិយាយគ្នា។",
       emailMe: "ផ្ញើអ៊ីមែល",
       quickFacts: "ព័ត៌មានសង្ខេប",
       facts: {
@@ -337,7 +337,7 @@ const km: Messages = {
       },
     },
     footer: {
-      built: "សាងសង់ជាមួយ Next.js & Tailwind CSS។",
+      built: "បង្កើតជាមួយ Next.js & Tailwind CSS។",
       from: "រចនា & ប្រគល់ពី",
     },
     resume: {
@@ -347,7 +347,7 @@ const km: Messages = {
       summary: "ការសង្ខេប",
       experience: "បទពិសោធន៍",
       education: "ការអប់រំ & បណ្តុះបណ្តាល",
-      selectedProjects: "គម្រោងបានជ្រើសរើស",
+      selectedProjects: "គម្រោងដែលបានជ្រើសរើស",
       internalProjects: "គម្រោងផ្ទៃក្នុង · E-Power CCL",
       personalProjects: "គម្រោងផ្ទាល់ខ្លួន & ស្រាវជ្រាវ",
       skills: "ជំនាញ",
@@ -358,36 +358,36 @@ const km: Messages = {
       open: "ជជែកជាមួយខ្ញុំ",
       close: "បិទ",
       title: "Pov Lyhoung",
-      subtitle: "ឆ្លើយជាធម្មតាក្នុងពេលប៉ុន្មានម៉ោង",
+      subtitle: "ឆ្លើយតបជាធម្មតាក្នុងរយៈពេលពីរបីម៉ោង",
       status: "នៅលើបណ្តាញ",
       placeholder: "សរសេរសារ…",
       send: "ផ្ញើ",
-      demoNote: "ការសាកល្បង · ឆ្លើយតបជាគំរូ មុនពេលភ្ជាប់ backend",
+      demoNote: "ការបង្ហាញគំរូ · ឆ្លើយតបជាគំរូ មុនពេលភ្ជាប់ Backend",
       typing: "កំពុងវាយ…",
       welcome:
         "សួស្តី 👋 អរគុណដែលបានមកលេង! ខ្ញុំឈ្មោះ Lyhoung។ សួរអ្វីក៏បាន — អំពីគម្រោងរបស់ខ្ញុំ បច្ចេកវិទ្យាដែលខ្ញុំប្រើ ឬការងារ។",
-      suggestions: ["តើអ្នកអាចទទួលការងារទេ?", "បង្ហាញគម្រោងរបស់អ្នក", "Stack អ្វីខ្លះ?"],
+      suggestions: ["តើអ្នកអាចទទួលការងារដែរឬទេ?", "បង្ហាញគម្រោងរបស់អ្នក", "Stack អ្វីខ្លះ?"],
       replies: {
         greeting:
-          "សួស្តី! រីករាយដែលបានជួប។ តើមានអ្វីដែលអាចជួយបាន? កំពុងស្វែងរកជួល ឬគ្រាន់តែចង់ដឹង?",
+          "សួស្តី! រីករាយដែលបានជួប។ តើខ្ញុំអាចជួយអ្វីបាន? កំពុងស្វែងរកជួល ឬគ្រាន់តែចង់ដឹង?",
         hire:
-          "បាទ — ខ្ញុំបើកសម្រាប់ការងារពេញម៉ោង និង outsourcing។ ផ្ញើអ៊ីមែលមក povlyhoung02@gmail.com ឬមើលផ្នែក Contact ខាងក្រោម។",
+          "បាទ — ខ្ញុំបើកទទួលការងារពេញម៉ោង និង Outsourcing។ ផ្ញើអ៊ីមែលមក povlyhoung02@gmail.com ឬមើលផ្នែក Contact ខាងក្រោម។",
         projects:
-          "ខ្ញុំកំពុងធ្វើផលិតផលបួននៅ E-Power CCL — Solar, EAC App, ePower Maps, Mobile Billing។ គម្រោងផ្ទាល់ខ្លួន៖ JRMS, E-Commerce, SS Garage។ មើលផ្នែក Projects ខាងលើ 👆",
+          "ខ្ញុំកំពុងបង្កើតផលិតផលបួននៅ E-Power CCL — Solar, EAC App, ePower Maps, Mobile Billing។ គម្រោងផ្ទាល់ខ្លួន៖ JRMS, E-Commerce, SS Garage។ មើលផ្នែក Projects ខាងលើ 👆",
         stack:
-          "ភាគច្រើន Flutter, Next.js, Node.js, .NET, PostgreSQL, Docker។ បញ្ជីពេញមួយនៅផ្នែក Skills។",
-        phone: "បាន — ហៅទូរសព្ទមកលេខ +855 15-357 776 ឬ +855 89-826 667។",
+          "ភាគច្រើន Flutter, Next.js, Node.js, .NET, PostgreSQL, Docker។ បញ្ជីពេញនៅផ្នែក Skills។",
+        phone: "ប្រាកដ — ហៅទូរសព្ទមកលេខ +855 15-357 776 ឬ +855 89-826 667។",
         resume:
-          "មើល CV ពេញនៅ /resume — អាចបោះពុម្ពជា PDF ដែរ។",
+          "មើល CV ពេញនៅ /resume — អាចបោះពុម្ពជា PDF បានដែរ។",
         email:
           "សាធារណៈ៖ povlyhoung02@gmail.com · ការងារ៖ pov.lyhoung@e-power.com.kh",
-        thanks: "មិនអីទេ! ប្រាប់បើចង់ដឹងលម្អិតបន្ថែម។",
+        thanks: "មិនអីទេ! ប្រាប់ខ្ញុំបើចង់ដឹងលម្អិតបន្ថែម។",
         default:
           "អរគុណសម្រាប់សារ — ខ្ញុំនឹងឆ្លើយតបក្នុងពេលឆាប់ៗ។ ផ្ញើអ៊ីមែលមក povlyhoung02@gmail.com បានដែរ។",
       },
     },
     settings: {
-      theme: "របៀប",
+      theme: "ស្បែក",
       themeDark: "ងងឹត",
       themeLight: "ភ្លឺ",
       themeSystem: "តាមប្រព័ន្ធ",
