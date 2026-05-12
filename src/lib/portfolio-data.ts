@@ -282,6 +282,57 @@ export const internalProjects: InternalProject[] = [
     difficulty: "Challenging",
     accent: "from-amber-400 to-rose-400",
   },
+  {
+    slug: "eac-bill24",
+    period: "Jun 2025",
+    name: "EAC App · Bill24 Payment",
+    tagline: "Embedding the Bill24 SDK inside the EAC App",
+    description:
+      "Integrated the Bill24 payment SDK into the EAC App customer flow — letting end-users pay electricity bills directly from the app without leaving the experience.",
+    stack: ["Flutter", "Bill24 SDK", "Payment Integration", "EAC App"],
+    difficulty: "Challenging",
+    accent: "from-emerald-400 to-cyan-400",
+  },
+  {
+    slug: "mobile-billing-flutter",
+    period: "Aug 2025",
+    name: "Mobile Billing → Flutter",
+    tagline: "Kotlin single-platform → Flutter cross-platform redesign",
+    description:
+      "Redesigned Mobile Billing from a Kotlin single-platform app into a Flutter cross-platform build — same field-billing workflows, now running on both Android and iOS from one codebase.",
+    stack: ["Flutter", "Kotlin", "Cross-platform Migration", "Mobile Billing"],
+    difficulty: "Hard",
+    accent: "from-sky-400 to-violet-400",
+  },
+  {
+    slug: "epower-maps-flutter",
+    period: "Feb 2026",
+    name: "ePower Maps → Flutter (Online + Offline)",
+    tagline: "Kotlin → Flutter rewrite with online & offline support",
+    description:
+      "Rebuilt ePower Maps from Kotlin into Flutter, adding full offline support so field crews can keep working without network — local data store, sync on reconnect, and conflict handling.",
+    stack: [
+      "Flutter",
+      "Kotlin",
+      "Offline-first",
+      "Local Storage",
+      "Sync",
+      "Maps SDK",
+    ],
+    difficulty: "Hard",
+    accent: "from-orange-400 to-pink-400",
+  },
+  {
+    slug: "solar-keycloak",
+    period: "Apr — May 2026",
+    name: "Solar · Keycloak Migration",
+    tagline: "Centralized auth & full security migration to Keycloak",
+    description:
+      "Integrated Solar with Keycloak and migrated all security across the platform onto Keycloak — single sign-on, role/realm modeling, and a unified identity layer for the company's products.",
+    stack: ["Keycloak", "OAuth 2.0 / OIDC", "SSO", "Solar", ".NET", "Security"],
+    difficulty: "Hard",
+    accent: "from-amber-400 to-indigo-500",
+  },
 ];
 
 export const skillGroups = [
