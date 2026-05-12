@@ -87,12 +87,23 @@ export default function Hero() {
           <div className="reveal reveal-delay-2 relative mx-auto lg:mx-0">
             <div className="relative h-72 w-72 sm:h-80 sm:w-80 lg:h-[360px] lg:w-[360px] float">
               <div className="absolute inset-0 rounded-3xl glow-ring bg-gradient-to-br from-indigo-500/20 via-cyan-400/15 to-amber-400/20" />
-              <div className="absolute inset-3 rounded-2xl glass overflow-hidden flex items-center justify-center">
-                <div className="relative h-full w-full flex items-center justify-center">
-                  <div className="relative h-40 w-40 sm:h-48 sm:w-48 rounded-full bg-gradient-to-br from-indigo-500/30 to-cyan-400/30 flex items-center justify-center text-6xl sm:text-7xl font-bold gradient-text">
-                    {profile.initials}
-                  </div>
-                </div>
+              <div className="absolute inset-3 rounded-2xl glass overflow-hidden">
+                <div
+                  aria-hidden
+                  className="absolute inset-0 bg-gradient-to-br from-indigo-500/25 via-cyan-400/15 to-amber-400/25"
+                />
+                <div
+                  aria-hidden
+                  className="absolute -bottom-10 left-1/2 -translate-x-1/2 h-40 w-40 rounded-full bg-indigo-500/40 blur-3xl"
+                />
+                <Image
+                  src="/profile-nobg.png"
+                  alt={`${profile.name} portrait`}
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 320px, 360px"
+                  className="relative z-10 object-contain object-bottom drop-shadow-[0_20px_40px_rgba(0,0,0,0.45)]"
+                />
               </div>
 
               <FloatingBadge
