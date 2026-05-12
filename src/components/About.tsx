@@ -91,6 +91,62 @@ export default function About() {
             </div>
           ))}
         </div>
+
+        <div className="mt-6 grid lg:grid-cols-[1.15fr_1fr] gap-4">
+          <div className="glass card-hover rounded-2xl p-5 sm:p-6">
+            <div className="flex items-center gap-3">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400/30 to-cyan-400/20 text-white">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <circle cx="9" cy="8" r="3" stroke="currentColor" strokeWidth="2" />
+                  <circle cx="17" cy="10" r="2.5" stroke="currentColor" strokeWidth="2" />
+                  <path
+                    d="M3 19c0-3 2.5-5 6-5s6 2 6 5M14 19c0-2 2-3.5 4-3.5s3.5 1.5 3.5 3.5"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-base font-semibold text-white">
+                {t.about.workStyle.title}
+              </h3>
+            </div>
+            <p className="mt-3 text-sm text-white/70 leading-relaxed">
+              {t.about.workStyle.intro}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {t.about.workStyle.traits.map((trait) => (
+                <span
+                  key={trait}
+                  className="text-xs rounded-full px-2.5 py-1 bg-gradient-to-br from-emerald-400/15 to-cyan-400/10 border border-emerald-300/25 text-emerald-100"
+                >
+                  {trait}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="glass card-hover rounded-2xl p-5 sm:p-6">
+            <div className="flex items-center gap-3">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/30 to-amber-300/20 text-white">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M12 3v4M12 17v4M5 12H1M23 12h-4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-base font-semibold text-white">
+                {t.about.aiMindset.title}
+              </h3>
+            </div>
+            <p className="mt-3 text-sm text-white/70 leading-relaxed">
+              {t.about.aiMindset.description}
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );

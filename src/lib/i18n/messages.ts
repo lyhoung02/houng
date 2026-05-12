@@ -32,6 +32,26 @@ const en = {
     about: {
       eyebrow: "About",
       title: "An engineer wired for shipping.",
+      workStyle: {
+        title: "How I work with teams",
+        intro:
+          "I'm easygoing, friendly, and respectful — a hard-working, active teammate and a leader who resolves problems with the best possible solution.",
+        traits: [
+          "Easygoing",
+          "Friendly",
+          "Hard-working",
+          "Active",
+          "Respectful",
+          "Open-minded",
+          "Problem-solver",
+          "Team Leader",
+        ],
+      },
+      aiMindset: {
+        title: "Built for the AI era",
+        description:
+          "Flexible between hands-on coding and AI-augmented generation — sharpening prompt craft, exploring creative ideas, and proposing directions for the next generation of builds.",
+      },
       services: {
         backend: {
           title: "Backend Engineering",
@@ -232,6 +252,26 @@ const km: Messages = {
     about: {
       eyebrow: "អំពីខ្ញុំ",
       title: "វិស្វករដែលដឹកនាំការងារឲ្យចេញដំណើរការ។",
+      workStyle: {
+        title: "របៀបដែលខ្ញុំធ្វើការជាមួយក្រុម",
+        intro:
+          "ខ្ញុំជាមនុស្សងាយស្រួល រួសរាយ និងគោរពអ្នកដទៃ — ជាសមាជិកក្រុមដែលឧស្សាហ៍ សកម្ម និងជាមេក្រុមដែលដោះស្រាយបញ្ហាជាមួយដំណោះស្រាយល្អបំផុត។",
+        traits: [
+          "ងាយស្រួល",
+          "រួសរាយ",
+          "ឧស្សាហ៍",
+          "សកម្ម",
+          "គោរពអ្នកដទៃ",
+          "ចិត្តទូលាយ",
+          "ដោះស្រាយបញ្ហា",
+          "មេក្រុម",
+        ],
+      },
+      aiMindset: {
+        title: "ត្រៀមសម្រាប់យុគ AI",
+        description:
+          "សម្របខ្លួនបានរវាងការសរសេរកូដដោយដៃ និងការប្រើ AI — អភិវឌ្ឍសិល្បៈ Prompt, ស្វែងយល់គំនិតច្នៃប្រឌិត, និងស្នើទិសដៅសម្រាប់ការងារជំនាន់ក្រោយ។",
+      },
       services: {
         backend: {
           title: "Backend Engineering",
