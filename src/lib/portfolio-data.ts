@@ -155,6 +155,61 @@ export const projects: Project[] = [
   },
 ];
 
+export type InternalProject = {
+  slug: string;
+  period: string;
+  name: string;
+  tagline: string;
+  description: string;
+  stack: string[];
+  difficulty: "Challenging" | "Hard" | "Foundational";
+  accent: string;
+};
+
+export const internalProjects: InternalProject[] = [
+  {
+    slug: "mdms-v1",
+    period: "May 2024",
+    name: "MDMS v1",
+    tagline: "Meter Data Management System — first cut",
+    description:
+      "Crafted the first version of the Meter Data Management System (MDMS) in close pair-programming sessions with ChatGPT-4.0 — an early dive into AI-augmented development workflows.",
+    stack: ["ChatGPT-4.0", "MDMS", "AI Pair Programming"],
+    difficulty: "Challenging",
+    accent: "from-indigo-500 to-cyan-400",
+  },
+  {
+    slug: "mdms-v2",
+    period: "Jul 2024 — Feb 2025",
+    name: "MDMS v2 · DMS · Onboard v1",
+    tagline: "Flutter Flow foundation + Supabase + Hasura + .NET Core",
+    description:
+      "Rebuilt MDMS as v2 on a Flutter Flow foundation, shipped a Document Management System (DMS) with backend-less Supabase integration, and delivered Onboard v1 on Flutter Flow + Hasura + .NET Core.",
+    stack: [
+      "Flutter Flow",
+      "Supabase",
+      "Hasura",
+      ".NET Core",
+      "MDMS",
+      "DMS",
+      "Onboard",
+    ],
+    difficulty: "Hard",
+    accent: "from-cyan-400 to-amber-400",
+  },
+  {
+    slug: "bill24-billflow",
+    period: "Mar 2025",
+    name: "Bill24 · BillFlow v1",
+    tagline: "Payment SDK integration with the Bill24 team",
+    description:
+      "Joined the Bill24 team and integrated their payment SDK into BillFlow v1 — wiring up secure payment flows across the billing surface.",
+    stack: ["Bill24 SDK", "Payment Integration", "BillFlow"],
+    difficulty: "Challenging",
+    accent: "from-amber-400 to-rose-400",
+  },
+];
+
 export const skillGroups = [
   {
     title: "Languages",
