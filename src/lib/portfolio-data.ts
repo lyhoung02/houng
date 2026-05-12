@@ -155,6 +155,77 @@ export const projects: Project[] = [
   },
 ];
 
+export type PersonalProject = {
+  slug: string;
+  name: string;
+  tagline: string;
+  description: string;
+  stack: string[];
+  logo: string;
+  accent: string;
+  status: "Research" | "Active" | "Shipped";
+  highlights: string[];
+};
+
+export const personalProjects: PersonalProject[] = [
+  {
+    slug: "jrms",
+    name: "JRMS",
+    tagline: "Job Recruitment Management System",
+    description:
+      "Self-initiated research project — a cross-platform recruitment system pairing a Flutter client (web, mobile, desktop) with a .NET service layer. Exploring matching logic, candidate flows, and multi-tenant org structure.",
+    stack: ["Flutter", "Dart 3", ".NET", "Docker", "PostgreSQL", "Render"],
+    logo: "/assets/projects/jrms.png",
+    accent: "from-indigo-500 via-violet-400 to-orange-400",
+    status: "Research",
+    highlights: [
+      "Designed end-to-end recruitment data model",
+      "Built Flutter client targeting web + mobile + desktop",
+      "Containerized with Docker, deployment-ready via Render",
+    ],
+  },
+  {
+    slug: "e-commerce",
+    name: "E-Commerce Platform",
+    tagline: "Multi-vendor marketplace with payments & realtime",
+    description:
+      "A multi-vendor marketplace inspired by Facebook Marketplace — personal sellers, company storefronts, staff/roles, inventory, payouts, and reporting. Trilingual (Khmer · English · Chinese), KHQR payments, WebSocket realtime.",
+    stack: [
+      "Next.js 14",
+      "Fastify",
+      "PostgreSQL",
+      "Supabase Storage",
+      "KHQR",
+      "WebSocket",
+      "pnpm",
+    ],
+    logo: "/assets/projects/e-commerce.svg",
+    accent: "from-cyan-400 via-indigo-400 to-amber-300",
+    status: "Active",
+    highlights: [
+      "Multi-vendor storefronts with staff + role management",
+      "KHQR payment flow & payout reporting",
+      "Trilingual i18n (KM / EN / ZH) end-to-end",
+    ],
+  },
+  {
+    slug: "ss-garage",
+    name: "SS Garage Billing",
+    tagline: "Self-contained invoice manager for a real garage",
+    description:
+      "A bilingual (Khmer + English) invoice management system modeled 1:1 on a paper invoice — customer + vehicle blocks, 18-row item table, totals, cash/check note. Runs as three Docker containers with a one-command spin-up.",
+    stack: ["Next.js 14", "Express", "PostgreSQL 16", "Docker Compose", "Tailwind"],
+    logo: "/assets/projects/ss-garage.svg",
+    accent: "from-amber-400 via-yellow-300 to-cyan-400",
+    status: "Shipped",
+    highlights: [
+      "1:1 reproduction of a hand-written paper invoice",
+      "Bilingual UI (Khmer + English)",
+      "One-command Docker Compose stack",
+    ],
+  },
+];
+
 export type InternalProject = {
   slug: string;
   period: string;
