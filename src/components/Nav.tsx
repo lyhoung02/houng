@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useT } from "./providers/LanguageProvider";
 import PreferencesMenu from "./PreferencesMenu";
 
@@ -37,11 +38,17 @@ export default function Nav() {
     >
       <div className="mx-auto max-w-6xl px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
         <a
-          href="#top"
-          className="flex items-center gap-2 font-semibold tracking-tight"
+          href="/#top"
+          className="flex items-center gap-2 font-semibold tracking-tight group"
         >
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 via-cyan-400 to-amber-400 text-[12px] font-bold text-slate-950 shadow-lg shadow-indigo-500/30">
-            PL
+          <span className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden ring-1 ring-white/15 shadow-lg shadow-indigo-500/30 transition group-hover:ring-white/30 group-hover:scale-[1.04]">
+            <Image
+              src="/icon.png"
+              alt="Pov Lyhoung"
+              fill
+              sizes="36px"
+              className="object-cover"
+            />
           </span>
           <span className="text-white/90 hidden sm:inline">
             Pov<span className="text-white/40"> · </span>Lyhoung
