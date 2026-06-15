@@ -41,7 +41,7 @@ export default function Nav() {
           href="/#top"
           className="flex items-center gap-2 font-semibold tracking-tight group"
         >
-          <span className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden ring-1 ring-white/15 shadow-lg shadow-indigo-500/30 transition group-hover:ring-white/30 group-hover:scale-[1.04]">
+          <span className="relative inline-flex h-9 w-9 items-center justify-center rounded-full overflow-hidden ring-1 ring-white/15 shadow-lg shadow-indigo-500/30 transition group-hover:ring-white/30 group-hover:scale-[1.04]">
             <Image
               src="/icon.png"
               alt="Pov Lyhoung"

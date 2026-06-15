@@ -206,7 +206,7 @@ const en = {
         hire:
           "Yes — I'm open to full-time roles and outsourcing. Drop me an email at povlyhoung02@gmail.com or scroll down to the Contact section.",
         projects:
-          "I'm shipping four products at E-Power CCL — Solar, EAC App, ePower Maps, Mobile Billing. Side projects: JRMS, E-Commerce, SS Garage. See the Projects section above 👆",
+          "I'm shipping four products at E-Power CCL — Solar, EAC App, E-Power Maps, Mobile Billing. Side projects: JRMS, E-Commerce, SS Garage. See the Projects section above 👆",
         stack:
           "Mostly Flutter, Next.js, Node.js, .NET, PostgreSQL, Docker. Full list in the Skills section.",
         phone:
@@ -439,7 +439,7 @@ const km: Messages = {
         hire:
           "បាទ — ខ្ញុំបើកទទួលការងារពេញម៉ោង និង Outsourcing។ ផ្ញើអ៊ីមែលមក povlyhoung02@gmail.com ឬមើលផ្នែក Contact ខាងក្រោម។",
         projects:
-          "ខ្ញុំកំពុងបង្កើតផលិតផលបួននៅ E-Power CCL — Solar, EAC App, ePower Maps, Mobile Billing។ គម្រោងផ្ទាល់ខ្លួន៖ JRMS, E-Commerce, SS Garage។ មើលផ្នែក Projects ខាងលើ 👆",
+          "ខ្ញុំកំពុងបង្កើតផលិតផលបួននៅ E-Power CCL — Solar, EAC App, E-Power Maps, Mobile Billing។ គម្រោងផ្ទាល់ខ្លួន៖ JRMS, E-Commerce, SS Garage។ មើលផ្នែក Projects ខាងលើ 👆",
         stack:
           "ភាគច្រើន Flutter, Next.js, Node.js, .NET, PostgreSQL, Docker។ បញ្ជីពេញនៅផ្នែក Skills។",
         phone: "ប្រាកដ — ហៅទូរសព្ទមកលេខ +855 15-357 776 ឬ +855 89-826 667។",

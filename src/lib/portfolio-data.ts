@@ -24,7 +24,7 @@ export const profile = {
   pitch:
     "I'm a hands-on software engineer shipping production-grade backend, web, and mobile apps for the energy sector. I love clean systems, fast iterations, and shipping things people actually use.",
   longPitch:
-    "Since December 2023 I've been part of the engineering team at E-Power CCL, working across four real-world products — Solar, EAC App, Mobile Billing, and ePower Maps — owning slices of backend, frontend, and ongoing maintenance. I learn fast, write practical code, and stay calm under deadlines.",
+    "Since December 2023 I've been part of the engineering team at E-Power CCL, working across four real-world products — Solar, EAC App, Mobile Billing, and E-Power Maps — owning slices of backend, frontend, and ongoing maintenance. I learn fast, write practical code, and stay calm under deadlines.",
   stats: [
     { label: "Production projects", value: "4+" },
     { label: "Years coding", value: "3+" },
@@ -43,7 +43,15 @@ export type EducationItem = {
 
 export const education: EducationItem[] = [
   {
-    title: "English Level 6 (Part-time)",
+    title: "Master of Science in Information Technology",
+    org: "Norton University",
+    period: "2025 — Aug 2026 (Expected)",
+    detail:
+      "Graduate program advancing software engineering, distributed systems, and applied research — building on the Bachelor program at Norton.",
+    logo: "/assets/norton.png",
+  },
+  {
+    title: "English Level 7 (Part-time)",
     org: "Pannasastra University of Cambodia (PUC)",
     period: "Feb 2026 — Present",
     detail:
@@ -95,8 +103,8 @@ export const experience: ExperienceItem[] = [
     logo: "/assets/projects/epower.png",
     logoMode: "wordmark",
     bullets: [
-      "Backend engineer on the Solar rooftop platform and ePower Maps services — designing APIs, modeling data, and shipping features end-to-end.",
-      "Frontend engineer on Solar, EAC App, ePower Maps, and Mobile Billing — building cross-platform UI with Flutter and modern web stacks.",
+      "Backend engineer on the Solar rooftop platform and E-Power Maps services — designing APIs, modeling data, and shipping features end-to-end.",
+      "Frontend engineer on Solar, EAC App, E-Power Maps, and Mobile Billing — building cross-platform UI with Flutter and modern web stacks.",
       "Maintaining all four products in production — fixing bugs, tuning performance, and rolling out updates against live customer data.",
       "Collaborating across backend, mobile, and ops — using GitLab, Docker, and Sentry to keep deliveries predictable.",
     ],
@@ -164,7 +172,7 @@ export const projects: Project[] = [
   },
   {
     slug: "epower-maps",
-    name: "ePower Maps",
+    name: "E-Power Maps",
     tagline: "Field-ops geospatial platform for E-Power",
     description:
       "Geospatial platform mapping power infrastructure, field assets, and operations — backend services plus a mobile client for the field team.",
@@ -345,10 +353,10 @@ export const internalProjects: InternalProject[] = [
   {
     slug: "epower-maps-flutter",
     period: "Feb 2026",
-    name: "ePower Maps → Flutter (Online + Offline)",
+    name: "E-Power Maps → Flutter (Online + Offline)",
     tagline: "Kotlin → Flutter rewrite with online & offline support",
     description:
-      "Rebuilt ePower Maps from Kotlin into Flutter, adding full offline support so field crews can keep working without network — local data store, sync on reconnect, and conflict handling.",
+      "Rebuilt E-Power Maps from Kotlin into Flutter, adding full offline support so field crews can keep working without network — local data store, sync on reconnect, and conflict handling.",
     stack: [
       "Flutter",
       "Kotlin",
