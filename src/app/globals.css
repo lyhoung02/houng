@@ -223,7 +223,7 @@ a, button { outline-offset: 4px; }
 
 .resume-page {
   width: 210mm;
-  min-height: 297mm;
+  height: 297mm;
   background: #ffffff;
   color: #0f172a;
   margin: 0 auto;
@@ -234,9 +234,31 @@ a, button { outline-offset: 4px; }
   line-height: 1.45;
   font-size: 10.5pt;
   box-sizing: border-box;
-  overflow: hidden;
+  position: relative;
   display: flex;
   flex-direction: column;
+  /* White frame around the content so nothing bleeds to the paper edge
+     (also keeps the printer's unprintable margin from clipping content). */
+  padding: 8mm;
+  /* Fixed A4 + clip so the on-screen sheet is a true 1:1 preview of print. */
+  overflow: hidden;
+}
+
+/* ---- Multi-sheet résumé (explicit A4 pages, PDF-viewer look) ---- */
+
+/* Stack the A4 sheets with a gap, like pages in a PDF viewer. */
+.resume-doc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9mm;
+}
+
+/* A short running head on continuation sheets (page 2+). */
+.resume-sidebar-runninghead {
+  padding-bottom: 8px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .resume-grid {
@@ -249,11 +271,11 @@ a, button { outline-offset: 4px; }
 .resume-sidebar {
   background: #0f172a;
   color: #f8fafc;
-  padding: 16mm 9mm 12mm;
+  padding: 8mm 7mm;
 }
 
 .resume-main {
-  padding: 16mm 12mm 12mm;
+  padding: 8mm 9mm;
 }
 
 .resume-avatar {
@@ -305,7 +327,7 @@ a, button { outline-offset: 4px; }
 
 .resume-footer {
   border-top: 1px solid #e2e8f0;
-  padding: 6mm 12mm 8mm;
+  padding: 5mm 9mm 0;
   font-size: 8pt;
   color: #64748b;
   display: flex;
@@ -384,7 +406,7 @@ a, button { outline-offset: 4px; }
 
 @page {
   size: A4;
-  margin: 14mm;
+  margin: 0;
 }
 
 @media print {
@@ -392,12 +414,23 @@ a, button { outline-offset: 4px; }
   body { padding: 0 !important; margin: 0 !important; }
   .no-print { display: none !important; }
   .resume-shell { background: #ffffff !important; padding: 0 !important; min-height: 0 !important; }
+  .resume-shell main { padding: 0 !important; margin: 0 !important; overflow: visible !important; }
+  .resume-doc { display: block !important; gap: 0 !important; }
   .resume-page {
     box-shadow: none !important;
     margin: 0 !important;
-    width: 100% !important;
+    width: 210mm !important;
+    /* A hair under A4 so rounding can't spill a 297mm box onto a blank page. */
+    height: 296mm !important;
     min-height: 0 !important;
+    overflow: hidden !important;
+    /* Forbid the sheet from fragmenting — Chrome ignores overflow:hidden for
+       paged-media breaking, so this is what actually keeps it to one page. */
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
+  /* Each sheet starts on its own physical page. */
+  .resume-page + .resume-page { break-before: page; page-break-before: always; }
   .resume-sidebar,
   .resume-chip,
   .resume-edu-dot,

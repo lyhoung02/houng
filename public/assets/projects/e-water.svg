@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="ew-bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#083344"/>
+    </linearGradient>
+    <linearGradient id="ew-drop" x1="48" y1="28" x2="80" y2="104" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7dd3fc"/>
+      <stop offset="0.5" stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+    <radialGradient id="ew-glow" cx="64" cy="64" r="46" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="rgba(34,211,238,0.5)"/>
+      <stop offset="1" stop-color="rgba(34,211,238,0)"/>
+    </radialGradient>
+  </defs>
+  <rect x="4" y="4" width="120" height="120" rx="24" fill="url(#ew-bg)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+  <circle cx="64" cy="64" r="40" fill="url(#ew-glow)"/>
+  <path d="M64 26C64 26 40 54 40 74a24 24 0 0 0 48 0C88 54 64 26 64 26z" fill="url(#ew-drop)" opacity="0.95"/>
+  <path d="M54 74a10 10 0 0 0 10 10" stroke="rgba(255,255,255,0.85)" stroke-width="4" stroke-linecap="round" fill="none"/>
+</svg>

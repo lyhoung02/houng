@@ -14,198 +14,257 @@ import { useT } from "./providers/LanguageProvider";
 
 export default function Resume() {
   const t = useT();
+  const coursework = education.find((e) => e.courses)?.courses;
 
   return (
-    <article className="resume-page print-keep" aria-label="Résumé">
-      <div className="resume-grid">
-        {/* --------------------------- SIDEBAR --------------------------- */}
-        <aside className="resume-sidebar">
-          <div className="flex flex-col items-center text-center">
-            <div className="resume-avatar">
-              <Image
-                src="/profile-nobg.png"
-                alt={`${profile.name} portrait`}
-                fill
-                sizes="120px"
-                className="object-cover object-top"
-              />
+    <div className="resume-doc" aria-label="Résumé">
+      {/* ============================ PAGE 1 ============================ */}
+      <article className="resume-page print-keep">
+        <div className="resume-grid">
+          {/* --------------------------- SIDEBAR --------------------------- */}
+          <aside className="resume-sidebar">
+            <div className="flex flex-col items-center text-center">
+              <div className="resume-avatar">
+                <Image
+                  src="/profile-nobg.png"
+                  alt={`${profile.name} portrait`}
+                  fill
+                  sizes="120px"
+                  className="object-cover object-top"
+                />
+              </div>
+              <h1 className="mt-3 text-[16pt] font-bold tracking-tight leading-tight">
+                {profile.name}
+              </h1>
+              <p className="mt-0.5 text-[10pt] font-medium opacity-90">
+                {profile.title}
+              </p>
             </div>
-            <h1 className="mt-3 text-[16pt] font-bold tracking-tight leading-tight">
-              {profile.name}
-            </h1>
-            <p className="mt-0.5 text-[10pt] font-medium opacity-90">
-              {profile.title}
-            </p>
-          </div>
 
-          <SidebarSection label={t.resume.contact}>
-            <ul className="space-y-2 text-[9pt] leading-snug">
-              <li className="flex items-start gap-2">
-                <Icon name="mail" />
-                <a href={`mailto:${profile.email}`} className="break-all">
-                  {profile.email}
-                </a>
-              </li>
-              <li className="flex items-start gap-2">
-                <Icon name="mail" />
-                <a href={`mailto:${profile.workEmail}`} className="break-all">
-                  {profile.workEmail}
-                </a>
-              </li>
-              {profile.phones.map((p) => (
-                <li key={p} className="flex items-start gap-2">
-                  <Icon name="phone" />
-                  <span>{p}</span>
+            <SidebarSection label={t.resume.contact}>
+              <ul className="space-y-2 text-[9pt] leading-snug">
+                <li className="flex items-start gap-2">
+                  <Icon name="mail" />
+                  <a href={`mailto:${profile.email}`} className="break-all">
+                    {profile.email}
+                  </a>
                 </li>
-              ))}
-              <li className="flex items-start gap-2">
-                <Icon name="pin" />
-                <span>{profile.address}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Icon name="globe" />
-                <a href="https://houng.pages.dev">houng.pages.dev</a>
-              </li>
-            </ul>
-          </SidebarSection>
-
-          <SidebarSection label={t.resume.skills}>
-            <div className="space-y-3">
-              {skillGroups.map((g) => (
-                <div key={g.title} className="print-keep">
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <span className="h-px w-3 bg-cyan-300" />
-                    <h4 className="text-[8pt] font-bold uppercase tracking-[0.14em] text-cyan-200">
-                      {g.title}
-                    </h4>
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    {g.items.map((it) => (
-                      <span
-                        key={it}
-                        className="resume-chip"
-                      >
-                        {it}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </SidebarSection>
-
-          <SidebarSection label={t.resume.education}>
-            <ol className="resume-edu">
-              {education.map((e) => (
-                <li key={e.title} className="print-keep">
-                  <span className="resume-edu-dot" aria-hidden />
-                  <p className="text-[9.5pt] font-semibold leading-snug">
-                    {e.title}
-                  </p>
-                  <p className="text-[8.75pt] opacity-90 leading-snug">
-                    {e.org}
-                  </p>
-                  <span className="resume-edu-period">{e.period}</span>
+                <li className="flex items-start gap-2">
+                  <Icon name="mail" />
+                  <a href={`mailto:${profile.workEmail}`} className="break-all">
+                    {profile.workEmail}
+                  </a>
                 </li>
-              ))}
-            </ol>
-          </SidebarSection>
-        </aside>
+                {profile.phones.map((p) => (
+                  <li key={p} className="flex items-start gap-2">
+                    <Icon name="phone" />
+                    <span>{p}</span>
+                  </li>
+                ))}
+                <li className="flex items-start gap-2">
+                  <Icon name="pin" />
+                  <span>{profile.address}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Icon name="globe" />
+                  <a href="https://houng.pages.dev">houng.pages.dev</a>
+                </li>
+              </ul>
+            </SidebarSection>
 
-        {/* ----------------------------- MAIN ----------------------------- */}
-        <main className="resume-main">
-          <Section title={t.resume.summary}>
-            <p className="resume-body">
-              {profile.pitch} {profile.longPitch}
-            </p>
-          </Section>
-
-          <Section title={t.resume.experience}>
-            <div className="space-y-3.5">
-              {experience.map((job) => (
-                <div key={job.company} className="print-keep">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <h3 className="text-[11pt] font-semibold text-slate-900">
-                      {job.role}
-                    </h3>
-                    <span className="resume-date">{job.period}</span>
+            <SidebarSection label={t.resume.skills}>
+              <div className="space-y-3">
+                {skillGroups.slice(0, 4).map((g) => (
+                  <div key={g.title} className="print-keep">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <span className="h-px w-3 bg-cyan-300" />
+                      <h4 className="text-[8pt] font-bold uppercase tracking-[0.14em] text-cyan-200">
+                        {g.title}
+                      </h4>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {g.items.map((it) => (
+                        <span key={it} className="resume-chip">
+                          {it}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                  <p className="text-[9.5pt] font-medium text-slate-600">
-                    {job.company} · {job.location}
-                  </p>
-                  <ul className="mt-1.5 ml-4 list-disc space-y-1 resume-body">
-                    {job.bullets.map((b, i) => (
-                      <li key={i}>{b}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </Section>
+                ))}
+              </div>
+            </SidebarSection>
+          </aside>
 
-          <Section title={t.resume.selectedProjects}>
-            <div className="space-y-2.5">
-              {projects.map((p) => (
-                <div key={p.slug} className="print-keep">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <h3 className="text-[10.5pt] font-semibold text-slate-900">
+          {/* ----------------------------- MAIN ----------------------------- */}
+          <main className="resume-main">
+            <Section title={t.resume.summary}>
+              <p className="resume-body">
+                {profile.pitch} {profile.longPitch}
+              </p>
+            </Section>
+
+            <Section title={t.resume.experience}>
+              <div className="space-y-3.5">
+                {experience.map((job) => (
+                  <div key={`${job.company}-${job.role}-${job.period}`} className="print-keep">
+                    <div className="flex items-baseline justify-between gap-3">
+                      <h3 className="text-[11pt] font-semibold text-slate-900">
+                        {job.role}
+                      </h3>
+                      <span className="resume-date">{job.period}</span>
+                    </div>
+                    <p className="text-[9.5pt] font-medium text-slate-600">
+                      {job.company} · {job.location}
+                    </p>
+                    <ul className="mt-1.5 ml-4 list-disc space-y-1 resume-body">
+                      {job.bullets.map((b, i) => (
+                        <li key={i}>{b}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </Section>
+
+            <Section title={t.resume.selectedProjects}>
+              <div className="space-y-2.5">
+                {projects.map((p) => (
+                  <div key={p.slug} className="print-keep">
+                    <div className="flex items-baseline justify-between gap-3">
+                      <h3 className="text-[10.5pt] font-semibold text-slate-900">
+                        {p.name}
+                        <span className="ml-1.5 font-normal text-slate-500 text-[9pt]">
+                          — {p.roles.map((r) => t.projects.roles[r]).join(" · ")}
+                        </span>
+                      </h3>
+                    </div>
+                    <p className="resume-body">{p.description}</p>
+                    <p className="text-[8.5pt] text-slate-500 mt-0.5">
+                      {p.stack.join(" · ")}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </Section>
+          </main>
+        </div>
+      </article>
+
+      {/* ============================ PAGE 2 ============================ */}
+      <article className="resume-page print-keep">
+        <div className="resume-grid">
+          {/* --------------------------- SIDEBAR --------------------------- */}
+          <aside className="resume-sidebar">
+            <div className="resume-sidebar-runninghead">
+              <p className="text-[11pt] font-bold tracking-tight leading-tight">
+                {profile.name}
+              </p>
+              <p className="text-[8.5pt] opacity-80">{profile.title}</p>
+            </div>
+
+            <SidebarSection label={t.resume.skills}>
+              <div className="space-y-3">
+                {skillGroups.slice(4).map((g) => (
+                  <div key={g.title} className="print-keep">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <span className="h-px w-3 bg-cyan-300" />
+                      <h4 className="text-[8pt] font-bold uppercase tracking-[0.14em] text-cyan-200">
+                        {g.title}
+                      </h4>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {g.items.map((it) => (
+                        <span key={it} className="resume-chip">
+                          {it}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </SidebarSection>
+
+            <SidebarSection label={t.resume.education}>
+              <ol className="resume-edu">
+                {education.map((e) => (
+                  <li key={e.title} className="print-keep">
+                    <span className="resume-edu-dot" aria-hidden />
+                    <p className="text-[9.5pt] font-semibold leading-snug">
+                      {e.title}
+                    </p>
+                    <p className="text-[8.75pt] opacity-90 leading-snug">
+                      {e.org}
+                    </p>
+                    {e.major && (
+                      <p className="text-[8pt] opacity-75 leading-snug">
+                        {e.major}
+                      </p>
+                    )}
+                    <span className="resume-edu-period">{e.period}</span>
+                    {e.result && (
+                      <p className="text-[8pt] opacity-80 leading-snug mt-0.5">
+                        {e.result}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </SidebarSection>
+          </aside>
+
+          {/* ----------------------------- MAIN ----------------------------- */}
+          <main className="resume-main">
+            {coursework && (
+              <Section title="Bachelor Coursework">
+                <p className="resume-body text-[8.5pt] leading-relaxed">
+                  {coursework.join(" · ")}
+                </p>
+              </Section>
+            )}
+
+            <Section title={t.resume.internalProjects}>
+              <ul className="space-y-1.5">
+                {internalProjects.map((p) => (
+                  <li key={p.slug} className="print-keep resume-body">
+                    <span className="font-semibold text-slate-900">
                       {p.name}
-                      <span className="ml-1.5 font-normal text-slate-500 text-[9pt]">
-                        — {p.roles.map((r) => t.projects.roles[r]).join(" · ")}
-                      </span>
-                    </h3>
-                  </div>
-                  <p className="resume-body">{p.description}</p>
-                  <p className="text-[8.5pt] text-slate-500 mt-0.5">
-                    {p.stack.join(" · ")}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </Section>
+                    </span>
+                    <span className="resume-date ml-1.5">{p.period}</span>
+                    <span className="ml-1">— {p.tagline}</span>
+                  </li>
+                ))}
+              </ul>
+            </Section>
 
-          <Section title={t.resume.internalProjects}>
-            <ul className="space-y-1.5">
-              {internalProjects.map((p) => (
-                <li key={p.slug} className="print-keep resume-body">
-                  <span className="font-semibold text-slate-900">
-                    {p.name}
-                  </span>
-                  <span className="resume-date ml-1.5">{p.period}</span>
-                  <span className="ml-1">— {p.tagline}</span>
-                </li>
-              ))}
-            </ul>
-          </Section>
+            <Section title={t.resume.personalProjects}>
+              <ul className="space-y-1.5">
+                {personalProjects.map((p) => (
+                  <li key={p.slug} className="print-keep resume-body">
+                    <span className="font-semibold text-slate-900">
+                      {p.name}
+                    </span>
+                    <span className="ml-1.5 text-[8.5pt] uppercase tracking-wider text-slate-500">
+                      {t.personal.status[p.status]}
+                    </span>
+                    <span className="ml-1">— {p.tagline}</span>
+                    <span className="block text-[8.5pt] text-slate-500">
+                      {p.stack.slice(0, 5).join(" · ")}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          </main>
+        </div>
 
-          <Section title={t.resume.personalProjects}>
-            <ul className="space-y-1.5">
-              {personalProjects.map((p) => (
-                <li key={p.slug} className="print-keep resume-body">
-                  <span className="font-semibold text-slate-900">
-                    {p.name}
-                  </span>
-                  <span className="ml-1.5 text-[8.5pt] uppercase tracking-wider text-slate-500">
-                    {t.personal.status[p.status]}
-                  </span>
-                  <span className="ml-1">— {p.tagline}</span>
-                  <span className="block text-[8.5pt] text-slate-500">
-                    {p.stack.slice(0, 5).join(" · ")}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </Section>
-        </main>
-      </div>
-
-      <footer className="resume-footer">
-        <span>
-          © {new Date().getFullYear()} {profile.name}
-        </span>
-        <span>{t.resume.printedFrom}</span>
-      </footer>
-    </article>
+        <footer className="resume-footer">
+          <span>
+            © {new Date().getFullYear()} {profile.name}
+          </span>
+          <span>{t.resume.printedFrom}</span>
+        </footer>
+      </article>
+    </div>
   );
 }
 

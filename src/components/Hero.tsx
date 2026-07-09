@@ -3,12 +3,31 @@
 import Image from "next/image";
 import { profile } from "@/lib/portfolio-data";
 import { useT } from "./providers/LanguageProvider";
+import { NeuralCanvas } from "./NeuralCanvas";
+
+const heroSkillCloud = [
+  "Dart 3",
+  "TypeScript",
+  "React",
+  "Tailwind CSS",
+  "Laravel",
+  "MySQL",
+  "Redis",
+  "Supabase",
+  "AWS",
+  "Render",
+  "Kubernetes",
+  "Figma",
+  "ChatGPT",
+  "Codex",
+  "Gemini",
+];
 
 export default function Hero() {
   const t = useT();
   const stats = [
-    { label: t.hero.stats.projects, value: "4+" },
-    { label: t.hero.stats.years, value: "3+" },
+    { label: t.hero.stats.projects, value: "6+" },
+    { label: t.hero.stats.years, value: "4+" },
     { label: t.hero.stats.roles, value: t.hero.stats.rolesValue },
     { label: t.hero.stats.openTo, value: t.hero.stats.openToValue },
   ];
@@ -16,9 +35,12 @@ export default function Hero() {
   return (
     <section
       id="top"
-      className="relative overflow-hidden pt-16 pb-20 sm:pt-24 sm:pb-28"
+      className="relative isolate overflow-hidden pt-16 pb-20 sm:pt-24 sm:pb-28"
     >
-      <div className="absolute inset-0 -z-10 bg-grid opacity-50" />
+      <div className="pointer-events-none absolute inset-0 -z-10 opacity-35 dark:opacity-70">
+        <NeuralCanvas />
+      </div>
+      <div className="absolute inset-0 -z-10 bg-grid opacity-100" />
       <div
         aria-hidden
         className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[480px] w-[680px] rounded-full bg-indigo-500/15 blur-3xl -z-10"
@@ -123,16 +145,48 @@ export default function Hero() {
                 label="Flutter"
               />
               <FloatingBadge
-                className="absolute -right-2 top-20 sm:-right-4"
+                className="absolute left-16 top-2 sm:left-20"
+                label=".NET"
+              />
+              <FloatingBadge
+                className="absolute -right-2 top-16 sm:-right-4"
                 label="Next.js"
+              />
+              <FloatingBadge
+                className="absolute right-8 top-32 sm:right-4"
+                label="C#"
               />
               <FloatingBadge
                 className="absolute -left-1 bottom-20 sm:-left-3"
                 label="Node.js"
               />
               <FloatingBadge
+                className="absolute -left-2 bottom-36 sm:-left-8"
+                label="REST API"
+              />
+              <FloatingBadge
                 className="absolute -right-3 bottom-36 sm:-right-6"
                 label="PostgreSQL"
+              />
+              <FloatingBadge
+                className="absolute left-8 bottom-7 sm:left-12"
+                label="SQL Server"
+              />
+              <FloatingBadge
+                className="absolute right-4 bottom-20 sm:-right-8"
+                label="Docker"
+              />
+              <FloatingBadge
+                className="absolute right-12 bottom-4 sm:right-8"
+                label="Firebase"
+              />
+              <FloatingBadge
+                className="absolute left-2 top-32 sm:-left-7"
+                label="GitLab"
+              />
+              <FloatingBadge
+                className="absolute right-20 top-4 sm:right-16"
+                label="Sentry"
               />
             </div>
 
@@ -147,6 +201,12 @@ export default function Hero() {
                 />
                 <span>{t.hero.buildingAt}</span>
               </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+              {heroSkillCloud.map((skill) => (
+                <FloatingBadge key={skill} label={skill} />
+              ))}
             </div>
           </div>
         </div>

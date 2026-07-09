@@ -17,6 +17,7 @@ export default function Nav() {
     { href: "/#internal", label: t.nav.internal },
     { href: "/#personal", label: t.nav.personal },
     { href: "/#skills", label: t.nav.skills },
+    { href: "/#archive", label: t.nav.archive },
     { href: "/resume", label: t.nav.resume },
     { href: "/#contact", label: t.nav.contact },
   ];

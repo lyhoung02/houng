@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="dms-bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#172554"/>
+    </linearGradient>
+    <linearGradient id="dms-db" x1="40" y1="32" x2="88" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#a5b4fc"/>
+      <stop offset="0.5" stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <radialGradient id="dms-glow" cx="64" cy="60" r="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="rgba(56,189,248,0.5)"/>
+      <stop offset="1" stop-color="rgba(56,189,248,0)"/>
+    </radialGradient>
+  </defs>
+  <rect x="4" y="4" width="120" height="120" rx="24" fill="url(#dms-bg)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+  <circle cx="64" cy="60" r="40" fill="url(#dms-glow)"/>
+  <g fill="url(#dms-db)" opacity="0.95">
+    <ellipse cx="64" cy="38" rx="26" ry="9"/>
+    <path d="M38 38v20c0 5 11.6 9 26 9s26-4 26-9V38c0 5-11.6 9-26 9s-26-4-26-9z"/>
+    <path d="M38 62v20c0 5 11.6 9 26 9s26-4 26-9V62c0 5-11.6 9-26 9s-26-4-26-9z"/>
+  </g>
+  <g stroke="rgba(15,23,42,0.7)" stroke-width="3" stroke-linecap="round">
+    <path d="M54 56h20"/>
+    <path d="M54 80h20"/>
+  </g>
+</svg>

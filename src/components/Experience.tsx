@@ -106,9 +106,31 @@ export default function Experience() {
                           </span>
                         </div>
                         <p className="mt-1 text-sm text-white/60">{e.org}</p>
+                        {e.major && (
+                          <p className="mt-0.5 text-xs text-white/50">
+                            {e.major}
+                          </p>
+                        )}
                         <p className="mt-2 text-sm text-white/65 leading-relaxed">
                           {e.detail}
                         </p>
+                        {e.result && (
+                          <p className="mt-2 text-xs font-medium text-emerald-200/80">
+                            {e.result}
+                          </p>
+                        )}
+                        {e.courses && (
+                          <div className="mt-3 flex flex-wrap gap-1.5">
+                            {e.courses.map((c) => (
+                              <span
+                                key={c}
+                                className="text-[11px] rounded-full px-2 py-0.5 bg-white/[0.04] border border-white/10 text-white/60"
+                              >
+                                {c}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

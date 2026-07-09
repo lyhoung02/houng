@@ -24,10 +24,10 @@ export const profile = {
   pitch:
     "I'm a hands-on software engineer shipping production-grade backend, web, and mobile apps for the energy sector. I love clean systems, fast iterations, and shipping things people actually use.",
   longPitch:
-    "Since December 2023 I've been part of the engineering team at E-Power CCL, working across four real-world products — Solar, EAC App, Mobile Billing, and E-Power Maps — owning slices of backend, frontend, and ongoing maintenance. I learn fast, write practical code, and stay calm under deadlines.",
+    "Since December 2023 I've been part of the engineering team at E-Power CCL, working across six real-world products — Solar, EAC App, Mobile Billing, E-Power Maps, E-Power Maps Desktop, and E-Power Condo Desktop Management System — owning slices of backend, frontend, and ongoing maintenance. I learn fast, write practical code, and stay calm under deadlines.",
   stats: [
-    { label: "Production projects", value: "4+" },
-    { label: "Years coding", value: "3+" },
+    { label: "Production projects", value: "6+" },
+    { label: "Years coding", value: "4+" },
     { label: "Roles covered", value: "Backend · Frontend · Mobile" },
     { label: "Open to", value: "Full-time · Part-time · Outsourcing" },
   ],
@@ -39,19 +39,22 @@ export type EducationItem = {
   period: string;
   detail: string;
   logo: string;
+  major?: string;
+  result?: string;
+  courses?: string[];
 };
 
 export const education: EducationItem[] = [
   {
     title: "Master of Science in Information Technology",
     org: "Norton University",
-    period: "2025 — Aug 2026 (Expected)",
+    period: "Oct 2026 - Present",
     detail:
       "Graduate program advancing software engineering, distributed systems, and applied research — building on the Bachelor program at Norton.",
     logo: "/assets/norton.png",
   },
   {
-    title: "English Level 7 (Part-time)",
+    title: "English Level 8 (Part-time)",
     org: "Pannasastra University of Cambodia (PUC)",
     period: "Feb 2026 — Present",
     detail:
@@ -59,12 +62,50 @@ export const education: EducationItem[] = [
     logo: "/assets/puc-nobg.png",
   },
   {
-    title: "Bachelor of Software Development",
+    title: "Bachelor of Computer Science",
     org: "Norton University",
-    period: "2022 — 2025",
+    period: "Mar 2022 — May 2026",
+    major: "Major: Software Development · College of Science",
+    result: "Final result: Pass · Total average 75.22",
     detail:
-      "Four-year program covering software engineering fundamentals, databases, networking, and project management.",
+      "Four-year program spanning software engineering, data structures and algorithms, databases, networking, AI, big data, and mobile and web development — capped with a research study and thesis.",
     logo: "/assets/norton.png",
+    courses: [
+      "Computing Fundamentals",
+      "Mathematics for Computer Science I & II",
+      "Programming Methodology in C/C++",
+      "Object-Oriented Modeling & Programming",
+      "Data Structures and Algorithms",
+      "Java Programming I",
+      "Advanced Java Programming",
+      "Advanced Application Development (OOP & Mobile Applied)",
+      "Mobile Apps Development",
+      "Advanced Mobile Apps Development",
+      "Web Development",
+      "Advanced Web Development",
+      "UX/UI Design",
+      "Digital Design",
+      "Digital Image Processing",
+      "Database Administration",
+      "Introduction to Networks",
+      "System Analysis and Design",
+      "Software Engineering",
+      "Software Security Technology",
+      "Introduction to Artificial Intelligence (AI)",
+      "AI Expert System Development",
+      "Introduction to Big Data",
+      "Big Data Analysis",
+      "Business Intelligence",
+      "Management Information System (MIS)",
+      "Introduction to Internet of Things (IoT)",
+      "Methods of Research and Thesis Writing",
+      "Core English 1A & 1B",
+      "Core English and Writing II",
+      "Human and Society",
+      "Khmer Studies",
+      "Principles of Business",
+      "Principles of Economics",
+    ],
   },
   {
     title: "Flutter & Dart 3.0 (Part-time)",
@@ -84,6 +125,54 @@ export const education: EducationItem[] = [
   },
 ];
 
+export type ArchiveItem = {
+  slug: string;
+  title: string;
+  issuer: string;
+  date: string;
+  kind: "Transcript" | "Degree" | "Certificate";
+  logo: string;
+  /** Full scan/photo of the credential, if available — drop into /public/assets/archive/ */
+  image?: string;
+  /** Optional external verification or view link */
+  href?: string;
+};
+
+export const archive: ArchiveItem[] = [
+  {
+    slug: "norton-transcript",
+    title: "Official Transcript of Records",
+    issuer: "Norton University",
+    date: "May 2026",
+    kind: "Transcript",
+    logo: "/assets/norton.png",
+  },
+  {
+    slug: "norton-bcs",
+    title: "Bachelor of Computer Science — Software Development",
+    issuer: "Norton University",
+    date: "2026",
+    kind: "Degree",
+    logo: "/assets/norton.png",
+  },
+  {
+    slug: "instinct-flutter",
+    title: "Flutter & Dart 3.0",
+    issuer: "Instinct InstiSuite",
+    date: "Jul 2024",
+    kind: "Certificate",
+    logo: "/assets/instinct-nobg.png",
+  },
+  {
+    slug: "etec-cpp",
+    title: "C / C++ Programming",
+    issuer: "ETEC Training Center",
+    date: "Nov 2023",
+    kind: "Certificate",
+    logo: "/assets/etec.png",
+  },
+];
+
 export type ExperienceItem = {
   role: string;
   company: string;
@@ -98,15 +187,40 @@ export const experience: ExperienceItem[] = [
   {
     role: "Software Engineer",
     company: "E-Power CCL",
-    period: "Dec 2023 — Present",
+    period: "Dec 2026 — Present",
     location: "Phnom Penh",
     logo: "/assets/projects/epower.png",
     logoMode: "wordmark",
     bullets: [
-      "Backend engineer on the Solar rooftop platform and E-Power Maps services — designing APIs, modeling data, and shipping features end-to-end.",
-      "Frontend engineer on Solar, EAC App, E-Power Maps, and Mobile Billing — building cross-platform UI with Flutter and modern web stacks.",
-      "Maintaining all four products in production — fixing bugs, tuning performance, and rolling out updates against live customer data.",
-      "Collaborating across backend, mobile, and ops — using GitLab, Docker, and Sentry to keep deliveries predictable.",
+      "Applying production experience from E-Power projects with the Bachelor of Computer Science foundation from Norton University.",
+      "Designing maintainable software across backend, web, and mobile systems with stronger ownership of architecture and delivery quality.",
+      "Continuing to grow through the Master of Science in Information Technology while building reliable customer-facing products.",
+    ],
+  },
+  {
+    role: "Full-stack Developer",
+    company: "E-Power CCL",
+    period: "Dec 2025 — Dec 2026",
+    location: "Phnom Penh",
+    logo: "/assets/projects/epower.png",
+    logoMode: "wordmark",
+    bullets: [
+      "Built end-to-end features across Solar, EAC App, E-Power Maps, and Mobile Billing using Flutter, Next.js, .NET, and SQL-backed APIs.",
+      "Connected frontend flows to backend services, modeled data, integrated REST APIs, and supported production releases.",
+      "Improved product reliability through bug fixes, performance tuning, and maintenance against live customer data.",
+    ],
+  },
+  {
+    role: "Junior Developer",
+    company: "E-Power CCL",
+    period: "Dec 2023 — Dec 2025",
+    location: "Phnom Penh",
+    logo: "/assets/projects/epower.png",
+    logoMode: "wordmark",
+    bullets: [
+      "Started as a junior developer while studying Computer Science, turning coursework in programming, databases, and software engineering into real product work.",
+      "Supported Flutter mobile screens, web UI, API integration, and testing for internal and customer-facing E-Power products.",
+      "Learned production workflows with GitLab, Docker, debugging, code review, and cross-team collaboration.",
     ],
   },
   {
@@ -184,6 +298,38 @@ export const projects: Project[] = [
       "Designed backend services for geo data",
       "Built map-driven mobile UI in Flutter",
       "Maintaining live data sync for field users",
+    ],
+  },
+  {
+    slug: "epower-maps-desktop",
+    name: "E-Power Maps Desktop",
+    tagline: "Desktop control panel for maps operations",
+    description:
+      "Desktop management tool for office teams working with E-Power Maps — reviewing field assets, managing map data, and supporting daily operations from a larger-screen workflow.",
+    roles: ["Frontend", "Maintenance"],
+    stack: [".NET Desktop", "C#", "SQL Server", "REST API", "Maps Data"],
+    logo: "/assets/projects/maps.png",
+    accent: "from-violet-400 via-sky-300 to-cyan-300",
+    highlights: [
+      "Built desktop workflows for maps operations",
+      "Connected asset screens to backend services",
+      "Supported staff with production fixes",
+    ],
+  },
+  {
+    slug: "epower-condo-desktop",
+    name: "E-Power Condo Desktop Management System",
+    tagline: "Desktop system for condo operations",
+    description:
+      "Desktop management system for condominium operations — helping teams organize customer records, utility workflows, billing support, and day-to-day administrative tasks.",
+    roles: ["Backend", "Frontend", "Maintenance"],
+    stack: [".NET Desktop", "C#", "SQL Server", "REST API", "Reporting"],
+    logo: "/assets/projects/epower.png",
+    accent: "from-rose-400 via-indigo-400 to-cyan-300",
+    highlights: [
+      "Implemented management screens and service flows",
+      "Worked with database-backed business records",
+      "Maintained reliability for office users",
     ],
   },
   {
@@ -271,6 +417,54 @@ export const personalProjects: PersonalProject[] = [
       "1:1 reproduction of a hand-written paper invoice",
       "Bilingual UI (Khmer + English)",
       "One-command Docker Compose stack",
+    ],
+  },
+  {
+    slug: "mdms-v2",
+    name: "MDMS v2",
+    tagline: "Meter Data Management System — next-gen rebuild",
+    description:
+      "A self-initiated v2 rebuild of the Meter Data Management System — rethinking meter ingestion, validation, and reporting around a modern, type-safe stack. Exploring multi-tenant data models, role-based access, and audit-friendly pipelines.",
+    stack: ["Next.js", ".NET", "PostgreSQL", "Docker", "Prisma", "Tailwind"],
+    logo: "/assets/projects/mdms-v2.svg",
+    accent: "from-indigo-500 via-sky-400 to-cyan-300",
+    status: "Research",
+    highlights: [
+      "Multi-tenant meter data model with role-based access",
+      "Validated ingestion + audit-ready pipelines",
+      "Type-safe API layer end-to-end",
+    ],
+  },
+  {
+    slug: "solar-v2",
+    name: "Solar v2",
+    tagline: "Next-gen rebuild of the solar rooftop platform",
+    description:
+      "A personal v2 reimagining of the Solar rooftop platform I work on at E-Power — cleaner architecture, faster dashboards, and richer energy analytics. Researching real-time monitoring, forecasting, and a smoother cross-platform client.",
+    stack: ["Flutter", "Dart 3", ".NET", "PostgreSQL", "WebSocket", "Docker"],
+    logo: "/assets/projects/solar.png",
+    accent: "from-amber-400 via-orange-400 to-yellow-300",
+    status: "Active",
+    highlights: [
+      "Real-time monitoring & energy analytics dashboards",
+      "Reworked architecture for speed and maintainability",
+      "Cross-platform Flutter client (web + mobile)",
+    ],
+  },
+  {
+    slug: "e-water-v2",
+    name: "E-Water v2",
+    tagline: "Water utility metering & billing, rebuilt",
+    description:
+      "A research rebuild of a water utility platform — metering, consumption tracking, and billing reimagined around a modern stack. Exploring offline-friendly meter reading, KHQR payments, and clearer customer billing flows.",
+    stack: ["Flutter", "Next.js", ".NET", "PostgreSQL", "KHQR", "Docker"],
+    logo: "/assets/projects/e-water.svg",
+    accent: "from-cyan-400 via-sky-400 to-blue-500",
+    status: "Research",
+    highlights: [
+      "Offline-friendly meter reading workflow",
+      "Consumption tracking + automated billing",
+      "KHQR payment integration",
     ],
   },
 ];
@@ -455,10 +649,27 @@ export const skillGroups = [
       "Claude Code",
       "ChatGPT",
       "Codex",
+      "GitHub Copilot",
       "Gemini",
       "DeepSeek",
       "Grok",
       "AI Expert Systems",
+    ],
+  },
+  {
+    title: "Microsoft Skills",
+    items: [
+      "Microsoft Word",
+      "Microsoft Excel",
+      "Microsoft PowerPoint",
+      "Microsoft 365",
+      "Microsoft Teams",
+      "Outlook",
+      "OneDrive",
+      "SharePoint",
+      "Excel Formulas",
+      "Document Formatting",
+      "Presentation Design",
     ],
   },
 ];

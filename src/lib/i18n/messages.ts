@@ -8,6 +8,7 @@ const en = {
       internal: "Internal",
       personal: "Personal",
       skills: "Skills",
+      archive: "Archive",
       contact: "Contact",
       resume: "Resume",
       hire: "Hire Me",
@@ -89,8 +90,8 @@ const en = {
       eyebrow: "Selected Work",
       title: "Real products. Real users. Live in production.",
       description:
-        "Four products I helped build and keep running at E-Power CCL — covering backend, frontend, and ongoing maintenance.",
-      cta: "Every product above is in production today — and I'm still maintaining all four.",
+        "Six products I helped build and keep running at E-Power CCL — covering backend, frontend, desktop, and ongoing maintenance.",
+      cta: "Every product above is in production today — and I'm still maintaining them.",
       ctaSub: "Want a deeper walkthrough or a code sample? Reach out below.",
       ctaButton: "Let's talk",
       roles: {
@@ -121,6 +122,18 @@ const en = {
         Shipped: "Shipped",
       },
     },
+    archive: {
+      eyebrow: "Archive · Credentials",
+      title: "Degrees, transcripts, and certificates.",
+      description:
+        "A growing archive of academic and training credentials — official records, degrees, and course certificates.",
+      view: "View",
+      kind: {
+        Transcript: "Transcript",
+        Degree: "Degree",
+        Certificate: "Certificate",
+      },
+    },
     skills: {
       eyebrow: "Skills & Toolbox",
       title: "A practical full-stack + mobile toolkit.",
@@ -134,6 +147,7 @@ const en = {
         "DevOps & Cloud": "DevOps & Cloud",
         "Tooling & Collaboration": "Tooling & Collaboration",
         "Design & AI": "Design & AI",
+        "Microsoft Skills": "Microsoft Skills",
       },
     },
     contact: {
@@ -206,7 +220,7 @@ const en = {
         hire:
           "Yes — I'm open to full-time roles and outsourcing. Drop me an email at povlyhoung02@gmail.com or scroll down to the Contact section.",
         projects:
-          "I'm shipping four products at E-Power CCL — Solar, EAC App, E-Power Maps, Mobile Billing. Side projects: JRMS, E-Commerce, SS Garage. See the Projects section above 👆",
+          "I'm shipping six products at E-Power CCL — Solar, EAC App, E-Power Maps, E-Power Maps Desktop, E-Power Condo Desktop Management System, and Mobile Billing. Side projects: JRMS, E-Commerce, SS Garage. See the Projects section above 👆",
         stack:
           "Mostly Flutter, Next.js, Node.js, .NET, PostgreSQL, Docker. Full list in the Skills section.",
         phone:
@@ -241,6 +255,7 @@ const km: Messages = {
       internal: "ផ្ទៃក្នុង",
       personal: "ផ្ទាល់ខ្លួន",
       skills: "ជំនាញ",
+      archive: "ឯកសារ",
       contact: "ទំនាក់ទំនង",
       resume: "ប្រវត្តិរូប",
       hire: "ជួលខ្ញុំ",
@@ -322,8 +337,8 @@ const km: Messages = {
       eyebrow: "ការងារដែលបានជ្រើសរើស",
       title: "ផលិតផលពិត។ អ្នកប្រើពិត។ កំពុងដំណើរការក្នុងផលិតកម្ម។",
       description:
-        "ផលិតផលបួនដែលខ្ញុំជួយបង្កើត និងថែទាំនៅ E-Power CCL — គ្របដណ្តប់ Backend, Frontend និងការថែទាំ។",
-      cta: "ផលិតផលទាំងអស់ខាងលើកំពុងដំណើរការក្នុងផលិតកម្ម — ហើយខ្ញុំនៅតែថែទាំទាំងបួន។",
+        "ផលិតផលប្រាំមួយដែលខ្ញុំជួយបង្កើត និងថែទាំនៅ E-Power CCL — គ្របដណ្តប់ Backend, Frontend, Desktop និងការថែទាំ។",
+      cta: "ផលិតផលទាំងអស់ខាងលើកំពុងដំណើរការក្នុងផលិតកម្ម — ហើយខ្ញុំនៅតែថែទាំ។",
       ctaSub: "ចង់ឃើញការពន្យល់លម្អិត ឬគំរូកូដ? ទាក់ទងខាងក្រោម។",
       ctaButton: "មកនិយាយគ្នា",
       roles: {
@@ -354,6 +369,18 @@ const km: Messages = {
         Shipped: "ដាក់ឲ្យដំណើរការ",
       },
     },
+    archive: {
+      eyebrow: "ឯកសារ · សញ្ញាបត្រ",
+      title: "សញ្ញាបត្រ ប្រតិចារិក និងវិញ្ញាបនបត្រ។",
+      description:
+        "ឯកសារសញ្ញាបត្រ និងវគ្គបណ្តុះបណ្តាល — កំណត់ត្រាផ្លូវការ សញ្ញាបត្រ និងវិញ្ញាបនបត្រវគ្គសិក្សា។",
+      view: "មើល",
+      kind: {
+        Transcript: "ប្រតិចារិក",
+        Degree: "សញ្ញាបត្រ",
+        Certificate: "វិញ្ញាបនបត្រ",
+      },
+    },
     skills: {
       eyebrow: "ជំនាញ & ឧបករណ៍",
       title: "ឧបករណ៍ full-stack និង mobile សម្រាប់ការប្រើប្រាស់ជាក់ស្តែង។",
@@ -367,6 +394,7 @@ const km: Messages = {
         "DevOps & Cloud": "DevOps & Cloud",
         "Tooling & Collaboration": "ឧបករណ៍ & ការសហការ",
         "Design & AI": "រចនា & AI",
+        "Microsoft Skills": "ជំនាញ Microsoft",
       },
     },
     contact: {
@@ -439,7 +467,7 @@ const km: Messages = {
         hire:
           "បាទ — ខ្ញុំបើកទទួលការងារពេញម៉ោង និង Outsourcing។ ផ្ញើអ៊ីមែលមក povlyhoung02@gmail.com ឬមើលផ្នែក Contact ខាងក្រោម។",
         projects:
-          "ខ្ញុំកំពុងបង្កើតផលិតផលបួននៅ E-Power CCL — Solar, EAC App, E-Power Maps, Mobile Billing។ គម្រោងផ្ទាល់ខ្លួន៖ JRMS, E-Commerce, SS Garage។ មើលផ្នែក Projects ខាងលើ 👆",
+          "ខ្ញុំកំពុងបង្កើតផលិតផលប្រាំមួយនៅ E-Power CCL — Solar, EAC App, E-Power Maps, E-Power Maps Desktop, E-Power Condo Desktop Management System, Mobile Billing។ គម្រោងផ្ទាល់ខ្លួន៖ JRMS, E-Commerce, SS Garage។ មើលផ្នែក Projects ខាងលើ 👆",
         stack:
           "ភាគច្រើន Flutter, Next.js, Node.js, .NET, PostgreSQL, Docker។ បញ្ជីពេញនៅផ្នែក Skills។",
         phone: "ប្រាកដ — ហៅទូរសព្ទមកលេខ +855 15-357 776 ឬ +855 89-826 667។",

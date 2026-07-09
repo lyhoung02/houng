@@ -6,6 +6,7 @@ import Projects from "@/components/Projects";
 import InternalWork from "@/components/InternalWork";
 import PersonalProjects from "@/components/PersonalProjects";
 import Skills from "@/components/Skills";
+import Archive from "@/components/Archive";
 import Contact from "@/components/Contact";
 import Playground from "@/components/Playground";
 import Footer from "@/components/Footer";
@@ -24,6 +25,7 @@ export default function Home() {
         <InternalWork />
         <PersonalProjects />
         <Skills />
+        <Archive />
         <Contact />
         <Playground />
       </main>
