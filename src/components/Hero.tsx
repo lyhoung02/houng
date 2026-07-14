@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { profile } from "@/lib/portfolio-data";
 import { useT } from "./providers/LanguageProvider";
 import { NeuralCanvas } from "./NeuralCanvas";
@@ -69,8 +70,8 @@ export default function Hero() {
             </p>
 
             <div className="reveal reveal-delay-3 mt-8 flex flex-wrap items-center gap-3">
-              <a
-                href="#projects"
+              <Link
+                href="/projects"
                 className="group inline-flex items-center gap-2 rounded-full bg-white text-slate-950 px-5 py-2.5 text-sm font-medium hover:bg-white/90 transition"
               >
                 {t.hero.seeWork}
@@ -89,13 +90,13 @@ export default function Hero() {
                     strokeLinejoin="round"
                   />
                 </svg>
-              </a>
-              <a
-                href="#contact"
+              </Link>
+              <Link
+                href="/resume"
                 className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-medium text-white/90 hover:bg-white/10 transition"
               >
-                {t.hero.getInTouch}
-              </a>
+                {t.nav.resume}
+              </Link>
               <a
                 href={`mailto:${profile.email}`}
                 className="text-sm text-white/55 hover:text-white transition underline-offset-4 hover:underline"

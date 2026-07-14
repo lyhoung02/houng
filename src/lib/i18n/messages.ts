@@ -2,7 +2,7 @@ export type Lang = "en" | "km";
 
 const en = {
     nav: {
-      about: "About",
+      about: "Home",
       experience: "Experience",
       projects: "Projects",
       internal: "Internal",
@@ -92,7 +92,7 @@ const en = {
       description:
         "Six products I helped build and keep running at E-Power CCL — covering backend, frontend, desktop, and ongoing maintenance.",
       cta: "Every product above is in production today — and I'm still maintaining them.",
-      ctaSub: "Want a deeper walkthrough or a code sample? Reach out below.",
+      ctaSub: "Want a deeper walkthrough or a code sample? Open the Contact page.",
       ctaButton: "Let's talk",
       roles: {
         Backend: "Backend",
@@ -218,11 +218,11 @@ const en = {
         greeting:
           "Hey! Thanks for saying hi. What brings you here today — looking to hire, or just curious about my work?",
         hire:
-          "Yes — I'm open to full-time roles and outsourcing. Drop me an email at povlyhoung02@gmail.com or scroll down to the Contact section.",
+          "Yes — I'm open to full-time roles and outsourcing. Drop me an email at povlyhoung02@gmail.com or open the Contact page.",
         projects:
-          "I'm shipping six products at E-Power CCL — Solar, EAC App, E-Power Maps, E-Power Maps Desktop, E-Power Condo Desktop Management System, and Mobile Billing. Side projects: JRMS, E-Commerce, SS Garage. See the Projects section above 👆",
+          "I'm shipping six products at E-Power CCL — Solar, EAC App, E-Power Maps, E-Power Maps Desktop, E-Power Condo Desktop Management System, and Mobile Billing. Side projects: JRMS, E-Commerce, SS Garage. Open the Projects page for details.",
         stack:
-          "Mostly Flutter, Next.js, Node.js, .NET, PostgreSQL, Docker. Full list in the Skills section.",
+          "Mostly Flutter, Next.js, Node.js, .NET, PostgreSQL, Docker. Full list is on the Skills page.",
         phone:
           "Sure — call or message me at +855 15-357 776 or +855 89-826 667.",
         resume:
@@ -249,7 +249,7 @@ export type Messages = typeof en;
 
 const km: Messages = {
     nav: {
-      about: "អំពីខ្ញុំ",
+      about: "ទំព័រដើម",
       experience: "បទពិសោធន៍",
       projects: "គម្រោង",
       internal: "ផ្ទៃក្នុង",
@@ -339,7 +339,7 @@ const km: Messages = {
       description:
         "ផលិតផលប្រាំមួយដែលខ្ញុំជួយបង្កើត និងថែទាំនៅ E-Power CCL — គ្របដណ្តប់ Backend, Frontend, Desktop និងការថែទាំ។",
       cta: "ផលិតផលទាំងអស់ខាងលើកំពុងដំណើរការក្នុងផលិតកម្ម — ហើយខ្ញុំនៅតែថែទាំ។",
-      ctaSub: "ចង់ឃើញការពន្យល់លម្អិត ឬគំរូកូដ? ទាក់ទងខាងក្រោម។",
+      ctaSub: "ចង់ឃើញការពន្យល់លម្អិត ឬគំរូកូដ? បើកទំព័រ Contact។",
       ctaButton: "មកនិយាយគ្នា",
       roles: {
         Backend: "Backend",
@@ -465,11 +465,11 @@ const km: Messages = {
         greeting:
           "សួស្តី! រីករាយដែលបានជួប។ តើខ្ញុំអាចជួយអ្វីបាន? កំពុងស្វែងរកជួល ឬគ្រាន់តែចង់ដឹង?",
         hire:
-          "បាទ — ខ្ញុំបើកទទួលការងារពេញម៉ោង និង Outsourcing។ ផ្ញើអ៊ីមែលមក povlyhoung02@gmail.com ឬមើលផ្នែក Contact ខាងក្រោម។",
+          "បាទ — ខ្ញុំបើកទទួលការងារពេញម៉ោង និង Outsourcing។ ផ្ញើអ៊ីមែលមក povlyhoung02@gmail.com ឬបើកទំព័រ Contact។",
         projects:
-          "ខ្ញុំកំពុងបង្កើតផលិតផលប្រាំមួយនៅ E-Power CCL — Solar, EAC App, E-Power Maps, E-Power Maps Desktop, E-Power Condo Desktop Management System, Mobile Billing។ គម្រោងផ្ទាល់ខ្លួន៖ JRMS, E-Commerce, SS Garage។ មើលផ្នែក Projects ខាងលើ 👆",
+          "ខ្ញុំកំពុងបង្កើតផលិតផលប្រាំមួយនៅ E-Power CCL — Solar, EAC App, E-Power Maps, E-Power Maps Desktop, E-Power Condo Desktop Management System, Mobile Billing។ គម្រោងផ្ទាល់ខ្លួន៖ JRMS, E-Commerce, SS Garage។ បើកទំព័រ Projects សម្រាប់ព័ត៌មានលម្អិត។",
         stack:
-          "ភាគច្រើន Flutter, Next.js, Node.js, .NET, PostgreSQL, Docker។ បញ្ជីពេញនៅផ្នែក Skills។",
+          "ភាគច្រើន Flutter, Next.js, Node.js, .NET, PostgreSQL, Docker។ បញ្ជីពេញនៅទំព័រ Skills។",
         phone: "ប្រាកដ — ហៅទូរសព្ទមកលេខ +855 15-357 776 ឬ +855 89-826 667។",
         resume:
           "មើល CV ពេញនៅ /resume — អាចបោះពុម្ពជា PDF បានដែរ។",

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { projects } from "@/lib/portfolio-data";
 import { SectionHeader } from "./About";
 import { useT } from "./providers/LanguageProvider";
@@ -104,12 +105,12 @@ export default function Projects() {
             <p className="text-sm text-white/80">{t.projects.cta}</p>
             <p className="text-xs text-white/50 mt-1">{t.projects.ctaSub}</p>
           </div>
-          <a
-            href="#contact"
+          <Link
+            href="/contact"
             className="rounded-full bg-white text-slate-950 px-5 py-2 text-sm font-medium hover:bg-white/90 transition"
           >
             {t.projects.ctaButton}
-          </a>
+          </Link>
         </div>
       </div>
     </section>

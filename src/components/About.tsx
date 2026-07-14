@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { profile } from "@/lib/portfolio-data";
 import { useT } from "./providers/LanguageProvider";
 
@@ -54,8 +55,21 @@ const icons: Record<string, React.ReactNode> = {
   ),
 };
 
+const popDelayClasses = [
+  "scroll-pop-delay-0",
+  "scroll-pop-delay-1",
+  "scroll-pop-delay-2",
+  "scroll-pop-delay-3",
+  "scroll-pop-delay-4",
+  "scroll-pop-delay-5",
+  "scroll-pop-delay-6",
+  "scroll-pop-delay-7",
+];
+
 export default function About() {
   const t = useT();
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const [animateCards, setAnimateCards] = useState(false);
   const services = [
     { key: "backend", ...t.about.services.backend },
     { key: "frontend", ...t.about.services.frontend },
@@ -65,8 +79,25 @@ export default function About() {
     { key: "leadership", ...t.about.services.leadership },
   ];
 
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setAnimateCards(true);
+        observer.disconnect();
+      },
+      { threshold: 0.18 },
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section id="about" className="py-20 sm:py-28">
+    <section ref={sectionRef} id="about" className="py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <SectionHeader
           eyebrow={t.about.eyebrow}
@@ -75,8 +106,13 @@ export default function About() {
         />
 
         <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {services.map((s) => (
-            <div key={s.key} className="glass card-hover rounded-2xl p-5 sm:p-6">
+          {services.map((s, index) => (
+            <div
+              key={s.key}
+              className={`glass card-hover scroll-pop ${popDelayClasses[index]} rounded-2xl p-5 sm:p-6 ${
+                animateCards ? "scroll-pop-in" : ""
+              }`}
+            >
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/30 to-cyan-400/20 text-white">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   {icons[s.key]}
@@ -93,7 +129,11 @@ export default function About() {
         </div>
 
         <div className="mt-6 grid lg:grid-cols-[1.15fr_1fr] gap-4">
-          <div className="glass card-hover rounded-2xl p-5 sm:p-6">
+          <div
+            className={`glass card-hover scroll-pop scroll-pop-delay-6 rounded-2xl p-5 sm:p-6 ${
+              animateCards ? "scroll-pop-in" : ""
+            }`}
+          >
             <div className="flex items-center gap-3">
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400/30 to-cyan-400/20 text-white">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -126,7 +166,11 @@ export default function About() {
             </div>
           </div>
 
-          <div className="glass card-hover rounded-2xl p-5 sm:p-6">
+          <div
+            className={`glass card-hover scroll-pop scroll-pop-delay-7 rounded-2xl p-5 sm:p-6 ${
+              animateCards ? "scroll-pop-in" : ""
+            }`}
+          >
             <div className="flex items-center gap-3">
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/30 to-amber-300/20 text-white">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">

@@ -573,6 +573,39 @@ export const internalProjects: InternalProject[] = [
     difficulty: "Hard",
     accent: "from-amber-400 to-indigo-500",
   },
+  {
+    slug: "epower-maps-desktop-maintenance",
+    period: "May — Jun 2026",
+    name: "E-Power Maps Desktop · Maintenance",
+    tagline: "Desktop maps operations maintenance",
+    description:
+      "Maintained E-Power Maps Desktop for office and operations teams — fixing production issues, improving workflow stability, and supporting map-data management for daily field operations.",
+    stack: ["E-Power Maps Desktop", ".NET Desktop", "C#", "SQL Server", "Maps Data"],
+    difficulty: "Challenging",
+    accent: "from-sky-400 to-cyan-300",
+  },
+  {
+    slug: "epower-condo-maintenance-development",
+    period: "Jun 2026 — Present",
+    name: "E-Power Condo · Maintenance & Development",
+    tagline: "Condo desktop system improvements",
+    description:
+      "Maintaining and developing E-Power Condo for condominium operations — adding features, improving data workflows, and supporting billing, customer, and administrative processes.",
+    stack: ["E-Power Condo", ".NET Desktop", "C#", "SQL Server", "Operations"],
+    difficulty: "Hard",
+    accent: "from-violet-400 to-rose-400",
+  },
+  {
+    slug: "epower-condo-web-service-updater",
+    period: "Jun 2026 — Present",
+    name: "E-Power Condo Web Service Updater",
+    tagline: "Release updater for new E-Power Condo versions",
+    description:
+      "Developed the web service updater used to release new E-Power Condo versions — managing version metadata, update delivery, release files, and safer rollout workflows for desktop clients.",
+    stack: ["Updater Service", ".NET", "C#", "Release Management", "Versioning"],
+    difficulty: "Hard",
+    accent: "from-emerald-400 to-indigo-500",
+  },
 ];
 
 export const skillGroups = [

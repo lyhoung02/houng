@@ -2,24 +2,27 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useT } from "./providers/LanguageProvider";
 import PreferencesMenu from "./PreferencesMenu";
 
 export default function Nav() {
   const t = useT();
+  const pathname = usePathname();
+  const currentPath =
+    pathname.length > 1 ? pathname.replace(/\/$/, "") : pathname;
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
   const links = [
-    { href: "/#about", label: t.nav.about },
-    { href: "/#experience", label: t.nav.experience },
-    { href: "/#projects", label: t.nav.projects },
-    { href: "/#internal", label: t.nav.internal },
-    { href: "/#personal", label: t.nav.personal },
-    { href: "/#skills", label: t.nav.skills },
-    { href: "/#archive", label: t.nav.archive },
-    { href: "/resume", label: t.nav.resume },
-    { href: "/#contact", label: t.nav.contact },
+    { href: "/", label: t.nav.about },
+    { href: "/experience", label: t.nav.experience },
+    { href: "/projects", label: t.nav.projects },
+    { href: "/internal", label: t.nav.internal },
+    { href: "/personal", label: t.nav.personal },
+    { href: "/skills", label: t.nav.skills },
+    { href: "/archive", label: t.nav.archive },
   ];
 
   useEffect(() => {
@@ -38,8 +41,8 @@ export default function Nav() {
       }`}
     >
       <div className="mx-auto max-w-6xl px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
-        <a
-          href="/#top"
+        <Link
+          href="/"
           className="flex items-center gap-2 font-semibold tracking-tight group"
         >
           <span className="relative inline-flex h-9 w-9 items-center justify-center rounded-full overflow-hidden ring-1 ring-white/15 shadow-lg shadow-indigo-500/30 transition group-hover:ring-white/30 group-hover:scale-[1.04]">
@@ -54,28 +57,32 @@ export default function Nav() {
           <span className="text-white/90 hidden sm:inline">
             Pov<span className="text-white/40"> · </span>Lyhoung
           </span>
-        </a>
+        </Link>
 
         <nav className="hidden lg:flex items-center gap-1 text-sm">
-          {links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="nav-link"
-            >
-              {l.label}
-            </a>
-          ))}
+          {links.map((l) => {
+            const active = currentPath === l.href;
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                aria-current={active ? "page" : undefined}
+                className={`nav-link ${active ? "nav-link-active" : ""}`}
+              >
+                {l.label}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-2">
           <PreferencesMenu />
-          <a
-            href="#contact"
+          <Link
+            href="/contact"
             className="hidden md:inline-flex rounded-full bg-white text-slate-950 px-4 py-1.5 text-sm font-medium hover:bg-white/90 transition"
           >
             {t.nav.hire}
-          </a>
+          </Link>
           <button
             type="button"
             aria-label={t.nav.menu}
@@ -98,23 +105,29 @@ export default function Nav() {
       {open && (
         <div className="lg:hidden border-t border-white/5 glass">
           <div className="mx-auto max-w-6xl px-5 py-3 flex flex-col gap-2 text-sm">
-            {links.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className="nav-link nav-link-mobile"
-              >
-                {l.label}
-              </a>
-            ))}
-            <a
-              href="#contact"
+            {links.map((l) => {
+              const active = currentPath === l.href;
+              return (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  aria-current={active ? "page" : undefined}
+                  onClick={() => setOpen(false)}
+                  className={`nav-link nav-link-mobile ${
+                    active ? "nav-link-active" : ""
+                  }`}
+                >
+                  {l.label}
+                </Link>
+              );
+            })}
+            <Link
+              href="/contact"
               onClick={() => setOpen(false)}
               className="mt-1 rounded-full bg-white text-slate-950 px-4 py-2 text-sm font-medium text-center"
             >
               {t.nav.hire}
-            </a>
+            </Link>
           </div>
         </div>
       )}
