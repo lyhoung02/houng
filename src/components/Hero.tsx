@@ -38,7 +38,7 @@ export default function Hero() {
       id="top"
       className="relative isolate overflow-hidden pt-16 pb-20 sm:pt-24 sm:pb-28"
     >
-      <div className="pointer-events-none absolute inset-0 -z-10 opacity-35 dark:opacity-70">
+      <div className="pointer-events-none absolute inset-0 -z-10 opacity-35 dark:opacity-60">
         <NeuralCanvas />
       </div>
       <div className="absolute inset-0 -z-10 bg-grid opacity-100" />
