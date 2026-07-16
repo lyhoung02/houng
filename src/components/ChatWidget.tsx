@@ -9,20 +9,37 @@ import { AdminPanel } from "./chat/AdminPanel";
 import { VisitorPanel } from "./chat/VisitorPanel";
 import { CommunityPanel } from "./chat/CommunityPanel";
 import { ProfilePanel } from "./chat/ProfilePanel";
+import {
+  ChatTabIcon,
+  CollapseIcon,
+  ExpandIcon,
+  UserTabIcon,
+  UsersTabIcon,
+} from "./chat/icons";
 
 const ADMIN_TAPS = 7;
 const TAP_WINDOW_MS = 3000;
 
 type Tab = "chat" | "community" | "profile";
 
+const TAB_ICONS: Record<Tab, React.ReactNode> = {
+  chat: <ChatTabIcon />,
+  community: <UsersTabIcon />,
+  profile: <UserTabIcon />,
+};
+
 export default function ChatWidget() {
   const { t, lang } = useLanguage();
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [adminMode, setAdminMode] = useState(false);
   const [tab, setTab] = useState<Tab>("chat");
 
   const chat = useVisitorChat(lang);
-  const admin = useAdminSession(adminMode);
+  // Always watching: an admin signing in through the normal form goes straight
+  // to the inbox, no 7-tap needed. The tap remains as a fallback door.
+  const admin = useAdminSession(true);
+  const isAdminView = adminMode || (admin.ready && admin.isAdmin);
 
   // Seven taps on the avatar (within a rolling window) reveal the admin door.
   // This only *reveals* the panel — RLS is what actually protects the inbox.
@@ -83,13 +100,21 @@ export default function ChatWidget() {
         role="dialog"
         aria-label={t.chat.title}
         aria-hidden={!open}
-        className={`no-print fixed bottom-24 right-5 z-50 w-[calc(100vw-2.5rem)] max-w-[380px] origin-bottom-right transition-all duration-200 ${
+        className={`no-print fixed bottom-24 right-5 z-50 w-[calc(100vw-2.5rem)] origin-bottom-right transition-all duration-200 ${
+          expanded ? "max-w-[760px]" : "max-w-[380px]"
+        } ${
           open
             ? "opacity-100 translate-y-0 pointer-events-auto"
             : "opacity-0 translate-y-3 pointer-events-none"
         }`}
       >
-        <div className="glass rounded-2xl overflow-hidden border border-border shadow-2xl shadow-slate-950/40 flex flex-col h-[70vh] max-h-[560px]">
+        <div
+          // Solid bg-background (not .glass): page content bleeding through the
+          // blur made the chat hard to read.
+          className={`bg-background rounded-2xl overflow-hidden border border-border shadow-2xl shadow-slate-950/40 flex flex-col transition-all duration-200 ${
+            expanded ? "h-[85vh] max-h-[850px]" : "h-[70vh] max-h-[560px]"
+          }`}
+        >
           {/* Header */}
           <div className="flex items-center gap-3 p-4 border-b border-border bg-gradient-to-r from-indigo-500/20 via-violet-500/15 to-cyan-400/20">
             <button
@@ -108,14 +133,18 @@ export default function ChatWidget() {
             </button>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-foreground truncate">
-                {adminMode ? t.chat.admin.inbox : t.chat.title}
+                {isAdminView ? t.chat.admin.inbox : t.chat.title}
               </p>
               <p className="text-[11px] text-foreground/70 flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                {adminMode ? (admin.email ?? "—") : `${t.chat.status} · ${t.chat.subtitle}`}
+                {isAdminView
+                  ? (admin.email ?? "—")
+                  : `${t.chat.status} · ${t.chat.subtitle}`}
               </p>
             </div>
-            {adminMode ? (
+            {/* Escape hatch for the tapped-open login form; a detected admin
+                signs out from inside the inbox instead. */}
+            {adminMode && !admin.isAdmin ? (
               <button
                 type="button"
                 onClick={() => setAdminMode(false)}
@@ -124,6 +153,7 @@ export default function ChatWidget() {
                 {t.chat.admin.back}
               </button>
             ) : (
+              !isAdminView &&
               chat.user && (
                 <button
                   type="button"
@@ -134,6 +164,15 @@ export default function ChatWidget() {
                 </button>
               )
             )}
+            <button
+              type="button"
+              aria-label={expanded ? t.chat.collapse : t.chat.expand}
+              title={expanded ? t.chat.collapse : t.chat.expand}
+              onClick={() => setExpanded((v) => !v)}
+              className="text-foreground/70 hover:text-foreground p-1 rounded"
+            >
+              {expanded ? <CollapseIcon /> : <ExpandIcon />}
+            </button>
             <button
               type="button"
               aria-label={t.chat.close}
@@ -155,7 +194,7 @@ export default function ChatWidget() {
             <div className="flex-1 grid place-items-center p-6">
               <p className="text-sm text-foreground/60 text-center">{t.chat.unavailable}</p>
             </div>
-          ) : adminMode ? (
+          ) : isAdminView ? (
             <AdminPanel
               session={admin}
               signIn={admin.signIn}
@@ -171,12 +210,13 @@ export default function ChatWidget() {
                       key={key}
                       type="button"
                       onClick={() => setTab(key)}
-                      className={`flex-1 py-2 text-[11px] font-medium transition border-b-2 ${
+                      className={`flex-1 py-2 text-[11px] font-medium transition border-b-2 inline-flex items-center justify-center gap-1.5 ${
                         tab === key
                           ? "border-indigo-500 text-foreground"
                           : "border-transparent text-foreground/50 hover:text-foreground"
                       }`}
                     >
+                      {TAB_ICONS[key]}
                       {t.chat.tabs[key]}
                     </button>
                   ))}

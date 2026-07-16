@@ -4,11 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import { useT } from "../providers/LanguageProvider";
 import { getSupabase } from "@/lib/supabase/client";
 import { avatarUrl, type Draft } from "@/lib/supabase/attachments";
-import { useCommunity } from "@/lib/supabase/useCommunity";
+import {
+  MEMBER_STACK_MAX,
+  useCommunity,
+  type MemberPreview,
+} from "@/lib/supabase/useCommunity";
 import { displayName } from "@/lib/supabase/useProfile";
+import { BAD_WORDS_ERROR } from "@/lib/supabase/useThread";
 import type { ChatMessage, CommunityMessage } from "@/lib/supabase/types";
 import { ChatBubble, TypingBubble, type BubbleAuthor } from "./ChatBubble";
 import { Composer } from "./Composer";
+import { useJumpToMessage } from "./useJumpToMessage";
 
 /**
  * Community rows reuse ChatBubble, which is typed for the 1:1 chat — the
@@ -35,6 +41,55 @@ function toChatMessage(m: CommunityMessage): ChatMessage {
   };
 }
 
+/**
+ * Overlapping member avatars, capped at MEMBER_STACK_MAX circles; anything
+ * beyond that collapses into a trailing "9+" badge.
+ */
+function MemberStack({
+  previews,
+  total,
+}: {
+  previews: MemberPreview[];
+  total: number;
+}) {
+  const supabase = getSupabase();
+  const overflow = total - previews.length;
+  return (
+    <div className="flex justify-center -space-x-2">
+      {previews.map((m) => {
+        const url = supabase ? avatarUrl(supabase, m.avatar_path) : null;
+        const name = displayName(
+          { username: m.username, phone: null, avatar_path: m.avatar_path },
+          m.user_id,
+        );
+        return url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={m.user_id}
+            src={url}
+            alt=""
+            title={name}
+            className="h-8 w-8 rounded-full object-cover border-2 border-background bg-surface"
+          />
+        ) : (
+          <span
+            key={m.user_id}
+            title={name}
+            className="h-8 w-8 rounded-full grid place-items-center border-2 border-background bg-indigo-500/25 text-[11px] font-semibold text-indigo-700 dark:text-indigo-200"
+          >
+            {(name.trim()[0] ?? "?").toUpperCase()}
+          </span>
+        );
+      })}
+      {overflow > 0 && (
+        <span className="h-8 w-8 rounded-full grid place-items-center border-2 border-background bg-surface-strong text-[10px] font-semibold text-foreground/70">
+          {MEMBER_STACK_MAX}+
+        </span>
+      )}
+    </div>
+  );
+}
+
 export function CommunityPanel({
   userId,
   isAdmin,
@@ -47,6 +102,7 @@ export function CommunityPanel({
   const [replyTo, setReplyTo] = useState<CommunityMessage | null>(null);
   const [editing, setEditing] = useState<CommunityMessage | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const jump = useJumpToMessage();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -65,6 +121,12 @@ export function CommunityPanel({
           <p className="text-[11px] text-foreground/60 leading-snug">
             {t.chat.community.blurb}
           </p>
+          {community.memberPreviews.length > 0 && (
+            <MemberStack
+              previews={community.memberPreviews}
+              total={community.memberCount ?? community.memberPreviews.length}
+            />
+          )}
           {community.memberCount != null && community.memberCount > 0 && (
             <p className="text-[10px] text-foreground/40">
               {community.memberCount} {t.chat.community.members}
@@ -136,22 +198,29 @@ export function CommunityPanel({
           const mine = m.user_id === userId;
           const target = m.reply_to_id ? byId.get(m.reply_to_id) : null;
           return (
-            <ChatBubble
-              key={m.id}
-              message={toChatMessage(m)}
-              mineIs="visitor"
-              mineOverride={mine}
-              author={authorFor(m)}
-              showName
-              labels={labels}
-              replyTarget={target ? toChatMessage(target) : null}
-              onReply={() => setReplyTo(m)}
-              onEdit={mine ? () => setEditing(m) : undefined}
-              // Own messages always; admin moderates anything.
-              onDelete={
-                mine || isAdmin ? (msg) => void community.remove(msg.id) : undefined
-              }
-            />
+            <div key={m.id} ref={jump.register(m.id)} className={jump.highlightClass(m.id)}>
+              <ChatBubble
+                message={toChatMessage(m)}
+                mineIs="visitor"
+                mineOverride={mine}
+                author={authorFor(m)}
+                showName
+                labels={labels}
+                reactions={community.reactionsByMessage[m.id]}
+                myUserId={userId}
+                onReact={(msg, emoji) => void community.toggleReaction(msg.id, emoji)}
+                replyTarget={target ? toChatMessage(target) : null}
+                onReply={() => setReplyTo(m)}
+                onEdit={mine ? () => setEditing(m) : undefined}
+                // Own messages always; admin moderates anything.
+                onDelete={
+                  mine || isAdmin ? (msg) => void community.remove(msg.id) : undefined
+                }
+                onQuoteClick={
+                  m.reply_to_id ? () => jump.jumpTo(m.reply_to_id!) : undefined
+                }
+              />
+            </div>
           );
         })}
         {community.peerTyping && <TypingBubble label={t.chat.typing} />}
@@ -172,6 +241,7 @@ export function CommunityPanel({
             emoji: t.chat.msg.emoji,
             recording: t.chat.msg.recording,
             tooLarge: t.chat.msg.tooLarge,
+            blockedType: t.chat.msg.blockedType,
           }}
           disabled={community.sending}
           onTyping={community.sendTyping}
@@ -193,7 +263,9 @@ export function CommunityPanel({
           }}
         />
         <p className="mt-2 text-[10px] text-foreground/40 leading-snug text-center">
-          {community.error ?? t.chat.community.note}
+          {community.error === BAD_WORDS_ERROR
+            ? t.chat.msg.badWords
+            : (community.error ?? t.chat.community.note)}
         </p>
       </div>
     </>

@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useT } from "../providers/LanguageProvider";
-import type { useThread } from "@/lib/supabase/useThread";
+import { BAD_WORDS_ERROR, type useThread } from "@/lib/supabase/useThread";
 import type { ChatMessage, Sender } from "@/lib/supabase/types";
 import type { Draft } from "@/lib/supabase/attachments";
 import { ChatBubble, TypingBubble, type BubbleAuthor } from "./ChatBubble";
 import { Composer } from "./Composer";
+import { useJumpToMessage } from "./useJumpToMessage";
 
 type Thread = ReturnType<typeof useThread>;
 
@@ -34,6 +35,7 @@ export function ThreadView({
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
   const [editing, setEditing] = useState<ChatMessage | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const jump = useJumpToMessage();
 
   const byId = new Map(thread.messages.map((m) => [m.id, m]));
 
@@ -65,6 +67,7 @@ export function ThreadView({
     emoji: t.chat.msg.emoji,
     recording: t.chat.msg.recording,
     tooLarge: t.chat.msg.tooLarge,
+    blockedType: t.chat.msg.blockedType,
   };
 
   return (
@@ -72,20 +75,22 @@ export function ThreadView({
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-2.5">
         {header}
         {thread.messages.map((m) => (
-          <ChatBubble
-            key={m.id}
-            message={m}
-            mineIs={mineIs}
-            author={peerAuthor}
-            labels={labels}
-            reactions={thread.reactionsByMessage[m.id]}
-            myUserId={thread.myUserId}
-            replyTarget={m.reply_to_id ? (byId.get(m.reply_to_id) ?? null) : null}
-            onReply={setReplyTo}
-            onEdit={setEditing}
-            onDelete={(msg) => void thread.remove(msg.id)}
-            onReact={(msg, emoji) => void thread.toggleReaction(msg.id, emoji)}
-          />
+          <div key={m.id} ref={jump.register(m.id)} className={jump.highlightClass(m.id)}>
+            <ChatBubble
+              message={m}
+              mineIs={mineIs}
+              author={peerAuthor}
+              labels={labels}
+              reactions={thread.reactionsByMessage[m.id]}
+              myUserId={thread.myUserId}
+              replyTarget={m.reply_to_id ? (byId.get(m.reply_to_id) ?? null) : null}
+              onReply={setReplyTo}
+              onEdit={setEditing}
+              onDelete={(msg) => void thread.remove(msg.id)}
+              onReact={(msg, emoji) => void thread.toggleReaction(msg.id, emoji)}
+              onQuoteClick={m.reply_to_id ? () => jump.jumpTo(m.reply_to_id!) : undefined}
+            />
+          </div>
         ))}
         {thread.peerTyping && <TypingBubble label={t.chat.typing} />}
       </div>
@@ -113,7 +118,9 @@ export function ThreadView({
           }}
         />
         <p className="mt-2 text-[10px] text-foreground/40 leading-snug text-center">
-          {thread.error ?? t.chat.liveNote}
+          {thread.error === BAD_WORDS_ERROR
+            ? t.chat.msg.badWords
+            : (thread.error ?? t.chat.liveNote)}
         </p>
       </div>
     </>

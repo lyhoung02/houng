@@ -7,6 +7,8 @@ import { avatarUrl } from "@/lib/supabase/attachments";
 import { useAdminInbox, type AdminSession } from "@/lib/supabase/useChat";
 import { ThreadView } from "./ThreadView";
 import { CommunityPanel } from "./CommunityPanel";
+import { ProfilePanel } from "./ProfilePanel";
+import { ChatTabIcon, UsersTabIcon, UserTabIcon } from "./icons";
 
 type SignIn = (email: string, password: string) => Promise<string | null>;
 
@@ -20,7 +22,7 @@ export function AdminPanel({
   signOut: () => Promise<void>;
 }) {
   const t = useT();
-  const [tab, setTab] = useState<"inbox" | "community">("inbox");
+  const [tab, setTab] = useState<"inbox" | "community" | "profile">("inbox");
 
   if (!session.ready) {
     return <div className="flex-1 grid place-items-center text-foreground/50 text-sm">…</div>;
@@ -28,29 +30,39 @@ export function AdminPanel({
   if (!session.isAdmin) {
     return <AdminLogin signIn={signIn} signedInEmail={session.email} />;
   }
+
+  const tabMeta = {
+    inbox: { icon: <ChatTabIcon />, label: t.chat.admin.inbox },
+    community: { icon: <UsersTabIcon />, label: t.chat.tabs.community },
+    profile: { icon: <UserTabIcon />, label: t.chat.tabs.profile },
+  } as const;
+
   return (
     <>
       <div className="flex border-b border-border">
-        {(["inbox", "community"] as const).map((key) => (
+        {(["inbox", "community", "profile"] as const).map((key) => (
           <button
             key={key}
             type="button"
             onClick={() => setTab(key)}
-            className={`flex-1 py-2 text-[11px] font-medium transition border-b-2 ${
+            className={`flex-1 py-2 text-[11px] font-medium transition border-b-2 inline-flex items-center justify-center gap-1.5 ${
               tab === key
                 ? "border-indigo-500 text-foreground"
                 : "border-transparent text-foreground/50 hover:text-foreground"
             }`}
           >
-            {key === "inbox" ? t.chat.admin.inbox : t.chat.tabs.community}
+            {tabMeta[key].icon}
+            {tabMeta[key].label}
           </button>
         ))}
       </div>
       {tab === "inbox" ? (
         <AdminInbox signOut={signOut} />
-      ) : session.userId ? (
+      ) : !session.userId ? null : tab === "community" ? (
         <CommunityPanel userId={session.userId} isAdmin />
-      ) : null}
+      ) : (
+        <ProfilePanel userId={session.userId} email={session.email ?? ""} />
+      )}
     </>
   );
 }
@@ -117,37 +129,45 @@ function AdminInbox({ signOut }: { signOut: () => Promise<void> }) {
   const t = useT();
   const inbox = useAdminInbox(true);
   const { conversations, selectedId, setSelectedId, error } = inbox;
-  // Tagged with the visitor it was fetched for, so switching threads derives
-  // null instead of clearing state inside the effect.
-  const [avatarState, setAvatarState] = useState<{ id: string; url: string | null }>({
-    id: "",
-    url: null,
-  });
+  // Avatar URL per visitor, fetched in one query for everyone in the list and
+  // reused for the open thread. Missing profiles are stored as null so they
+  // aren't refetched every render.
+  const [avatars, setAvatars] = useState<Record<string, string | null>>({});
 
   const selected = conversations.find((c) => c.id === selectedId) ?? null;
   const visitorId = selected?.visitor_id ?? null;
 
-  // The open thread's visitor avatar, if they've set one on their profile.
   useEffect(() => {
     const supabase = getSupabase();
-    if (!supabase || !visitorId) return;
+    if (!supabase || conversations.length === 0) return;
+    const missing = [
+      ...new Set(
+        conversations
+          .map((c) => c.visitor_id)
+          .filter((id): id is string => Boolean(id && !(id in avatars))),
+      ),
+    ];
+    if (missing.length === 0) return;
     let cancelled = false;
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("avatar_path")
-        .eq("user_id", visitorId)
-        .maybeSingle();
-      if (!cancelled) {
-        setAvatarState({ id: visitorId, url: avatarUrl(supabase, data?.avatar_path) });
-      }
+        .select("user_id, avatar_path")
+        .in("user_id", missing);
+      if (cancelled) return;
+      setAvatars((prev) => {
+        const next = { ...prev };
+        for (const id of missing) next[id] = null;
+        for (const p of data ?? []) next[p.user_id] = avatarUrl(supabase, p.avatar_path);
+        return next;
+      });
     })();
     return () => {
       cancelled = true;
     };
-  }, [visitorId]);
+  }, [conversations, avatars]);
 
-  const visitorAvatar = avatarState.id === visitorId ? avatarState.url : null;
+  const visitorAvatar = visitorId ? (avatars[visitorId] ?? null) : null;
 
   if (!selected) {
     return (
@@ -156,26 +176,45 @@ function AdminInbox({ signOut }: { signOut: () => Promise<void> }) {
           {conversations.length === 0 && (
             <p className="p-4 text-sm text-foreground/50">{t.chat.admin.empty}</p>
           )}
-          {conversations.map((c) => (
-            <button
-              key={c.id}
-              type="button"
-              onClick={() => setSelectedId(c.id)}
-              className="w-full text-left px-4 py-3 border-b border-border hover:bg-surface transition"
-            >
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-medium text-foreground truncate flex-1">
-                  {c.visitor_name}
-                </p>
-                {c.unread_for_admin > 0 && (
-                  <span className="shrink-0 rounded-full bg-indigo-500 text-white text-[10px] px-1.5 py-0.5">
-                    {c.unread_for_admin}
+          {conversations.map((c) => {
+            const url = c.visitor_id ? avatars[c.visitor_id] : null;
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setSelectedId(c.id)}
+                className="w-full text-left px-4 py-3 border-b border-border hover:bg-surface transition flex items-center gap-3"
+              >
+                {url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={url}
+                    alt=""
+                    className="h-9 w-9 rounded-full object-cover shrink-0 border border-border"
+                  />
+                ) : (
+                  <span className="h-9 w-9 rounded-full shrink-0 grid place-items-center bg-indigo-500/25 text-xs font-semibold text-indigo-700 dark:text-indigo-200 border border-border">
+                    {(c.visitor_name.trim()[0] ?? "?").toUpperCase()}
                   </span>
                 )}
-              </div>
-              <p className="text-[11px] text-foreground/50 truncate">{c.visitor_email}</p>
-            </button>
-          ))}
+                <span className="flex-1 min-w-0">
+                  <span className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-foreground truncate flex-1">
+                      {c.visitor_name}
+                    </span>
+                    {c.unread_for_admin > 0 && (
+                      <span className="shrink-0 rounded-full bg-indigo-500 text-white text-[10px] px-1.5 py-0.5">
+                        {c.unread_for_admin}
+                      </span>
+                    )}
+                  </span>
+                  <span className="block text-[11px] text-foreground/50 truncate">
+                    {c.visitor_email}
+                  </span>
+                </span>
+              </button>
+            );
+          })}
         </div>
         {error && <p className="px-4 py-2 text-xs text-rose-600 dark:text-rose-300">{error}</p>}
         <div className="border-t border-border p-3">

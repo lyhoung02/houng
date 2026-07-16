@@ -48,13 +48,13 @@ export default function ChatResume() {
       ) : !chat.authReady ? (
         <p className="mt-4 text-sm text-foreground/60">{t.chat.resume.loading}</p>
       ) : !chat.user ? (
-        <div className="mt-6 glass rounded-2xl border border-border overflow-hidden flex flex-col">
+        <div className="mt-6 bg-background rounded-2xl border border-border overflow-hidden flex flex-col">
           <AuthForm chat={chat} />
         </div>
       ) : !chat.conversationId ? (
         <p className="mt-4 text-sm text-foreground/60">{t.chat.resume.loading}</p>
       ) : (
-        <div className="mt-6 glass rounded-2xl border border-border overflow-hidden flex flex-col h-[65vh]">
+        <div className="mt-6 bg-background rounded-2xl border border-border overflow-hidden flex flex-col h-[65vh]">
           <ThreadView
             thread={chat}
             mineIs="visitor"

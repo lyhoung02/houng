@@ -4,7 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { RealtimeChannel, SupabaseClient } from "@supabase/supabase-js";
 import { getSupabase } from "./client";
 import { removeAttachment, uploadAttachment, type Draft } from "./attachments";
-import type { CommunityMessage, Database } from "./types";
+import { mapDbError } from "./useThread";
+import type { CommunityMessage, Database, Reaction } from "./types";
 import type { ProfileState } from "./useProfile";
 
 /** Storage prefix for community attachments (see owns_attachment_path). */
@@ -27,10 +28,22 @@ export type CommunitySend = {
  * The single community room: membership, live messages, and the author
  * profiles needed to render names and avatars.
  */
+/** How many member avatars the join screen stacks before the overflow badge. */
+export const MEMBER_STACK_MAX = 9;
+
+export type MemberPreview = {
+  user_id: string;
+  username: string | null;
+  avatar_path: string | null;
+};
+
 export function useCommunity(userId: string | null, enabled: boolean, isAdmin = false) {
   const [isMember, setIsMember] = useState<boolean | null>(null);
   const [memberCount, setMemberCount] = useState<number | null>(null);
+  const [memberPreviews, setMemberPreviews] = useState<MemberPreview[]>([]);
+  const [memberRefresh, setMemberRefresh] = useState(0);
   const [messages, setMessages] = useState<CommunityMessage[]>([]);
+  const [reactions, setReactions] = useState<Reaction[]>([]);
   const [profiles, setProfiles] = useState<Record<string, ProfileState>>({});
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
@@ -40,13 +53,13 @@ export function useCommunity(userId: string | null, enabled: boolean, isAdmin = 
   const typingChannelRef = useRef<RealtimeChannel | null>(null);
   const lastPingRef = useRef(0);
 
-  // Membership + member count.
+  // Membership, member count, and the first few members for the avatar stack.
   useEffect(() => {
     const supabase = getSupabase();
     if (!supabase || !enabled || !userId) return;
     let cancelled = false;
     (async () => {
-      const [{ data: mine }, { count }] = await Promise.all([
+      const [{ data: mine }, { count }, { data: firstMembers }] = await Promise.all([
         supabase
           .from("community_members")
           .select("user_id")
@@ -55,15 +68,40 @@ export function useCommunity(userId: string | null, enabled: boolean, isAdmin = 
         supabase
           .from("community_members")
           .select("*", { count: "exact", head: true }),
+        supabase
+          .from("community_members")
+          .select("user_id")
+          .order("joined_at", { ascending: true })
+          .limit(MEMBER_STACK_MAX),
       ]);
       if (cancelled) return;
       setIsMember(Boolean(mine));
       setMemberCount(count ?? null);
+
+      const ids = (firstMembers ?? []).map((m) => m.user_id);
+      if (ids.length === 0) {
+        setMemberPreviews([]);
+        return;
+      }
+      const { data: profileRows } = await supabase
+        .from("profiles")
+        .select("user_id, username, avatar_path")
+        .in("user_id", ids);
+      if (cancelled) return;
+      const byUser = new Map((profileRows ?? []).map((p) => [p.user_id, p]));
+      // Preserve join order; members without a profile row still get a circle.
+      setMemberPreviews(
+        ids.map((id) => ({
+          user_id: id,
+          username: byUser.get(id)?.username ?? null,
+          avatar_path: byUser.get(id)?.avatar_path ?? null,
+        })),
+      );
     })();
     return () => {
       cancelled = true;
     };
-  }, [enabled, userId]);
+  }, [enabled, userId, memberRefresh]);
 
   // Messages + realtime. RLS lets admins read without joining, so the gate
   // mirrors that: member OR admin.
@@ -110,6 +148,56 @@ export function useCommunity(userId: string | null, enabled: boolean, isAdmin = 
       supabase.removeChannel(channel);
     };
   }, [enabled, canRead]);
+
+  // Reactions: load + reload on any change (RLS scopes rows to the room).
+  useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase || !enabled || !canRead) return;
+    let cancelled = false;
+
+    const load = async () => {
+      const { data } = await supabase.from("community_reactions").select("*");
+      if (!cancelled) setReactions((data ?? []) as Reaction[]);
+    };
+    void load();
+
+    const channel = supabase
+      .channel("community:reactions")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "community_reactions" },
+        () => void load(),
+      )
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
+  }, [enabled, canRead]);
+
+  const toggleReaction = useCallback(
+    async (messageId: string, emoji: string) => {
+      const supabase = getSupabase();
+      if (!supabase || !userId) return;
+      const mine = reactions.some(
+        (r) => r.message_id === messageId && r.user_id === userId && r.emoji === emoji,
+      );
+      if (mine) {
+        await supabase
+          .from("community_reactions")
+          .delete()
+          .eq("message_id", messageId)
+          .eq("user_id", userId)
+          .eq("emoji", emoji);
+      } else {
+        await supabase
+          .from("community_reactions")
+          .insert({ message_id: messageId, user_id: userId, emoji });
+      }
+    },
+    [reactions, userId],
+  );
 
   // Typing indicator: broadcast-only, same self-healing pattern as the 1:1
   // thread — pings throttle on the way out and expire on the way in.
@@ -240,6 +328,8 @@ export function useCommunity(userId: string | null, enabled: boolean, isAdmin = 
     }
     setIsMember(true);
     setMemberCount((n) => (n == null ? n : n + 1));
+    // Refetch the stack so the new member's own circle appears.
+    setMemberRefresh((n) => n + 1);
     return true;
   }, [userId]);
 
@@ -280,7 +370,7 @@ export function useCommunity(userId: string | null, enabled: boolean, isAdmin = 
         return true;
       } catch (e) {
         if (path) await removeAttachment(supabase as SupabaseClient<Database>, path);
-        setError(e instanceof Error ? e.message : "Message didn't send.");
+        setError(e instanceof Error ? mapDbError(e.message) : "Message didn't send.");
         return false;
       } finally {
         setSending(false);
@@ -297,7 +387,7 @@ export function useCommunity(userId: string | null, enabled: boolean, isAdmin = 
       p_body: body.trim(),
     });
     if (rpcErr) {
-      setError(rpcErr.message);
+      setError(mapDbError(rpcErr.message));
       return false;
     }
     return true;
@@ -310,7 +400,7 @@ export function useCommunity(userId: string | null, enabled: boolean, isAdmin = 
       p_message_id: messageId,
     });
     if (rpcErr) {
-      setError(rpcErr.message);
+      setError(mapDbError(rpcErr.message));
       return false;
     }
     if (typeof data === "string" && data) {
@@ -319,10 +409,18 @@ export function useCommunity(userId: string | null, enabled: boolean, isAdmin = 
     return true;
   }, []);
 
+  const reactionsByMessage: Record<string, Reaction[]> = {};
+  for (const r of reactions) {
+    (reactionsByMessage[r.message_id] ??= []).push(r);
+  }
+
   return {
     isMember,
     memberCount,
+    memberPreviews,
     messages,
+    reactionsByMessage,
+    toggleReaction,
     profiles,
     error,
     sending,

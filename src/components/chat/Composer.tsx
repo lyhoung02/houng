@@ -6,6 +6,7 @@ import { useRecorder, recorderSupported } from "@/lib/media/useRecorder";
 import {
   formatBytes,
   formatDuration,
+  isAllowedFileName,
   kindForMime,
   MAX_UPLOAD_BYTES,
   type Draft,
@@ -30,6 +31,7 @@ export type ComposerLabels = {
   emoji: string;
   recording: string;
   tooLarge: string;
+  blockedType: string;
 };
 
 export function Composer({
@@ -124,6 +126,10 @@ export function Composer({
   };
 
   const pickFile = (file: File) => {
+    if (!isAllowedFileName(file.name)) {
+      setLocalError(labels.blockedType);
+      return;
+    }
     if (file.size > MAX_UPLOAD_BYTES) {
       setLocalError(labels.tooLarge);
       return;

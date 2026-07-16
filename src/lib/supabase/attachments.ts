@@ -6,6 +6,24 @@ import type { Database, MessageKind } from "./types";
 export const BUCKET = "chat-attachments";
 export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024; // keep in sync with the bucket limit
 
+/**
+ * Executable/script formats rejected on upload. This is the UX check — the
+ * storage insert policy (is_allowed_attachment in migration 0006) is the
+ * enforcement; keep the two lists in sync.
+ */
+const BLOCKED_EXTENSIONS = new Set([
+  "exe", "msi", "bat", "cmd", "com", "scr", "pif", "vbs", "vbe", "js", "jse",
+  "wsf", "wsh", "ps1", "psm1", "hta", "jar", "apk", "ipa", "app", "dll", "so",
+  "dylib", "deb", "rpm", "bin", "run", "msc", "cpl", "gadget", "sh", "bash",
+  "zsh", "csh", "ksh", "php", "phtml", "asp", "aspx", "jsp", "cgi", "htm",
+  "html", "xhtml", "svg",
+]);
+
+export function isAllowedFileName(name: string) {
+  const ext = name.split(".").pop()?.toLowerCase() ?? "";
+  return !BLOCKED_EXTENSIONS.has(ext);
+}
+
 export type Draft = {
   file: Blob;
   name: string;

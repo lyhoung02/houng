@@ -213,6 +213,8 @@ const en = {
       unavailable: "Chat is offline right now. Email povlyhoung02@gmail.com instead.",
       sendFailed: "Message didn't send. Try again.",
       typing: "typing…",
+      expand: "Expand chat",
+      collapse: "Shrink chat",
       tabs: {
         chat: "Chat",
         community: "Community",
@@ -264,6 +266,8 @@ const en = {
         emoji: "Emoji",
         recording: "Recording",
         tooLarge: "File is too large (max 25 MB).",
+        blockedType: "This file type isn't allowed.",
+        badWords: "Please keep it polite — that message contains inappropriate language.",
       },
       welcome:
         "Hey 👋 thanks for stopping by! I'm Lyhoung. Ask me anything — about my projects, stack, or hiring me.",
@@ -537,6 +541,8 @@ const km: Messages = {
       unavailable: "ការជជែកបិទបណ្តោះអាសន្ន។ សូមផ្ញើអ៊ីមែលមក povlyhoung02@gmail.com។",
       sendFailed: "ផ្ញើសារមិនបានសម្រេច។ សូមព្យាយាមម្តងទៀត។",
       typing: "កំពុងវាយ…",
+      expand: "ពង្រីកការជជែក",
+      collapse: "បង្រួមការជជែក",
       tabs: {
         chat: "ជជែក",
         community: "សហគមន៍",
@@ -587,6 +593,8 @@ const km: Messages = {
         emoji: "សញ្ញាអារម្មណ៍",
         recording: "កំពុងថត",
         tooLarge: "ឯកសារធំពេក (អតិបរមា 25 MB)។",
+        blockedType: "ប្រភេទឯកសារនេះមិនត្រូវបានអនុញ្ញាតទេ។",
+        badWords: "សូមរក្សាភាពគួរសម — សារនេះមានពាក្យមិនសមរម្យ។",
       },
       welcome:
         "សួស្តី 👋 អរគុណដែលបានមកលេង! ខ្ញុំឈ្មោះ Lyhoung។ សួរអ្វីក៏បាន — អំពីគម្រោងរបស់ខ្ញុំ បច្ចេកវិទ្យាដែលខ្ញុំប្រើ ឬការងារ។",

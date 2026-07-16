@@ -131,6 +131,12 @@ export type Database = {
         Update: Partial<{ user_id: string }>;
         Relationships: [];
       };
+      community_reactions: {
+        Row: Reaction;
+        Insert: Pick<Reaction, "message_id" | "user_id" | "emoji">;
+        Update: Partial<Reaction>;
+        Relationships: [];
+      };
       community_messages: {
         Row: CommunityMessage;
         Insert: Pick<CommunityMessage, "user_id" | "body"> &

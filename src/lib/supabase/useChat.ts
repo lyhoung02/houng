@@ -52,6 +52,11 @@ export function useVisitorChat(lang: string) {
     let cancelled = false;
 
     (async () => {
+      // Admins land in the inbox, not the visitor thread — don't mint a
+      // conversation where the admin chats with themselves.
+      const { data: adminFlag } = await supabase.rpc("is_admin");
+      if (adminFlag || cancelled) return;
+
       const { data, error: rpcErr } = await supabase.rpc("start_conversation", {
         p_name: nameFromEmail(user.email),
         p_email: user.email,

@@ -109,13 +109,18 @@ export function ChatBubble({
             </p>
           )}
           {replyTarget && (
-            <div className="mb-1.5 pl-2 border-l-2 border-current opacity-50">
+            <button
+              type="button"
+              onClick={onQuoteClick}
+              disabled={!onQuoteClick}
+              className="block w-full text-left mb-1.5 pl-2 border-l-2 border-current opacity-50 enabled:hover:opacity-80 enabled:cursor-pointer transition"
+            >
               <p className="text-[10px] truncate max-w-[200px]">
                 {replyTarget.deleted_at
                   ? labels.deleted
                   : replyTarget.body || replyTarget.attachment_name}
               </p>
-            </div>
+            </button>
           )}
 
           {message.kind !== "text" && (

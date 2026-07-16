@@ -10,6 +10,16 @@ import {
 } from "./attachments";
 import type { ChatMessage, Database, Reaction, Sender } from "./types";
 
+/**
+ * Sentinel for the DB bad-words trigger (raises 'BAD_WORDS'); views translate
+ * it via i18n instead of showing the raw Postgres error.
+ */
+export const BAD_WORDS_ERROR = "bad-words";
+
+export function mapDbError(message: string): string {
+  return message.includes("BAD_WORDS") ? BAD_WORDS_ERROR : message;
+}
+
 /** At most one typing ping per this interval, however fast someone types. */
 const PING_THROTTLE_MS = 1800;
 /** Indicator hides this long after the last ping received. */
@@ -241,7 +251,7 @@ export function useThread(
       } catch (e) {
         // Don't leave the uploaded file orphaned if the row never landed.
         if (path) await removeAttachment(supabase as SupabaseClient<Database>, path);
-        setError(e instanceof Error ? e.message : "Message didn't send.");
+        setError(e instanceof Error ? mapDbError(e.message) : "Message didn't send.");
         return false;
       } finally {
         setSending(false);
@@ -258,7 +268,7 @@ export function useThread(
       p_body: body.trim(),
     });
     if (rpcErr) {
-      setError(rpcErr.message);
+      setError(mapDbError(rpcErr.message));
       return false;
     }
     return true;
@@ -272,7 +282,7 @@ export function useThread(
       p_message_id: messageId,
     });
     if (rpcErr) {
-      setError(rpcErr.message);
+      setError(mapDbError(rpcErr.message));
       return false;
     }
     if (typeof data === "string" && data) {
