@@ -70,6 +70,9 @@ export type Conversation = {
   unread_for_visitor: number;
   /** Language the visitor registered in; picks the auto-reply translation. */
   lang: "en" | "km";
+  /** Read receipts: a message is seen once the other side's stamp passes it. */
+  visitor_last_read_at: string;
+  admin_last_read_at: string;
 };
 
 type MessageInsert = Pick<ChatMessage, "conversation_id" | "sender" | "body"> &
@@ -131,6 +134,18 @@ export type Database = {
         Update: Partial<{ user_id: string }>;
         Relationships: [];
       };
+      blocked_users: {
+        Row: { user_id: string; reason: "blocked" | "removed"; created_at: string };
+        Insert: { user_id: string; reason?: "blocked" | "removed" };
+        Update: Partial<{ user_id: string; reason: "blocked" | "removed" }>;
+        Relationships: [];
+      };
+      community_reads: {
+        Row: { user_id: string; last_read_at: string };
+        Insert: { user_id: string; last_read_at?: string };
+        Update: Partial<{ user_id: string; last_read_at: string }>;
+        Relationships: [];
+      };
       community_reactions: {
         Row: Reaction;
         Insert: Pick<Reaction, "message_id" | "user_id" | "emoji">;
@@ -190,6 +205,22 @@ export type Database = {
       is_community_member: {
         Args: Record<never, never>;
         Returns: boolean;
+      };
+      is_blocked: {
+        Args: Record<never, never>;
+        Returns: boolean;
+      };
+      admin_block_user: {
+        Args: { p_user_id: string };
+        Returns: void;
+      };
+      admin_unblock_user: {
+        Args: { p_user_id: string };
+        Returns: void;
+      };
+      admin_remove_user: {
+        Args: { p_user_id: string };
+        Returns: void;
       };
       is_admin: {
         Args: Record<never, never>;

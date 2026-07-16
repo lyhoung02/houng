@@ -267,7 +267,19 @@ const en = {
         recording: "Recording",
         tooLarge: "File is too large (max 25 MB).",
         blockedType: "This file type isn't allowed.",
+        fmtBold: "Bold",
+        fmtItalic: "Italic",
+        fmtUnderline: "Underline",
+        fmtStrike: "Strikethrough",
+        fmtSpoiler: "Spoiler",
+        fmtCode: "Code",
         badWords: "Please keep it polite — that message contains inappropriate language.",
+        today: "Today",
+        yesterday: "Yesterday",
+        you: "You",
+        seen: "Seen",
+        notSeen: "Not seen yet",
+        seenBy: "Seen by",
       },
       welcome:
         "Hey 👋 thanks for stopping by! I'm Lyhoung. Ask me anything — about my projects, stack, or hiring me.",
@@ -308,6 +320,21 @@ const en = {
         selectHint: "Pick a conversation to reply.",
         back: "Back",
         notAdmin: "This account isn't an admin.",
+        block: "Block",
+        unblock: "Unblock",
+        remove: "Remove",
+        blockedBadge: "Blocked",
+        confirmBlock:
+          "Block {name}? They will be signed out immediately and can no longer chat.",
+        confirmRemove:
+          "Remove {name}? They will be blocked and ALL their chats and messages will be permanently deleted.",
+      },
+      blocked: {
+        blockedNotice:
+          "Your account has been blocked by the admin. You can no longer use the chat.",
+        removedNotice:
+          "Your account has been removed by the admin. Your chats were deleted and you can no longer use the chat.",
+        dismiss: "OK",
       },
       resume: {
         heading: "Opening your chat",
@@ -594,7 +621,19 @@ const km: Messages = {
         recording: "កំពុងថត",
         tooLarge: "ឯកសារធំពេក (អតិបរមា 25 MB)។",
         blockedType: "ប្រភេទឯកសារនេះមិនត្រូវបានអនុញ្ញាតទេ។",
+        fmtBold: "ដិត",
+        fmtItalic: "ទ្រេត",
+        fmtUnderline: "គូសបន្ទាត់ក្រោម",
+        fmtStrike: "ឆូតកណ្តាល",
+        fmtSpoiler: "លាក់អត្ថបទ",
+        fmtCode: "កូដ",
         badWords: "សូមរក្សាភាពគួរសម — សារនេះមានពាក្យមិនសមរម្យ។",
+        today: "ថ្ងៃនេះ",
+        yesterday: "ម្សិលមិញ",
+        you: "អ្នក",
+        seen: "បានឃើញ",
+        notSeen: "មិនទាន់ឃើញទេ",
+        seenBy: "បានឃើញដោយ",
       },
       welcome:
         "សួស្តី 👋 អរគុណដែលបានមកលេង! ខ្ញុំឈ្មោះ Lyhoung។ សួរអ្វីក៏បាន — អំពីគម្រោងរបស់ខ្ញុំ បច្ចេកវិទ្យាដែលខ្ញុំប្រើ ឬការងារ។",
@@ -634,6 +673,21 @@ const km: Messages = {
         selectHint: "ជ្រើសរើសការជជែកដើម្បីឆ្លើយតប។",
         back: "ត្រឡប់",
         notAdmin: "គណនីនេះមិនមែនជាអ្នកគ្រប់គ្រងទេ។",
+        block: "រារាំង",
+        unblock: "ដោះរារាំង",
+        remove: "លុបចេញ",
+        blockedBadge: "បានរារាំង",
+        confirmBlock:
+          "រារាំង {name}? ពួកគេនឹងត្រូវបានចាកចេញភ្លាមៗ ហើយមិនអាចជជែកបានទៀតទេ។",
+        confirmRemove:
+          "លុប {name} ចេញ? ពួកគេនឹងត្រូវបានរារាំង ហើយការជជែក និងសារទាំងអស់នឹងត្រូវលុបជាអចិន្ត្រៃយ៍។",
+      },
+      blocked: {
+        blockedNotice:
+          "គណនីរបស់អ្នកត្រូវបានរារាំងដោយអ្នកគ្រប់គ្រង។ អ្នកមិនអាចប្រើការជជែកបានទៀតទេ។",
+        removedNotice:
+          "គណនីរបស់អ្នកត្រូវបានលុបចេញដោយអ្នកគ្រប់គ្រង។ ការជជែករបស់អ្នកត្រូវបានលុប ហើយអ្នកមិនអាចប្រើការជជែកបានទៀតទេ។",
+        dismiss: "យល់ព្រម",
       },
       resume: {
         heading: "កំពុងបើកការជជែក",

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useT } from "../providers/LanguageProvider";
+import { useLanguage } from "../providers/LanguageProvider";
+import { DateChip, dayLabel, formatTime, isSameDay } from "./datetime";
 import { BAD_WORDS_ERROR, type useThread } from "@/lib/supabase/useThread";
 import type { ChatMessage, Sender } from "@/lib/supabase/types";
 import type { Draft } from "@/lib/supabase/attachments";
@@ -31,7 +32,7 @@ export function ThreadView({
   /** The other side's name/avatar, shown next to their bubbles. */
   peerAuthor?: BubbleAuthor | null;
 }) {
-  const t = useT();
+  const { t, lang } = useLanguage();
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
   const [editing, setEditing] = useState<ChatMessage | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -68,30 +69,87 @@ export function ThreadView({
     recording: t.chat.msg.recording,
     tooLarge: t.chat.msg.tooLarge,
     blockedType: t.chat.msg.blockedType,
+    fmtBold: t.chat.msg.fmtBold,
+    fmtItalic: t.chat.msg.fmtItalic,
+    fmtUnderline: t.chat.msg.fmtUnderline,
+    fmtStrike: t.chat.msg.fmtStrike,
+    fmtSpoiler: t.chat.msg.fmtSpoiler,
+    fmtCode: t.chat.msg.fmtCode,
   };
 
   return (
     <>
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-2.5">
         {header}
-        {thread.messages.map((m) => (
-          <div key={m.id} ref={jump.register(m.id)} className={jump.highlightClass(m.id)}>
-            <ChatBubble
-              message={m}
-              mineIs={mineIs}
-              author={peerAuthor}
-              labels={labels}
-              reactions={thread.reactionsByMessage[m.id]}
-              myUserId={thread.myUserId}
-              replyTarget={m.reply_to_id ? (byId.get(m.reply_to_id) ?? null) : null}
-              onReply={setReplyTo}
-              onEdit={setEditing}
-              onDelete={(msg) => void thread.remove(msg.id)}
-              onReact={(msg, emoji) => void thread.toggleReaction(msg.id, emoji)}
-              onQuoteClick={m.reply_to_id ? () => jump.jumpTo(m.reply_to_id!) : undefined}
-            />
+        {/* Empty state — only when there's no welcome header filling the void. */}
+        {!header && thread.messages.length === 0 && (
+          <div className="h-full grid place-items-center">
+            <div className="text-center space-y-2">
+              <p className="text-2xl">💬</p>
+              <p className="text-[11px] text-foreground/40">
+                {t.chat.community.empty}
+              </p>
+            </div>
           </div>
-        ))}
+        )}
+        {thread.messages.map((m, i) => {
+          const mine = m.sender === mineIs;
+          const seen = mine
+            ? Boolean(
+                thread.peerLastReadAt && m.created_at <= thread.peerLastReadAt,
+              )
+            : undefined;
+          const reactionRows = (thread.reactionsByMessage[m.id] ?? []).map((r) => ({
+            emoji: r.emoji,
+            name: r.user_id === thread.myUserId ? t.chat.msg.you : (peerAuthor?.name ?? "—"),
+          }));
+          return (
+            <div key={m.id}>
+              {/* Day separator whenever the calendar date changes. */}
+              {(i === 0 || !isSameDay(thread.messages[i - 1].created_at, m.created_at)) && (
+                <DateChip label={dayLabel(m.created_at, lang, t.chat.msg)} />
+              )}
+              <div ref={jump.register(m.id)} className={jump.highlightClass(m.id)}>
+                <ChatBubble
+                  message={m}
+                  mineIs={mineIs}
+                  author={peerAuthor}
+                  labels={labels}
+                  time={formatTime(m.created_at, lang)}
+                  seen={seen}
+                  reactions={thread.reactionsByMessage[m.id]}
+                  myUserId={thread.myUserId}
+                  replyTarget={m.reply_to_id ? (byId.get(m.reply_to_id) ?? null) : null}
+                  onReply={setReplyTo}
+                  onEdit={setEditing}
+                  onDelete={(msg) => void thread.remove(msg.id)}
+                  onReact={(msg, emoji) => void thread.toggleReaction(msg.id, emoji)}
+                  onQuoteClick={
+                    m.reply_to_id ? () => jump.jumpTo(m.reply_to_id!) : undefined
+                  }
+                  menuFooter={
+                    mine || reactionRows.length > 0 ? (
+                      <>
+                        {mine && (
+                          <p>
+                            {seen
+                              ? `✓✓ ${t.chat.msg.seen}`
+                              : `✓ ${t.chat.msg.notSeen}`}
+                          </p>
+                        )}
+                        {reactionRows.map((r, idx) => (
+                          <p key={idx}>
+                            {r.emoji} {r.name}
+                          </p>
+                        ))}
+                      </>
+                    ) : undefined
+                  }
+                />
+              </div>
+            </div>
+          );
+        })}
         {thread.peerTyping && <TypingBubble label={t.chat.typing} />}
       </div>
 

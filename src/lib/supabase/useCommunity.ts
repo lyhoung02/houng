@@ -44,6 +44,8 @@ export function useCommunity(userId: string | null, enabled: boolean, isAdmin = 
   const [memberRefresh, setMemberRefresh] = useState(0);
   const [messages, setMessages] = useState<CommunityMessage[]>([]);
   const [reactions, setReactions] = useState<Reaction[]>([]);
+  /** Every member's last-read stamp — "seen by" is derived from these. */
+  const [reads, setReads] = useState<Record<string, string>>({});
   const [profiles, setProfiles] = useState<Record<string, ProfileState>>({});
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
@@ -148,6 +150,44 @@ export function useCommunity(userId: string | null, enabled: boolean, isAdmin = 
       supabase.removeChannel(channel);
     };
   }, [enabled, canRead]);
+
+  // Read receipts: everyone's last-read stamp, live.
+  useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase || !enabled || !canRead) return;
+    let cancelled = false;
+
+    const load = async () => {
+      const { data } = await supabase.from("community_reads").select("*");
+      if (cancelled) return;
+      setReads(Object.fromEntries((data ?? []).map((r) => [r.user_id, r.last_read_at])));
+    };
+    void load();
+
+    const channel = supabase
+      .channel("community:reads")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "community_reads" },
+        () => void load(),
+      )
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
+  }, [enabled, canRead]);
+
+  // Stamp my own read position when the room opens and as new messages land.
+  const latestMessageId = messages.length ? messages[messages.length - 1].id : null;
+  useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase || !enabled || !canRead || !userId || !latestMessageId) return;
+    void supabase
+      .from("community_reads")
+      .upsert({ user_id: userId, last_read_at: new Date().toISOString() });
+  }, [enabled, canRead, userId, latestMessageId]);
 
   // Reactions: load + reload on any change (RLS scopes rows to the room).
   useEffect(() => {
@@ -421,6 +461,7 @@ export function useCommunity(userId: string | null, enabled: boolean, isAdmin = 
     messages,
     reactionsByMessage,
     toggleReaction,
+    reads,
     profiles,
     error,
     sending,

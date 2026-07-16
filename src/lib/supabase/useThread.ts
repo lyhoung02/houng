@@ -8,7 +8,7 @@ import {
   uploadAttachment,
   type Draft,
 } from "./attachments";
-import type { ChatMessage, Database, Reaction, Sender } from "./types";
+import type { ChatMessage, Conversation, Database, Reaction, Sender } from "./types";
 
 /**
  * Sentinel for the DB bad-words trigger (raises 'BAD_WORDS'); views translate
@@ -68,6 +68,11 @@ export function useThread(
   const [myUserId, setMyUserId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+  // The other side's last-read stamp, tagged with its conversation.
+  const [peerRead, setPeerRead] = useState<{ id: string | null; at: string | null }>({
+    id: null,
+    at: null,
+  });
   // Timestamp of the last typing ping from the *other* party.
   const [peerTypingAt, setPeerTypingAt] = useState(0);
   const [now, setNow] = useState(0);
@@ -163,6 +168,49 @@ export function useThread(
       supabase.removeChannel(channel);
     };
   }, [active, conversationId]);
+
+  // Read receipt: watch the other side's last-read stamp on the conversation.
+  useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase || !active || !conversationId) return;
+    let cancelled = false;
+    const stampOf = (row: {
+      visitor_last_read_at: string;
+      admin_last_read_at: string;
+    }) => (sender === "visitor" ? row.admin_last_read_at : row.visitor_last_read_at);
+
+    (async () => {
+      const { data } = await supabase
+        .from("conversations")
+        .select("visitor_last_read_at, admin_last_read_at")
+        .eq("id", conversationId)
+        .maybeSingle();
+      if (!cancelled && data) setPeerRead({ id: conversationId, at: stampOf(data) });
+    })();
+
+    const channel = supabase
+      .channel(`convo:${conversationId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "conversations",
+          filter: `id=eq.${conversationId}`,
+        },
+        (payload) =>
+          setPeerRead({
+            id: conversationId,
+            at: stampOf(payload.new as Conversation),
+          }),
+      )
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
+  }, [active, conversationId, sender]);
 
   // Typing indicator. Broadcast-only (never touches the DB): each keystroke
   // pings at most once every PING_THROTTLE_MS, and the bubble hides itself
@@ -316,6 +364,7 @@ export function useThread(
 
   // A stale thread from a previously open conversation reads as empty.
   const messages = thread.id === conversationId ? thread.list : [];
+  const peerLastReadAt = peerRead.id === conversationId ? peerRead.at : null;
   const reactionList = reactions.id === conversationId ? reactions.list : [];
 
   const reactionsByMessage: ReactionMap = {};
@@ -331,6 +380,7 @@ export function useThread(
     setError,
     sending,
     peerTyping,
+    peerLastReadAt,
     sendTyping,
     send,
     edit,

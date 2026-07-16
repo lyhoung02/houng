@@ -9,6 +9,11 @@ import { ThreadView } from "./ThreadView";
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 export function VisitorPanel({ chat }: { chat: VisitorChat }) {
+  // Blocked/removed: the account was signed out by force; the notice stays up
+  // until they dismiss it (signing in again just brings them straight back).
+  if (chat.blockedReason) {
+    return <BlockedNotice chat={chat} />;
+  }
   // Wait for the stored session to resolve before deciding, or a returning
   // visitor sees the sign-up form flash before their thread loads.
   if (!chat.authReady) {
@@ -31,6 +36,29 @@ export function VisitorPanel({ chat }: { chat: VisitorChat }) {
 
 /** The site owner, shown beside admin replies in the 1:1 thread. */
 const ADMIN_AUTHOR = { name: "Pov Lyhoung", avatarUrl: "/profile-nobg.png" };
+
+function BlockedNotice({ chat }: { chat: VisitorChat }) {
+  const t = useT();
+  return (
+    <div className="flex-1 grid place-items-center p-6">
+      <div className="text-center space-y-3 max-w-[260px]">
+        <p className="text-2xl">🚫</p>
+        <p className="text-sm text-foreground/80 leading-snug">
+          {chat.blockedReason === "removed"
+            ? t.chat.blocked.removedNotice
+            : t.chat.blocked.blockedNotice}
+        </p>
+        <button
+          type="button"
+          onClick={chat.clearBlocked}
+          className="text-[11px] text-indigo-600 dark:text-indigo-300 hover:underline"
+        >
+          {t.chat.blocked.dismiss}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 /** The canned greeting isn't a real row, so it renders as a plain bubble. */
 function WelcomeBubble() {

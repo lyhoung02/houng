@@ -30,7 +30,55 @@ export function useVisitorChat(lang: string) {
   // Set when signup succeeded but returned no session, i.e. the project still
   // has "Confirm email" switched on.
   const [awaitingConfirm, setAwaitingConfirm] = useState(false);
+  // Set when this account is on the ban list; survives the forced sign-out so
+  // the notice stays on screen.
+  const [blockedReason, setBlockedReason] = useState<"blocked" | "removed" | null>(
+    null,
+  );
   const thread = useThread(conversationId, "visitor", true);
+
+  // Ban check on sign-in, plus a live subscription so blocking kicks the user
+  // out on the spot. Sign-out is forced; the reason state keeps the notice up.
+  useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase || !user) return;
+    let cancelled = false;
+
+    const kick = (reason: "blocked" | "removed") => {
+      if (cancelled) return;
+      setBlockedReason(reason);
+      setConversationId(null);
+      void supabase.auth.signOut();
+    };
+
+    (async () => {
+      const { data } = await supabase
+        .from("blocked_users")
+        .select("reason")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (data) kick(data.reason);
+    })();
+
+    const channel = supabase
+      .channel(`blocked:${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "blocked_users",
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => kick((payload.new as { reason: "blocked" | "removed" }).reason),
+      )
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
 
   // Track the signed-in visitor. Admins and anonymous sessions don't count:
   // the widget should ask them to sign in as a visitor.
@@ -77,6 +125,16 @@ export function useVisitorChat(lang: string) {
       cancelled = true;
     };
   }, [user, lang]);
+
+  // Re-stamp the read receipt when a new admin message arrives while the
+  // thread is open (keyed on the id, not count — edits shouldn't re-mark).
+  const lastIncomingId =
+    [...thread.messages].reverse().find((m) => m.sender === "admin")?.id ?? null;
+  useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase || !conversationId || !lastIncomingId) return;
+    void supabase.rpc("mark_visitor_read", { p_conversation_id: conversationId });
+  }, [conversationId, lastIncomingId]);
 
   const signUp = useCallback(async (email: string, password: string) => {
     const supabase = getSupabase();
@@ -162,6 +220,8 @@ export function useVisitorChat(lang: string) {
     conversationId,
     loading,
     awaitingConfirm,
+    blockedReason,
+    clearBlocked: () => setBlockedReason(null),
     // Auth errors take precedence over in-thread ones.
     error: error ?? thread.error,
     signUp,
@@ -276,15 +336,34 @@ export function useAdminInbox(active: boolean) {
     };
   }, [active]);
 
-  // Clear the admin badge for whichever thread is open.
+  // Clear the admin badge + stamp the read receipt for the open thread,
+  // re-stamping when a new visitor message lands while it's open. The local
+  // list clears optimistically — the realtime reload confirms it after.
+  const lastVisitorMsgId =
+    [...thread.messages].reverse().find((m) => m.sender === "visitor")?.id ?? null;
   useEffect(() => {
     const supabase = getSupabase();
     if (!supabase || !active || !selectedId) return;
     void supabase
       .from("conversations")
-      .update({ unread_for_admin: 0 })
-      .eq("id", selectedId);
-  }, [active, selectedId]);
+      .update({ unread_for_admin: 0, admin_last_read_at: new Date().toISOString() })
+      .eq("id", selectedId)
+      .then(({ error: upErr }) => {
+        // Surfaced, not swallowed: a silent failure here leaves the badge stuck.
+        if (upErr) setError(upErr.message);
+      });
+  }, [active, selectedId, lastVisitorMsgId]);
+
+  // Opening a thread zeroes its badge locally right away; the DB write above
+  // and the realtime reload confirm it.
+  const selectConversation = useCallback((id: string | null) => {
+    setSelectedId(id);
+    if (id) {
+      setConversations((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, unread_for_admin: 0 } : c)),
+      );
+    }
+  }, []);
 
   const totalUnread = conversations.reduce((n, c) => n + c.unread_for_admin, 0);
 
@@ -292,7 +371,7 @@ export function useAdminInbox(active: boolean) {
     ...thread,
     conversations,
     selectedId,
-    setSelectedId,
+    setSelectedId: selectConversation,
     error: error ?? thread.error,
     totalUnread,
   };

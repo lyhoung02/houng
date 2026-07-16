@@ -32,6 +32,12 @@ export type ComposerLabels = {
   recording: string;
   tooLarge: string;
   blockedType: string;
+  fmtBold: string;
+  fmtItalic: string;
+  fmtUnderline: string;
+  fmtStrike: string;
+  fmtSpoiler: string;
+  fmtCode: string;
 };
 
 export function Composer({
@@ -62,8 +68,24 @@ export function Composer({
   const [showEmoji, setShowEmoji] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [hasSelection, setHasSelection] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
+
+  /** Wrap the current selection in Telegram-style markers (e.g. "**"). */
+  const applyFormat = (marker: string) => {
+    const el = textareaRef.current;
+    if (!el) return;
+    const { selectionStart: s, selectionEnd: e } = el;
+    if (s === e) return;
+    const next = value.slice(0, s) + marker + value.slice(s, e) + marker + value.slice(e);
+    setValue(next);
+    // Keep the same text selected (shifted past the opening marker).
+    requestAnimationFrame(() => {
+      el.focus();
+      el.setSelectionRange(s + marker.length, e + marker.length);
+    });
+  };
 
   const voice = useRecorder("audio", (r) => {
     setDraft({
@@ -251,6 +273,31 @@ export function Composer({
           </button>
         </div>
       ) : (
+        <>
+          {/* Formatting toolbar, shown while text is selected. */}
+          {hasSelection && (
+            <div className="flex items-center gap-0.5 mb-1.5">
+              <FormatButton label={labels.fmtBold} onApply={() => applyFormat("**")}>
+                <span className="font-bold">B</span>
+              </FormatButton>
+              <FormatButton label={labels.fmtItalic} onApply={() => applyFormat("*")}>
+                <span className="italic">I</span>
+              </FormatButton>
+              <FormatButton label={labels.fmtUnderline} onApply={() => applyFormat("__")}>
+                <span className="underline">U</span>
+              </FormatButton>
+              <FormatButton label={labels.fmtStrike} onApply={() => applyFormat("~~")}>
+                <span className="line-through">S</span>
+              </FormatButton>
+              <FormatButton label={labels.fmtSpoiler} onApply={() => applyFormat("||")}>
+                <span className="blur-[2px]">||</span>
+              </FormatButton>
+              <FormatButton label={labels.fmtCode} onApply={() => applyFormat("`")}>
+                <span className="font-mono">{"<>"}</span>
+              </FormatButton>
+            </div>
+          )}
+
         <div className="flex items-end gap-1.5">
           {/* Attach leads the row, ahead of the input. */}
           {!editing && (
@@ -270,6 +317,19 @@ export function Composer({
               setValue(e.target.value);
               onTyping?.();
             }}
+            onSelect={(e) =>
+              setHasSelection(
+                e.currentTarget.selectionStart !== e.currentTarget.selectionEnd,
+              )
+            }
+            onBlur={(e) =>
+              // Keep the toolbar when focus moves into it (its buttons prevent
+              // default on mousedown, so blur only fires for real focus loss).
+              setHasSelection(
+                e.currentTarget.selectionStart !== e.currentTarget.selectionEnd &&
+                  document.activeElement === e.currentTarget,
+              )
+            }
             onKeyDown={onKey}
             placeholder={labels.placeholder}
             className="flex-1 min-w-0 resize-none rounded-xl bg-surface border border-border px-3 py-2 text-sm text-foreground placeholder-foreground/40 focus:outline-none focus:border-indigo-400 leading-5"
@@ -314,6 +374,7 @@ export function Composer({
             </button>
           </div>
         </div>
+        </>
       )}
 
       {showEmoji && (
@@ -337,6 +398,30 @@ export function Composer({
         }}
       />
     </div>
+  );
+}
+
+function FormatButton({
+  label,
+  onApply,
+  children,
+}: {
+  label: string;
+  onApply: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      // preventDefault keeps focus (and the selection) in the textarea.
+      onMouseDown={(e) => e.preventDefault()}
+      onClick={onApply}
+      className="h-7 min-w-7 px-1.5 grid place-items-center rounded-lg text-xs text-foreground/80 hover:bg-surface-strong transition"
+    >
+      {children}
+    </button>
   );
 }
 

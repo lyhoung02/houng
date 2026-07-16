@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { ChatMessage, Reaction, Sender } from "@/lib/supabase/types";
 import { Attachment } from "./Attachment";
 import { QUICK_REACTIONS } from "./EmojiPicker";
+import { FormattedText } from "./FormattedText";
 import { Popover } from "./Popover";
 
 export type BubbleLabels = {
@@ -38,6 +39,9 @@ export function ChatBubble({
   onDelete,
   onReact,
   onQuoteClick,
+  time,
+  seen,
+  menuFooter,
 }: {
   message: ChatMessage;
   /** Which sender renders as the right-hand "my" bubble. */
@@ -59,11 +63,46 @@ export function ChatBubble({
   onReact?: (m: ChatMessage, emoji: string) => void;
   /** Tap the quoted preview to jump to the original message. */
   onQuoteClick?: () => void;
+  /** Formatted send time, shown bottom-right in the bubble. */
+  time?: string;
+  /** Read receipt for own messages: true ✓✓, false ✓, undefined = no ticks. */
+  seen?: boolean;
+  /** Extra rows at the bottom of the ⋯ menu (seen-by, reactors). */
+  menuFooter?: React.ReactNode;
 }) {
   // The trigger's rect, captured on click — doubles as the "menu is open" flag.
   const [menuAnchor, setMenuAnchor] = useState<DOMRect | null>(null);
+  const pressTimer = useRef<number | null>(null);
   const mine = mineOverride ?? message.sender === mineIs;
   const deleted = Boolean(message.deleted_at);
+
+  const clearPress = () => {
+    if (pressTimer.current) {
+      window.clearTimeout(pressTimer.current);
+      pressTimer.current = null;
+    }
+  };
+
+  // Long-press (touch) and right-click (desktop) open the same ⋯ menu,
+  // anchored to the bubble. Any pointer movement cancels — that's a scroll.
+  const pressHandlers = deleted
+    ? {}
+    : {
+        onPointerDown: (e: React.PointerEvent<HTMLDivElement>) => {
+          if (e.pointerType === "mouse" && e.button !== 0) return;
+          const rect = e.currentTarget.getBoundingClientRect();
+          clearPress();
+          pressTimer.current = window.setTimeout(() => setMenuAnchor(rect), 450);
+        },
+        onPointerUp: clearPress,
+        onPointerCancel: clearPress,
+        onPointerMove: clearPress,
+        onContextMenu: (e: React.MouseEvent<HTMLDivElement>) => {
+          e.preventDefault();
+          clearPress();
+          setMenuAnchor(e.currentTarget.getBoundingClientRect());
+        },
+      };
 
   // Group identical emoji so the row shows "👍 3" rather than three thumbs.
   const grouped = new Map<string, { count: number; mine: boolean }>();
@@ -92,9 +131,12 @@ export function ChatBubble({
       <div className={`flex items-end gap-1.5 max-w-[85%] ${mine ? "flex-row-reverse" : ""}`}>
         {avatar}
         <div
-          className={`rounded-2xl px-3 py-2 text-sm leading-relaxed min-w-0 ${
+          {...pressHandlers}
+          className={`rounded-2xl px-3 py-2 text-sm leading-relaxed min-w-0 select-none sm:select-text ${
             mine
-              ? "bg-gradient-to-br from-indigo-500 to-cyan-500 text-white rounded-br-md"
+              ? // Same quiet surface as received bubbles; the accent border is
+                // what marks it as yours.
+                "bg-surface text-foreground rounded-br-md border border-indigo-500/60"
               : "bg-surface text-foreground rounded-bl-md border border-border"
           }`}
         >
@@ -129,11 +171,22 @@ export function ChatBubble({
             </div>
           )}
 
-          {message.body && <p className="whitespace-pre-wrap">{message.body}</p>}
-
-          {message.edited_at && (
-            <span className="text-[9px] opacity-60 ml-1">({labels.edited})</span>
+          {/* div, not p: formatted bodies can contain <pre> blocks, which are
+              invalid inside a paragraph and would break hydration. */}
+          {message.body && (
+            <div className="whitespace-pre-wrap">
+              <FormattedText text={message.body} />
+            </div>
           )}
+
+          {/* Meta line: edited · time · ticks, Telegram-style bottom-right. */}
+          <span className="flex items-center justify-end gap-1 text-[9px] opacity-60 mt-0.5 -mb-0.5">
+            {message.edited_at && <span>({labels.edited})</span>}
+            {time && <span className="tabular-nums">{time}</span>}
+            {mine && seen !== undefined && (
+              <span className={seen ? "" : "opacity-70"}>{seen ? "✓✓" : "✓"}</span>
+            )}
+          </span>
         </div>
 
         {/* Action affordance: hover on desktop, always present on touch. */}
@@ -200,6 +253,11 @@ export function ChatBubble({
                 >
                   🗑 {labels.delete}
                 </MenuItem>
+              )}
+              {menuFooter && (
+                <div className="border-t border-border mt-1 pt-1.5 px-2 pb-1 space-y-1 text-[10px] text-foreground/60">
+                  {menuFooter}
+                </div>
               )}
             </Popover>
           )}

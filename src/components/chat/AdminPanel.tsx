@@ -133,6 +133,43 @@ function AdminInbox({ signOut }: { signOut: () => Promise<void> }) {
   // reused for the open thread. Missing profiles are stored as null so they
   // aren't refetched every render.
   const [avatars, setAvatars] = useState<Record<string, string | null>>({});
+  // Ban list, keyed by user id.
+  const [blocked, setBlocked] = useState<Record<string, "blocked" | "removed">>({});
+  const [blockedRefresh, setBlockedRefresh] = useState(0);
+  const [modError, setModError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase.from("blocked_users").select("user_id, reason");
+      if (cancelled) return;
+      setBlocked(Object.fromEntries((data ?? []).map((b) => [b.user_id, b.reason])));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [blockedRefresh]);
+
+  const moderate = async (
+    action: "admin_block_user" | "admin_unblock_user" | "admin_remove_user",
+    targetId: string,
+    confirmText?: string,
+  ) => {
+    const supabase = getSupabase();
+    if (!supabase) return;
+    if (confirmText && !window.confirm(confirmText)) return;
+    const { error: rpcErr } = await supabase.rpc(action, { p_user_id: targetId });
+    if (rpcErr) {
+      setModError(rpcErr.message);
+      return;
+    }
+    setModError(null);
+    setBlockedRefresh((n) => n + 1);
+    // A removed user's conversations are gone; drop back to the list.
+    if (action === "admin_remove_user") setSelectedId(null);
+  };
 
   const selected = conversations.find((c) => c.id === selectedId) ?? null;
   const visitorId = selected?.visitor_id ?? null;
@@ -202,6 +239,11 @@ function AdminInbox({ signOut }: { signOut: () => Promise<void> }) {
                     <span className="text-sm font-medium text-foreground truncate flex-1">
                       {c.visitor_name}
                     </span>
+                    {c.visitor_id && blocked[c.visitor_id] && (
+                      <span className="shrink-0 rounded-full bg-rose-500/20 text-rose-600 dark:text-rose-300 text-[10px] px-1.5 py-0.5">
+                        {t.chat.admin.blockedBadge}
+                      </span>
+                    )}
                     {c.unread_for_admin > 0 && (
                       <span className="shrink-0 rounded-full bg-indigo-500 text-white text-[10px] px-1.5 py-0.5">
                         {c.unread_for_admin}
@@ -230,6 +272,8 @@ function AdminInbox({ signOut }: { signOut: () => Promise<void> }) {
     );
   }
 
+  const isBlocked = Boolean(visitorId && blocked[visitorId]);
+
   return (
     <>
       <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
@@ -240,8 +284,45 @@ function AdminInbox({ signOut }: { signOut: () => Promise<void> }) {
         >
           ← {t.chat.admin.back}
         </button>
-        <p className="text-xs text-foreground/50 truncate">{selected.visitor_email}</p>
+        <p className="text-xs text-foreground/50 truncate flex-1">
+          {selected.visitor_email}
+        </p>
+        {visitorId && (
+          <>
+            <button
+              type="button"
+              onClick={() =>
+                isBlocked
+                  ? void moderate("admin_unblock_user", visitorId)
+                  : void moderate(
+                      "admin_block_user",
+                      visitorId,
+                      t.chat.admin.confirmBlock.replace("{name}", selected.visitor_name),
+                    )
+              }
+              className="text-[11px] text-amber-600 dark:text-amber-300 hover:underline px-1"
+            >
+              {isBlocked ? t.chat.admin.unblock : t.chat.admin.block}
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                void moderate(
+                  "admin_remove_user",
+                  visitorId,
+                  t.chat.admin.confirmRemove.replace("{name}", selected.visitor_name),
+                )
+              }
+              className="text-[11px] text-rose-600 dark:text-rose-300 hover:underline px-1"
+            >
+              {t.chat.admin.remove}
+            </button>
+          </>
+        )}
       </div>
+      {modError && (
+        <p className="px-4 py-2 text-xs text-rose-600 dark:text-rose-300">{modError}</p>
+      )}
       <ThreadView
         thread={inbox}
         mineIs="admin"

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useT } from "../providers/LanguageProvider";
+import { useLanguage } from "../providers/LanguageProvider";
+import { DateChip, dayLabel, formatTime, isSameDay } from "./datetime";
 import { getSupabase } from "@/lib/supabase/client";
 import { avatarUrl, type Draft } from "@/lib/supabase/attachments";
 import {
@@ -97,7 +98,7 @@ export function CommunityPanel({
   userId: string;
   isAdmin?: boolean;
 }) {
-  const t = useT();
+  const { t, lang } = useLanguage();
   const community = useCommunity(userId, true, isAdmin);
   const [replyTo, setReplyTo] = useState<CommunityMessage | null>(null);
   const [editing, setEditing] = useState<CommunityMessage | null>(null);
@@ -183,43 +184,89 @@ export function CommunityPanel({
             {t.chat.community.empty}
           </p>
         )}
-        {community.messages.map((m) => {
+        {community.messages.map((m, i) => {
+          const dateChip = (i === 0 ||
+            !isSameDay(community.messages[i - 1].created_at, m.created_at)) && (
+            <DateChip label={dayLabel(m.created_at, lang, t.chat.msg)} />
+          );
           // Join notices: body carries the joiner's name, text localises here.
           if (m.is_system) {
             return (
-              <p
-                key={m.id}
-                className="text-center text-[10px] text-foreground/40 py-1"
-              >
-                👋 {t.chat.community.welcome.replace("{name}", m.body)}
-              </p>
+              <div key={m.id}>
+                {dateChip}
+                <p className="text-center text-[10px] text-foreground/40 py-1">
+                  👋 {t.chat.community.welcome.replace("{name}", m.body)}
+                </p>
+              </div>
             );
           }
           const mine = m.user_id === userId;
           const target = m.reply_to_id ? byId.get(m.reply_to_id) : null;
+
+          const nameFor = (id: string) =>
+            id === userId ? t.chat.msg.you : displayName(community.profiles[id], id);
+          // Who has read past this message (besides its author).
+          const seenNames = mine
+            ? Object.entries(community.reads)
+                .filter(([id, at]) => id !== m.user_id && at >= m.created_at)
+                .map(([id]) => nameFor(id))
+            : [];
+          const seen = mine ? seenNames.length > 0 : undefined;
+          const reactionRows = (community.reactionsByMessage[m.id] ?? []).map((r) => ({
+            emoji: r.emoji,
+            name: nameFor(r.user_id),
+          }));
+
           return (
-            <div key={m.id} ref={jump.register(m.id)} className={jump.highlightClass(m.id)}>
-              <ChatBubble
-                message={toChatMessage(m)}
-                mineIs="visitor"
-                mineOverride={mine}
-                author={authorFor(m)}
-                showName
-                labels={labels}
-                reactions={community.reactionsByMessage[m.id]}
-                myUserId={userId}
-                onReact={(msg, emoji) => void community.toggleReaction(msg.id, emoji)}
-                replyTarget={target ? toChatMessage(target) : null}
-                onReply={() => setReplyTo(m)}
-                onEdit={mine ? () => setEditing(m) : undefined}
-                // Own messages always; admin moderates anything.
-                onDelete={
-                  mine || isAdmin ? (msg) => void community.remove(msg.id) : undefined
-                }
-                onQuoteClick={
-                  m.reply_to_id ? () => jump.jumpTo(m.reply_to_id!) : undefined
-                }
-              />
+            <div key={m.id}>
+              {dateChip}
+              <div ref={jump.register(m.id)} className={jump.highlightClass(m.id)}>
+                <ChatBubble
+                  message={toChatMessage(m)}
+                  mineIs="visitor"
+                  mineOverride={mine}
+                  author={authorFor(m)}
+                  showName
+                  labels={labels}
+                  time={formatTime(m.created_at, lang)}
+                  seen={seen}
+                  reactions={community.reactionsByMessage[m.id]}
+                  myUserId={userId}
+                  onReact={(msg, emoji) => void community.toggleReaction(msg.id, emoji)}
+                  replyTarget={target ? toChatMessage(target) : null}
+                  onReply={() => setReplyTo(m)}
+                  onEdit={mine ? () => setEditing(m) : undefined}
+                  // Own messages always; admin moderates anything.
+                  onDelete={
+                    mine || isAdmin ? (msg) => void community.remove(msg.id) : undefined
+                  }
+                  onQuoteClick={
+                    m.reply_to_id ? () => jump.jumpTo(m.reply_to_id!) : undefined
+                  }
+                  menuFooter={
+                    mine || reactionRows.length > 0 ? (
+                      <>
+                        {mine && (
+                          <p>
+                            {seenNames.length > 0
+                              ? `✓✓ ${t.chat.msg.seenBy} ${seenNames.slice(0, 5).join(", ")}${
+                                  seenNames.length > 5
+                                    ? ` +${seenNames.length - 5}`
+                                    : ""
+                                }`
+                              : `✓ ${t.chat.msg.notSeen}`}
+                          </p>
+                        )}
+                        {reactionRows.map((r, idx) => (
+                          <p key={idx}>
+                            {r.emoji} {r.name}
+                          </p>
+                        ))}
+                      </>
+                    ) : undefined
+                  }
+                />
+              </div>
             </div>
           );
         })}
@@ -242,6 +289,12 @@ export function CommunityPanel({
             recording: t.chat.msg.recording,
             tooLarge: t.chat.msg.tooLarge,
             blockedType: t.chat.msg.blockedType,
+            fmtBold: t.chat.msg.fmtBold,
+            fmtItalic: t.chat.msg.fmtItalic,
+            fmtUnderline: t.chat.msg.fmtUnderline,
+            fmtStrike: t.chat.msg.fmtStrike,
+            fmtSpoiler: t.chat.msg.fmtSpoiler,
+            fmtCode: t.chat.msg.fmtCode,
           }}
           disabled={community.sending}
           onTyping={community.sendTyping}
