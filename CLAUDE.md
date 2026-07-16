@@ -31,7 +31,7 @@ To add a page: create the section component, then a `page.tsx` that wraps it in 
 ### Content vs. text
 
 - **Content data** (projects, experience, skills, education, archive) lives in [src/lib/portfolio-data.ts](src/lib/portfolio-data.ts) as typed arrays. Edit portfolio content there, not in components.
-- **UI strings** live in [src/lib/i18n/messages.ts](src/lib/i18n/messages.ts) with English (`en`) and Khmer (`km`) variants. `Messages = typeof en`, so any key added to `en` must also be added to `km` or the file won't typecheck. Components read strings via `const { t } = useLanguage()`.
+- **UI strings** live in [src/lib/i18n/messages.ts](src/lib/i18n/messages.ts) with English (`en`) and Khmer (`km`) variants. `Messages = typeof en`, so any key added to `en` must also be added to `km` or the file won't typecheck. Components read strings via `const t = useT()` from [LanguageProvider.tsx](src/components/providers/LanguageProvider.tsx) (`useLanguage()` returns the full context — lang, setLang, `t`).
 
 ### Providers (both client-side, localStorage-persisted)
 

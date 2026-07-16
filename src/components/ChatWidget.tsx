@@ -1,137 +1,45 @@
 "use client";
 
 import Image from "next/image";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type KeyboardEvent,
-} from "react";
-import { useT } from "./providers/LanguageProvider";
+import { useCallback, useRef, useState } from "react";
+import { useLanguage } from "./providers/LanguageProvider";
+import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { useAdminSession, useVisitorChat } from "@/lib/supabase/useChat";
+import { AdminPanel } from "./chat/AdminPanel";
+import { VisitorPanel } from "./chat/VisitorPanel";
+import { CommunityPanel } from "./chat/CommunityPanel";
+import { ProfilePanel } from "./chat/ProfilePanel";
 
-type Role = "bot" | "user";
+const ADMIN_TAPS = 7;
+const TAP_WINDOW_MS = 3000;
 
-type Message = {
-  id: string;
-  role: Role;
-  text: string;
-  ts: number;
-};
-
-type ReplyKey = keyof ReturnType<typeof useT>["chat"]["replies"];
-
-const STORAGE_KEY = "houng.chat";
-
-function uid() {
-  return Math.random().toString(36).slice(2, 10);
-}
-
-function detectIntent(input: string): ReplyKey {
-  const s = input.toLowerCase();
-  if (/(hi|hello|hey|សួស្តី|សួ​ស្តី)/.test(s)) return "greeting";
-  if (/(hire|job|work|freelance|outsourc|ការងារ|ជួល)/.test(s)) return "hire";
-  if (/(project|portfolio|គម្រោង)/.test(s)) return "projects";
-  if (/(stack|tech|skill|បច្ចេកវិទ្យា|ជំនាញ|stack)/.test(s)) return "stack";
-  if (/(phone|call|number|ទូរសព្ទ|លេខ)/.test(s)) return "phone";
-  if (/(resume|cv|ប្រវត្តិរូប)/.test(s)) return "resume";
-  if (/(email|អ៊ីមែល|mail)/.test(s)) return "email";
-  if (/(thanks|thank you|អរគុណ|thx)/.test(s)) return "thanks";
-  return "default";
-}
+type Tab = "chat" | "community" | "profile";
 
 export default function ChatWidget() {
-  const t = useT();
+  const { t, lang } = useLanguage();
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [typing, setTyping] = useState(false);
-  const scrollRef = useRef<HTMLDivElement | null>(null);
-  const inputRef = useRef<HTMLTextAreaElement | null>(null);
-  const greeted = useRef(false);
+  const [adminMode, setAdminMode] = useState(false);
+  const [tab, setTab] = useState<Tab>("chat");
 
-  // Restore prior messages
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Message[];
-        if (Array.isArray(parsed)) setMessages(parsed);
-      }
-    } catch {
-      /* ignore */
+  const chat = useVisitorChat(lang);
+  const admin = useAdminSession(adminMode);
+
+  // Seven taps on the avatar (within a rolling window) reveal the admin door.
+  // This only *reveals* the panel — RLS is what actually protects the inbox.
+  const taps = useRef<number[]>([]);
+  const onAvatarTap = useCallback(() => {
+    const now = Date.now();
+    taps.current = [...taps.current, now].filter((ts) => now - ts < TAP_WINDOW_MS);
+    if (taps.current.length >= ADMIN_TAPS) {
+      taps.current = [];
+      setAdminMode(true);
     }
   }, []);
 
-  // Persist messages
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-30)));
-    } catch {
-      /* ignore */
-    }
-  }, [messages]);
-
-  // Auto-scroll to bottom on new messages
-  useEffect(() => {
-    if (!scrollRef.current) return;
-    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages, typing, open]);
-
-  // Initial welcome message when first opened
-  useEffect(() => {
-    if (!open || greeted.current || messages.length > 0) return;
-    greeted.current = true;
-    const id = uid();
-    setTyping(true);
-    const timer = setTimeout(() => {
-      setTyping(false);
-      setMessages((prev) => [
-        ...prev,
-        { id, role: "bot", text: t.chat.welcome, ts: Date.now() },
-      ]);
-    }, 700);
-    return () => clearTimeout(timer);
-  }, [open, messages.length, t.chat.welcome]);
-
-  const sendUserMessage = useCallback(
-    (text: string) => {
-      const trimmed = text.trim();
-      if (!trimmed) return;
-      const userMsg: Message = {
-        id: uid(),
-        role: "user",
-        text: trimmed,
-        ts: Date.now(),
-      };
-      setMessages((prev) => [...prev, userMsg]);
-      setInput("");
-      setTyping(true);
-      const intent = detectIntent(trimmed);
-      const reply = t.chat.replies[intent];
-      // Variable thinking time so it feels real
-      const delay = 600 + Math.min(reply.length * 18, 1400);
-      window.setTimeout(() => {
-        setTyping(false);
-        setMessages((prev) => [
-          ...prev,
-          { id: uid(), role: "bot", text: reply, ts: Date.now() },
-        ]);
-      }, delay);
-    },
-    [t.chat.replies],
-  );
-
-  const onKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendUserMessage(input);
-    }
-  };
-
-  const suggestions = useMemo(() => t.chat.suggestions, [t.chat.suggestions]);
-  const showSuggestions = messages.length <= 1 && !typing;
+  const handleSignOut = useCallback(async () => {
+    await admin.signOut();
+    setAdminMode(false);
+  }, [admin]);
 
   return (
     <>
@@ -181,32 +89,56 @@ export default function ChatWidget() {
             : "opacity-0 translate-y-3 pointer-events-none"
         }`}
       >
-        <div className="glass rounded-2xl overflow-hidden border border-white/15 shadow-2xl shadow-slate-950/40 flex flex-col h-[70vh] max-h-[560px]">
+        <div className="glass rounded-2xl overflow-hidden border border-border shadow-2xl shadow-slate-950/40 flex flex-col h-[70vh] max-h-[560px]">
           {/* Header */}
-          <div className="flex items-center gap-3 p-4 border-b border-white/10 bg-gradient-to-r from-indigo-500/20 via-violet-500/15 to-cyan-400/20">
-            <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gradient-to-br from-indigo-500 to-cyan-400 shrink-0">
+          <div className="flex items-center gap-3 p-4 border-b border-border bg-gradient-to-r from-indigo-500/20 via-violet-500/15 to-cyan-400/20">
+            <button
+              type="button"
+              onClick={onAvatarTap}
+              aria-label={t.chat.title}
+              className="relative h-10 w-10 rounded-full overflow-hidden bg-gradient-to-br from-indigo-500 to-cyan-400 shrink-0 cursor-default"
+            >
               <Image
                 src="/profile-nobg.png"
                 alt=""
                 fill
                 sizes="40px"
-                className="object-cover object-top"
+                className="object-cover object-top pointer-events-none"
               />
-            </div>
+            </button>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-white truncate">
-                {t.chat.title}
+              <p className="text-sm font-semibold text-foreground truncate">
+                {adminMode ? t.chat.admin.inbox : t.chat.title}
               </p>
-              <p className="text-[11px] text-white/70 flex items-center gap-1.5">
+              <p className="text-[11px] text-foreground/70 flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                {t.chat.status} · {t.chat.subtitle}
+                {adminMode ? (admin.email ?? "—") : `${t.chat.status} · ${t.chat.subtitle}`}
               </p>
             </div>
+            {adminMode ? (
+              <button
+                type="button"
+                onClick={() => setAdminMode(false)}
+                className="text-[11px] text-foreground/60 hover:text-foreground px-1"
+              >
+                {t.chat.admin.back}
+              </button>
+            ) : (
+              chat.user && (
+                <button
+                  type="button"
+                  onClick={() => void chat.signOut()}
+                  className="text-[11px] text-foreground/60 hover:text-foreground px-1"
+                >
+                  {t.chat.admin.signOut}
+                </button>
+              )
+            )}
             <button
               type="button"
               aria-label={t.chat.close}
               onClick={() => setOpen(false)}
-              className="text-white/70 hover:text-white p-1 rounded"
+              className="text-foreground/70 hover:text-foreground p-1 rounded"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <path
@@ -219,105 +151,48 @@ export default function ChatWidget() {
             </button>
           </div>
 
-          {/* Messages */}
-          <div
-            ref={scrollRef}
-            className="flex-1 overflow-y-auto p-4 space-y-2.5"
-          >
-            {messages.map((m) => (
-              <Bubble key={m.id} role={m.role} text={m.text} />
-            ))}
-            {typing && <Typing label={t.chat.typing} />}
-            {showSuggestions && (
-              <div className="pt-1 flex flex-wrap gap-1.5">
-                {suggestions.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => sendUserMessage(s)}
-                    className="text-[11px] rounded-full px-2.5 py-1 border border-white/15 bg-white/[0.04] text-white/80 hover:bg-white/[0.08] transition"
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Footer / input */}
-          <div className="border-t border-white/10 p-3">
-            <div className="flex items-end gap-2">
-              <textarea
-                ref={inputRef}
-                rows={1}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={onKey}
-                placeholder={t.chat.placeholder}
-                className="flex-1 resize-none rounded-xl bg-white/[0.04] border border-white/10 px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-indigo-400 max-h-24"
-              />
-              <button
-                type="button"
-                aria-label={t.chat.send}
-                onClick={() => sendUserMessage(input)}
-                disabled={!input.trim()}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-400 text-white disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105 transition"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M3 11l18-8-8 18-2-8-8-2z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
+          {!isSupabaseConfigured ? (
+            <div className="flex-1 grid place-items-center p-6">
+              <p className="text-sm text-foreground/60 text-center">{t.chat.unavailable}</p>
             </div>
-            <p className="mt-2 text-[10px] text-white/40 leading-snug text-center">
-              {t.chat.demoNote}
-            </p>
-          </div>
+          ) : adminMode ? (
+            <AdminPanel
+              session={admin}
+              signIn={admin.signIn}
+              signOut={handleSignOut}
+            />
+          ) : (
+            <>
+              {/* Tabs appear once signed in. */}
+              {chat.user && (
+                <div className="flex border-b border-border">
+                  {(["chat", "community", "profile"] as const).map((key) => (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setTab(key)}
+                      className={`flex-1 py-2 text-[11px] font-medium transition border-b-2 ${
+                        tab === key
+                          ? "border-indigo-500 text-foreground"
+                          : "border-transparent text-foreground/50 hover:text-foreground"
+                      }`}
+                    >
+                      {t.chat.tabs[key]}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {!chat.user || tab === "chat" ? (
+                <VisitorPanel chat={chat} />
+              ) : tab === "community" ? (
+                <CommunityPanel userId={chat.user.id} />
+              ) : (
+                <ProfilePanel userId={chat.user.id} email={chat.user.email} />
+              )}
+            </>
+          )}
         </div>
       </div>
     </>
-  );
-}
-
-function Bubble({ role, text }: { role: Role; text: string }) {
-  const mine = role === "user";
-  return (
-    <div className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-      <div
-        className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap ${
-          mine
-            ? "bg-gradient-to-br from-indigo-500 to-cyan-500 text-white rounded-br-md"
-            : "bg-white/[0.06] text-white rounded-bl-md border border-white/10"
-        }`}
-      >
-        {text}
-      </div>
-    </div>
-  );
-}
-
-function Typing({ label }: { label: string }) {
-  return (
-    <div className="flex justify-start">
-      <div className="rounded-2xl rounded-bl-md bg-white/[0.06] border border-white/10 px-3 py-2 flex items-center gap-1.5">
-        <Dot />
-        <Dot delay="0.15s" />
-        <Dot delay="0.3s" />
-        <span className="sr-only">{label}</span>
-      </div>
-    </div>
-  );
-}
-
-function Dot({ delay }: { delay?: string }) {
-  return (
-    <span
-      className="inline-block h-1.5 w-1.5 rounded-full bg-white/70 animate-pulse"
-      style={delay ? { animationDelay: delay } : undefined}
-    />
   );
 }

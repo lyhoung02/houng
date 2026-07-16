@@ -78,6 +78,17 @@ body {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
 }
 
+/* Horizontally scrollable rows (chat suggestion chips) keep the gesture but
+   drop the bar, which would otherwise sit across the chips. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 .gradient-text {
   background: linear-gradient(90deg, #a5b4fc 0%, #67e8f9 50%, #fcd34d 100%);
   -webkit-background-clip: text;
