@@ -173,8 +173,10 @@ export function ChatBubble({
 
           {/* div, not p: formatted bodies can contain <pre> blocks, which are
               invalid inside a paragraph and would break hydration. */}
+          {/* break-words: an unbroken URL or token must wrap, not overflow the
+              bubble on narrow screens. */}
           {message.body && (
-            <div className="whitespace-pre-wrap">
+            <div className="whitespace-pre-wrap break-words">
               <FormattedText text={message.body} />
             </div>
           )}

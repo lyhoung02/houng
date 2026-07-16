@@ -26,17 +26,17 @@ export default function Footer() {
             </p>
             <a
               href={`mailto:${profile.email}`}
-              className="block hover:text-white transition"
+              className="block break-words hover:text-white transition"
             >
               {profile.email}
             </a>
             <a
               href={`mailto:${profile.workEmail}`}
-              className="block hover:text-white transition"
+              className="block break-words hover:text-white transition"
             >
               {profile.workEmail}
             </a>
-            <a href={phoneHref} className="block hover:text-white transition">
+            <a href={phoneHref} className="block break-words hover:text-white transition">
               {primaryPhone}
             </a>
           </div>

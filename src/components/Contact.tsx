@@ -134,8 +134,10 @@ function Row({
   return (
     <div className="flex items-start justify-between gap-4 border-b border-white/5 pb-3 last:border-b-0 last:pb-0">
       <span className="text-white/55 shrink-0">{k}</span>
+      {/* min-w-0 + break-words: long emails must wrap on narrow screens
+          instead of pushing the card into horizontal scroll. */}
       <span
-        className={`text-white text-right ${mono ? "font-mono text-xs sm:text-sm" : ""}`}
+        className={`text-white text-right min-w-0 break-words ${mono ? "font-mono text-xs sm:text-sm" : ""}`}
       >
         {v}
       </span>

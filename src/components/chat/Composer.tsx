@@ -349,9 +349,13 @@ export function Composer({
                     <IconButton label={labels.voice} onClick={() => void voice.start()}>
                       <MicIcon />
                     </IconButton>
-                    <IconButton label={labels.video} onClick={() => setShowVideo(true)}>
-                      <VideoIcon />
-                    </IconButton>
+                    {/* On very narrow phones the input needs the room more
+                        than a fourth icon; voice remains available. */}
+                    <span className="max-[379px]:hidden">
+                      <IconButton label={labels.video} onClick={() => setShowVideo(true)}>
+                        <VideoIcon />
+                      </IconButton>
+                    </span>
                   </>
                 )}
               </>
