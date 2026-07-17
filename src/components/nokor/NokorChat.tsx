@@ -3,13 +3,14 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { nokorAvatarUrl } from "@/lib/supabase/useNokor";
-import {
-  useNokorConversation,
-  useNokorThreads,
-  type NokorDmSummary,
-} from "@/lib/supabase/useNokorChat";
+import { useNokorThreads, type NokorDmSummary } from "@/lib/supabase/useNokorChat";
+import { useNokorRooms, type NokorRoomSummary } from "@/lib/supabase/useNokorRooms";
 import type { NokorAuthor } from "@/lib/supabase/useNokor";
+import type { NokorRoomKind } from "@/lib/supabase/types";
 import { useT } from "../providers/LanguageProvider";
+import NokorCreateRoom from "./NokorCreateRoom";
+import NokorDmView from "./NokorDmView";
+import NokorRoomView from "./NokorRoomView";
 
 function name(username: string | null, userId: string) {
   return username?.trim() || `user-${userId.slice(0, 4) || "anon"}`;
@@ -40,109 +41,35 @@ function Avatar({ author, userId, size = 44 }: { author: NokorAuthor | null; use
   );
 }
 
-function Conversation({
-  meId,
-  summary,
-  onBack,
+function Row({
+  icon,
+  title,
+  subtitle,
+  onOpen,
 }: {
-  meId: string;
-  summary: { threadId: string; otherId: string; other: NokorAuthor | null };
-  onBack: () => void;
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  onOpen: () => void;
 }) {
-  const t = useT();
-  const { messages, send } = useNokorConversation(summary.threadId, meId);
-  const [draft, setDraft] = useState("");
-  const endRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ block: "end" });
-  }, [messages.length]);
-
-  const submit = async () => {
-    const body = draft.trim();
-    if (!body) return;
-    setDraft("");
-    const ok = await send(body);
-    if (!ok) setDraft(body);
-  };
-
-  return (
-    <div className="glass flex h-[70vh] flex-col rounded-2xl">
-      <header className="flex items-center gap-3 border-b border-border px-3 py-2.5">
-        <button
-          type="button"
-          onClick={onBack}
-          aria-label={t.nokor.chat.back}
-          className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-surface-strong"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-        <Avatar author={summary.other} userId={summary.otherId} size={32} />
-        <p className="text-sm font-semibold">{name(summary.other?.username ?? null, summary.otherId)}</p>
-      </header>
-
-      <div className="flex-1 space-y-2 overflow-y-auto px-3 py-3">
-        {messages.map((m) => {
-          const mine = m.sender_id === meId;
-          return (
-            <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-              <div
-                className={`max-w-[75%] rounded-2xl px-3.5 py-2 text-sm whitespace-pre-wrap ${
-                  mine ? "bg-indigo-500 text-white" : "bg-surface"
-                }`}
-              >
-                {m.body}
-              </div>
-            </div>
-          );
-        })}
-        <div ref={endRef} />
-      </div>
-
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          void submit();
-        }}
-        className="flex items-center gap-2 border-t border-border p-2.5"
-      >
-        <input
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          placeholder={t.nokor.chat.messagePlaceholder}
-          maxLength={4000}
-          className="min-w-0 flex-1 rounded-full border border-border bg-surface px-4 py-2 text-sm outline-none focus:border-indigo-400/60"
-        />
-        <button
-          type="submit"
-          disabled={!draft.trim()}
-          className="rounded-full bg-indigo-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-400 disabled:opacity-40"
-        >
-          {t.nokor.feed.send}
-        </button>
-      </form>
-    </div>
-  );
-}
-
-function ThreadRow({ thread, onOpen }: { thread: NokorDmSummary; onOpen: () => void }) {
-  const t = useT();
   return (
     <button
       type="button"
       onClick={onOpen}
       className="flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left transition hover:bg-surface-strong"
     >
-      <Avatar author={thread.other} userId={thread.otherId} />
+      {icon}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold">{name(thread.other?.username ?? null, thread.otherId)}</p>
-        <p className="truncate text-xs opacity-60">{thread.lastMessage ?? t.nokor.chat.noMessages}</p>
+        <p className="truncate text-sm font-semibold">{title}</p>
+        <p className="truncate text-xs opacity-60">{subtitle}</p>
       </div>
     </button>
   );
 }
+
+type Open =
+  | { type: "dm"; threadId: string; otherId: string }
+  | { type: "room"; roomId: string };
 
 export default function NokorChat({
   meId,
@@ -154,8 +81,11 @@ export default function NokorChat({
   onConsumed: () => void;
 }) {
   const t = useT();
+  const c = t.nokor.chat;
   const { threads, loaded, openWith } = useNokorThreads(meId);
-  const [selected, setSelected] = useState<{ threadId: string; otherId: string } | null>(null);
+  const { rooms, loaded: roomsLoaded, createRoom, leaveRoom } = useNokorRooms(meId);
+  const [open, setOpen] = useState<Open | null>(null);
+  const [creating, setCreating] = useState(false);
   const openWithRef = useRef(openWith);
   useEffect(() => {
     openWithRef.current = openWith;
@@ -167,7 +97,7 @@ export default function NokorChat({
     let cancelled = false;
     (async () => {
       const tid = await openWithRef.current(openWithUserId);
-      if (!cancelled && tid) setSelected({ threadId: tid, otherId: openWithUserId });
+      if (!cancelled && tid) setOpen({ type: "dm", threadId: tid, otherId: openWithUserId });
       onConsumed();
     })();
     return () => {
@@ -177,33 +107,91 @@ export default function NokorChat({
 
   if (!meId) return null;
 
-  if (selected) {
-    const other = threads.find((th) => th.threadId === selected.threadId)?.other ?? null;
+  if (open?.type === "dm") {
+    const other = threads.find((th) => th.threadId === open.threadId)?.other ?? null;
     return (
-      <Conversation
-        key={selected.threadId}
+      <NokorDmView
+        key={open.threadId}
         meId={meId}
-        summary={{ ...selected, other }}
-        onBack={() => setSelected(null)}
+        summary={{ threadId: open.threadId, otherId: open.otherId, other }}
+        onBack={() => setOpen(null)}
       />
     );
   }
 
-  if (!loaded) {
-    return <p className="py-10 text-center text-sm opacity-60">{t.nokor.feed.loading}</p>;
-  }
-  if (!threads.length) {
-    return <p className="py-10 text-center text-sm opacity-60">{t.nokor.chat.empty}</p>;
-  }
-  return (
-    <div className="glass rounded-2xl p-2">
-      {threads.map((th) => (
-        <ThreadRow
-          key={th.threadId}
-          thread={th}
-          onOpen={() => setSelected({ threadId: th.threadId, otherId: th.otherId })}
+  if (open?.type === "room") {
+    const room = rooms.find((r) => r.id === open.roomId);
+    if (room) {
+      return (
+        <NokorRoomView
+          key={room.id}
+          meId={meId}
+          room={room}
+          onBack={() => setOpen(null)}
+          onLeave={async () => {
+            await leaveRoom(room.id);
+            setOpen(null);
+          }}
         />
-      ))}
+      );
+    }
+  }
+
+  const empty = loaded && roomsLoaded && !threads.length && !rooms.length;
+
+  return (
+    <div className="space-y-3">
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setCreating(true)}
+          className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-400"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+          {c.createTitle}
+        </button>
+      </div>
+
+      {!loaded || !roomsLoaded ? (
+        <p className="py-10 text-center text-sm opacity-60">{t.nokor.feed.loading}</p>
+      ) : empty ? (
+        <p className="py-10 text-center text-sm opacity-60">{c.empty}</p>
+      ) : (
+        <div className="glass rounded-2xl p-2">
+          {rooms.map((r: NokorRoomSummary) => (
+            <Row
+              key={r.id}
+              icon={
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-indigo-500/25 text-lg">
+                  {r.kind === "channel" ? "📢" : "👥"}
+                </span>
+              }
+              title={r.name}
+              subtitle={r.lastMessage || (r.kind === "channel" ? c.channel : c.group)}
+              onOpen={() => setOpen({ type: "room", roomId: r.id })}
+            />
+          ))}
+          {threads.map((th: NokorDmSummary) => (
+            <Row
+              key={th.threadId}
+              icon={<Avatar author={th.other} userId={th.otherId} />}
+              title={name(th.other?.username ?? null, th.otherId)}
+              subtitle={th.lastMessage ?? c.noMessages}
+              onOpen={() => setOpen({ type: "dm", threadId: th.threadId, otherId: th.otherId })}
+            />
+          ))}
+        </div>
+      )}
+
+      {creating && (
+        <NokorCreateRoom
+          meId={meId}
+          onCreate={(kind: NokorRoomKind, n, d, m) => createRoom(kind, n, d, m)}
+          onClose={() => setCreating(false)}
+        />
+      )}
     </div>
   );
 }

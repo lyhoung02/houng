@@ -6,6 +6,7 @@ import { nokorAvatarUrl, nokorPostImages } from "@/lib/supabase/useNokor";
 import { useNokorFollow } from "@/lib/supabase/useNokorSocial";
 import { useProfile } from "@/lib/supabase/useProfile";
 import { useT } from "../providers/LanguageProvider";
+import { NokorAbout, NokorAboutForm, type AboutFields } from "./NokorProfileAbout";
 import { useNokorNav } from "./useNokorNav";
 
 function name(username: string | null, userId: string) {
@@ -30,18 +31,10 @@ export default function NokorProfile({ meId, userId }: { meId: string | null; us
   const editable = useProfile(own ? meId : null);
 
   const [editing, setEditing] = useState(false);
-  const [username, setUsername] = useState("");
-  const [bio, setBio] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const startEdit = () => {
-    setUsername(profile?.username ?? "");
-    setBio(profile?.bio ?? "");
-    setEditing(true);
-  };
-
-  const saveEdit = async () => {
-    const ok = await editable.save({ username: username.trim() || null, bio: bio.trim() || null });
+  const saveEdit = async (fields: AboutFields & { username: string | null }) => {
+    const ok = await editable.save(fields);
     if (ok) {
       setEditing(false);
       await reload();
@@ -110,40 +103,24 @@ export default function NokorProfile({ meId, userId }: { meId: string | null; us
         </div>
 
         {editing ? (
-          <div className="mt-4 space-y-2">
-            <input
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder={p.username}
-              maxLength={40}
-              className="w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-indigo-400/60"
-            />
-            <textarea
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              placeholder={p.bioPlaceholder}
-              rows={2}
-              maxLength={300}
-              className="w-full resize-none rounded-xl border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-indigo-400/60"
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setEditing(false)}
-                className="rounded-full px-4 py-1.5 text-sm opacity-70 transition hover:opacity-100"
-              >
-                {t.nokor.feed.cancel}
-              </button>
-              <button
-                type="button"
-                onClick={() => void saveEdit()}
-                disabled={editable.saving}
-                className="rounded-full bg-indigo-500 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-indigo-400 disabled:opacity-40"
-              >
-                {t.nokor.feed.save}
-              </button>
-            </div>
-          </div>
+          <NokorAboutForm
+            initial={{
+              username: profile.username,
+              bio: profile.bio,
+              work: profile.work,
+              education: profile.education,
+              hometown: profile.hometown,
+              current_city: profile.current_city,
+              relationship: profile.relationship,
+              website: profile.website,
+              birthday: profile.birthday,
+              gender: profile.gender,
+              phone: profile.phone,
+            }}
+            saving={editable.saving}
+            onSave={(fields) => void saveEdit(fields)}
+            onCancel={() => setEditing(false)}
+          />
         ) : (
           <div className="mt-4">
             <p className="font-semibold">{name(profile.username, profile.userId)}</p>
@@ -153,7 +130,7 @@ export default function NokorProfile({ meId, userId }: { meId: string | null; us
               {own ? (
                 <button
                   type="button"
-                  onClick={startEdit}
+                  onClick={() => setEditing(true)}
                   className="flex-1 rounded-full border border-border py-2 text-sm font-medium transition hover:bg-surface-strong"
                 >
                   {p.editProfile}
@@ -185,6 +162,8 @@ export default function NokorProfile({ meId, userId }: { meId: string | null; us
         )}
         {editable.error && <p className="mt-2 text-sm text-rose-400">{editable.error}</p>}
       </div>
+
+      {!editing && <NokorAbout profile={profile} />}
 
       {posts.length === 0 ? (
         <p className="py-8 text-center text-sm opacity-60">{p.noPosts}</p>

@@ -5,11 +5,28 @@ import { getSupabase } from "./client";
 import { AVATAR_BUCKET, avatarUrl, MAX_AVATAR_BYTES } from "./attachments";
 import type { Profile } from "./types";
 
-export type ProfileState = Pick<Profile, "username" | "phone" | "avatar_path"> & {
-  bio?: string | null;
-};
+/** Editable profile fields. Everything past avatar_path is optional so callers
+ *  that only care about name/avatar (chat lists) still satisfy the type. */
+export type ProfileState = Pick<Profile, "username" | "phone" | "avatar_path"> &
+  Partial<
+    Pick<
+      Profile,
+      | "bio"
+      | "work"
+      | "education"
+      | "hometown"
+      | "current_city"
+      | "relationship"
+      | "website"
+      | "birthday"
+      | "gender"
+    >
+  >;
 
 const EMPTY: ProfileState = { username: null, phone: null, avatar_path: null, bio: null };
+
+const EDITABLE_COLUMNS =
+  "username, phone, avatar_path, bio, work, education, hometown, current_city, relationship, website, birthday, gender";
 
 /** Display name for chat: username if set, otherwise an anonymised user tag. */
 export function displayName(p: ProfileState | undefined, userId: string | null) {
@@ -31,7 +48,7 @@ export function useProfile(userId: string | null) {
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("username, phone, avatar_path, bio")
+        .select(EDITABLE_COLUMNS)
         .eq("user_id", userId)
         .maybeSingle();
       if (!cancelled) {
@@ -51,12 +68,22 @@ export function useProfile(userId: string | null) {
       setSaving(true);
       setError(null);
       const next = { ...profile, ...fields };
+      const text = (v: string | null | undefined) => v?.trim() || null;
       const { error: upErr } = await supabase.from("profiles").upsert({
         user_id: userId,
-        username: next.username?.trim() || null,
-        phone: next.phone?.trim() || null,
+        username: text(next.username),
+        phone: text(next.phone),
         avatar_path: next.avatar_path,
-        bio: next.bio?.trim() || null,
+        bio: text(next.bio),
+        work: text(next.work),
+        education: text(next.education),
+        hometown: text(next.hometown),
+        current_city: text(next.current_city),
+        relationship: next.relationship ?? null,
+        website: text(next.website),
+        // An empty date input yields "", which Postgres rejects for a date.
+        birthday: text(next.birthday),
+        gender: next.gender ?? null,
       });
       setSaving(false);
       if (upErr) {

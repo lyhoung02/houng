@@ -7,6 +7,7 @@ import {
   type NokorActivityItem,
 } from "@/lib/supabase/useNokorSocial";
 import { useT } from "../providers/LanguageProvider";
+import NokorNearby from "./NokorNearby";
 import { useNokorNav } from "./useNokorNav";
 
 function name(username: string | null, userId: string) {
@@ -62,17 +63,20 @@ export default function NokorActivity({ meId }: { meId: string | null }) {
   const t = useT();
   const { items, loaded } = useNokorActivity(meId);
 
-  if (!loaded) {
-    return <p className="py-10 text-center text-sm opacity-60">{t.nokor.feed.loading}</p>;
-  }
-  if (!items.length) {
-    return <p className="py-10 text-center text-sm opacity-60">{t.nokor.activity.empty}</p>;
-  }
   return (
-    <div className="glass rounded-2xl p-2">
-      {items.map((item) => (
-        <Row key={item.key} item={item} />
-      ))}
+    <div className="space-y-4">
+      <NokorNearby meId={meId} />
+      {!loaded ? (
+        <p className="py-10 text-center text-sm opacity-60">{t.nokor.feed.loading}</p>
+      ) : !items.length ? (
+        <p className="py-10 text-center text-sm opacity-60">{t.nokor.activity.empty}</p>
+      ) : (
+        <div className="glass rounded-2xl p-2">
+          {items.map((item) => (
+            <Row key={item.key} item={item} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

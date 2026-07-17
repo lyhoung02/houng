@@ -10,8 +10,17 @@ import {
 } from "@/lib/supabase/attachments";
 import type { ChatMessage } from "@/lib/supabase/types";
 
+/**
+ * Only the attachment-bearing fields are needed, so any message shape carrying
+ * them works — the portfolio chat and Nokor DMs both pass through here.
+ */
+type AttachmentLike = Pick<
+  ChatMessage,
+  "kind" | "attachment_path" | "attachment_name" | "attachment_size" | "duration_ms"
+>;
+
 /** Attachments live in a private bucket, so every render mints a signed URL. */
-export function Attachment({ message }: { message: ChatMessage }) {
+export function Attachment({ message }: { message: AttachmentLike }) {
   const [url, setUrl] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   const path = message.attachment_path;

@@ -30,12 +30,33 @@ export type Reaction = {
   created_at: string;
 };
 
+export type Relationship =
+  | "single"
+  | "in_a_relationship"
+  | "engaged"
+  | "married"
+  | "complicated"
+  | "private";
+
+export type Gender = "female" | "male" | "other" | "private";
+
 export type Profile = {
   user_id: string;
   username: string | null;
   phone: string | null;
   avatar_path: string | null;
   bio: string | null;
+  work: string | null;
+  education: string | null;
+  hometown: string | null;
+  current_city: string | null;
+  relationship: Relationship | null;
+  website: string | null;
+  /** ISO date (yyyy-mm-dd). */
+  birthday: string | null;
+  gender: Gender | null;
+  languages: string[] | null;
+  created_at: string;
   updated_at: string;
 };
 
@@ -137,7 +158,98 @@ export type NokorDmMessage = {
   thread_id: string;
   sender_id: string;
   body: string;
+  kind: MessageKind;
+  attachment_path: string | null;
+  attachment_name: string | null;
+  attachment_size: number | null;
+  attachment_mime: string | null;
+  duration_ms: number | null;
+  reply_to_id: string | null;
+  edited_at: string | null;
+  deleted_at: string | null;
   created_at: string;
+};
+
+export type NokorDmReaction = {
+  message_id: string;
+  user_id: string;
+  emoji: string;
+  created_at: string;
+};
+
+export type NokorDmRead = {
+  thread_id: string;
+  user_id: string;
+  last_read_at: string;
+};
+
+export type NokorRoomKind = "group" | "channel";
+export type NokorRoomRole = "owner" | "admin" | "member";
+
+export type NokorRoom = {
+  id: string;
+  kind: NokorRoomKind;
+  name: string;
+  description: string | null;
+  photo_path: string | null;
+  owner_id: string;
+  created_at: string;
+  last_message_at: string;
+};
+
+export type NokorRoomMember = {
+  room_id: string;
+  user_id: string;
+  role: NokorRoomRole;
+  joined_at: string;
+};
+
+export type NokorRoomMessage = {
+  id: string;
+  room_id: string;
+  sender_id: string;
+  body: string;
+  kind: MessageKind;
+  attachment_path: string | null;
+  attachment_name: string | null;
+  attachment_size: number | null;
+  attachment_mime: string | null;
+  duration_ms: number | null;
+  reply_to_id: string | null;
+  edited_at: string | null;
+  deleted_at: string | null;
+  created_at: string;
+};
+
+export type NokorRoomReaction = {
+  message_id: string;
+  user_id: string;
+  emoji: string;
+  created_at: string;
+};
+
+export type NokorRoomRead = {
+  room_id: string;
+  user_id: string;
+  last_read_at: string;
+};
+
+export type NokorUserLocation = {
+  user_id: string;
+  lat: number;
+  lng: number;
+  updated_at: string;
+};
+
+/** Row shape returned by the nokor_nearby_users RPC — never carries coords. */
+export type NokorNearbyUser = {
+  user_id: string;
+  username: string | null;
+  avatar_path: string | null;
+  bio: string | null;
+  current_city: string | null;
+  distance_km: number;
+  is_new: boolean;
 };
 
 export type Conversation = {
@@ -463,9 +575,85 @@ export type Database = {
       };
       nokor_dm_messages: {
         Row: NokorDmMessage;
-        Insert: Pick<NokorDmMessage, "thread_id" | "sender_id" | "body"> &
-          Partial<Pick<NokorDmMessage, "id">>;
+        Insert: Pick<NokorDmMessage, "thread_id" | "sender_id"> &
+          Partial<
+            Pick<
+              NokorDmMessage,
+              | "id"
+              | "body"
+              | "kind"
+              | "attachment_path"
+              | "attachment_name"
+              | "attachment_size"
+              | "attachment_mime"
+              | "duration_ms"
+              | "reply_to_id"
+            >
+          >;
         Update: Partial<NokorDmMessage>;
+        Relationships: [];
+      };
+      nokor_dm_reactions: {
+        Row: NokorDmReaction;
+        Insert: Pick<NokorDmReaction, "message_id" | "user_id" | "emoji">;
+        Update: Partial<NokorDmReaction>;
+        Relationships: [];
+      };
+      nokor_dm_reads: {
+        Row: NokorDmRead;
+        Insert: Pick<NokorDmRead, "thread_id" | "user_id"> & Partial<Pick<NokorDmRead, "last_read_at">>;
+        Update: Partial<NokorDmRead>;
+        Relationships: [];
+      };
+      nokor_rooms: {
+        Row: NokorRoom;
+        Insert: Pick<NokorRoom, "kind" | "name" | "owner_id"> &
+          Partial<Pick<NokorRoom, "id" | "description" | "photo_path">>;
+        Update: Partial<NokorRoom>;
+        Relationships: [];
+      };
+      nokor_room_members: {
+        Row: NokorRoomMember;
+        Insert: Pick<NokorRoomMember, "room_id" | "user_id"> & Partial<Pick<NokorRoomMember, "role">>;
+        Update: Partial<NokorRoomMember>;
+        Relationships: [];
+      };
+      nokor_room_messages: {
+        Row: NokorRoomMessage;
+        Insert: Pick<NokorRoomMessage, "room_id" | "sender_id"> &
+          Partial<
+            Pick<
+              NokorRoomMessage,
+              | "id"
+              | "body"
+              | "kind"
+              | "attachment_path"
+              | "attachment_name"
+              | "attachment_size"
+              | "attachment_mime"
+              | "duration_ms"
+              | "reply_to_id"
+            >
+          >;
+        Update: Partial<NokorRoomMessage>;
+        Relationships: [];
+      };
+      nokor_room_reactions: {
+        Row: NokorRoomReaction;
+        Insert: Pick<NokorRoomReaction, "message_id" | "user_id" | "emoji">;
+        Update: Partial<NokorRoomReaction>;
+        Relationships: [];
+      };
+      nokor_room_reads: {
+        Row: NokorRoomRead;
+        Insert: Pick<NokorRoomRead, "room_id" | "user_id"> & Partial<Pick<NokorRoomRead, "last_read_at">>;
+        Update: Partial<NokorRoomRead>;
+        Relationships: [];
+      };
+      nokor_user_locations: {
+        Row: NokorUserLocation;
+        Insert: Pick<NokorUserLocation, "user_id" | "lat" | "lng">;
+        Update: Partial<NokorUserLocation>;
         Relationships: [];
       };
     };
@@ -506,6 +694,19 @@ export type Database = {
       nokor_open_dm: {
         Args: { p_other: string };
         Returns: string;
+      };
+      nokor_create_room: {
+        Args: {
+          p_kind: NokorRoomKind;
+          p_name: string;
+          p_description?: string | null;
+          p_members?: string[];
+        };
+        Returns: string;
+      };
+      nokor_nearby_users: {
+        Args: { p_radius_km?: number };
+        Returns: NokorNearbyUser[];
       };
       is_blocked: {
         Args: Record<never, never>;

@@ -1,9 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 import { getSupabase } from "./client";
+import { removeAttachment, uploadAttachment, type Draft } from "./attachments";
 import type { NokorAuthor } from "./useNokor";
-import type { NokorDmMessage } from "./types";
+import type { NokorDmMessage, NokorDmReaction } from "./types";
 
 export type NokorDmSummary = {
   threadId: string;
@@ -101,55 +103,243 @@ export function useNokorThreads(meId: string | null) {
   return { threads, loaded, openWith };
 }
 
-/** Live messages for one open thread + a sender. */
+/** At most one typing ping per interval; the indicator hides after the TTL. */
+const PING_THROTTLE_MS = 1800;
+const TYPING_TTL_MS = 4000;
+
+export type NokorDmSend = {
+  body?: string;
+  draft?: Draft;
+  replyToId?: string | null;
+};
+
+/**
+ * One open DM thread: live messages, reactions, typing presence and read
+ * receipts. Attachments go to the private chat-attachments bucket keyed by
+ * thread id, so the storage policy authorises on thread membership.
+ */
 export function useNokorConversation(threadId: string | null, meId: string | null) {
   const [messages, setMessages] = useState<NokorDmMessage[]>([]);
+  const [reactions, setReactions] = useState<NokorDmReaction[]>([]);
+  const [otherReadAt, setOtherReadAt] = useState<string | null>(null);
+  const [otherTyping, setOtherTyping] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  const lastPingRef = useRef(0);
+  const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const load = useCallback(async () => {
     const supabase = getSupabase();
-    if (!supabase || !threadId) return;
-    const { data } = await supabase
+    if (!supabase || !threadId || !meId) return;
+    const { data: rows } = await supabase
       .from("nokor_dm_messages")
       .select("*")
       .eq("thread_id", threadId)
       .order("created_at", { ascending: true });
-    setMessages((data ?? []) as NokorDmMessage[]);
+    const list = (rows ?? []) as NokorDmMessage[];
+    setMessages(list);
+
+    const ids = list.map((m) => m.id);
+    const [reactRes, readRes] = await Promise.all([
+      ids.length
+        ? supabase.from("nokor_dm_reactions").select("*").in("message_id", ids)
+        : Promise.resolve({ data: [] }),
+      supabase.from("nokor_dm_reads").select("user_id, last_read_at").eq("thread_id", threadId),
+    ]);
+    setReactions((reactRes.data ?? []) as NokorDmReaction[]);
+    const other = (readRes.data ?? []).find((r) => r.user_id !== meId);
+    setOtherReadAt(other?.last_read_at ?? null);
     setLoaded(true);
-  }, [threadId]);
+  }, [threadId, meId]);
 
   const loadRef = useRef(load);
   useEffect(() => {
     loadRef.current = load;
   });
+
   useEffect(() => {
     const supabase = getSupabase();
-    if (!supabase || !threadId) return;
+    if (!supabase || !threadId || !meId) return;
     void loadRef.current();
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const schedule = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => void loadRef.current(), 150);
+    };
     const channel = supabase
       .channel(`nokor-dm-${threadId}`)
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "nokor_dm_messages", filter: `thread_id=eq.${threadId}` },
-        (payload) => setMessages((prev) => [...prev, payload.new as NokorDmMessage]),
+        { event: "*", schema: "public", table: "nokor_dm_messages", filter: `thread_id=eq.${threadId}` },
+        schedule,
       )
+      .on("postgres_changes", { event: "*", schema: "public", table: "nokor_dm_reactions" }, schedule)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "nokor_dm_reads", filter: `thread_id=eq.${threadId}` },
+        schedule,
+      )
+      // Typing is ephemeral — broadcast only, never stored.
+      .on("broadcast", { event: "typing" }, (payload) => {
+        const from = (payload.payload as { userId?: string })?.userId;
+        if (!from || from === meId) return;
+        setOtherTyping(true);
+        if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+        typingTimerRef.current = setTimeout(() => setOtherTyping(false), TYPING_TTL_MS);
+      })
       .subscribe();
+    channelRef.current = channel;
     return () => {
+      if (timer) clearTimeout(timer);
+      if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+      channelRef.current = null;
       void supabase.removeChannel(channel);
     };
-  }, [threadId]);
+  }, [threadId, meId]);
+
+  const pingTyping = useCallback(() => {
+    const now = Date.now();
+    if (now - lastPingRef.current < PING_THROTTLE_MS) return;
+    lastPingRef.current = now;
+    void channelRef.current?.send({
+      type: "broadcast",
+      event: "typing",
+      payload: { userId: meId },
+    });
+  }, [meId]);
 
   const send = useCallback(
-    async (body: string) => {
+    async ({ body, draft, replyToId }: NokorDmSend) => {
       const supabase = getSupabase();
-      if (!supabase || !threadId || !meId || !body.trim()) return false;
-      const { error } = await supabase
-        .from("nokor_dm_messages")
-        .insert({ thread_id: threadId, sender_id: meId, body: body.trim() });
-      return !error;
+      if (!supabase || !threadId || !meId) return false;
+      const text = (body ?? "").trim();
+      if (!text && !draft) return false;
+      setError(null);
+
+      // The id is minted client-side so the file can land before the row.
+      const messageId = crypto.randomUUID();
+      let path: string | null = null;
+      if (draft) {
+        try {
+          path = await uploadAttachment(supabase, threadId, messageId, draft);
+        } catch (e) {
+          setError(e instanceof Error ? e.message : "upload-failed");
+          return false;
+        }
+      }
+
+      const { error: insErr } = await supabase.from("nokor_dm_messages").insert({
+        id: messageId,
+        thread_id: threadId,
+        sender_id: meId,
+        body: text,
+        kind: draft ? draft.kind : "text",
+        attachment_path: path,
+        attachment_name: draft ? draft.name : null,
+        attachment_size: draft ? draft.file.size : null,
+        attachment_mime: draft ? draft.mime : null,
+        duration_ms: draft?.durationMs ?? null,
+        reply_to_id: replyToId ?? null,
+      });
+      if (insErr) {
+        if (path) await removeAttachment(supabase, path);
+        setError(insErr.message);
+        return false;
+      }
+      void load();
+      return true;
     },
-    [threadId, meId],
+    [threadId, meId, load],
   );
 
-  return { messages, loaded, send };
+  const editMessage = useCallback(
+    async (messageId: string, body: string) => {
+      const supabase = getSupabase();
+      if (!supabase || !body.trim()) return false;
+      const { error: upErr } = await supabase
+        .from("nokor_dm_messages")
+        .update({ body: body.trim(), edited_at: new Date().toISOString() })
+        .eq("id", messageId);
+      if (upErr) return false;
+      void load();
+      return true;
+    },
+    [load],
+  );
+
+  /** Soft delete: the row stays so the bubble can render "message deleted". */
+  const deleteMessage = useCallback(
+    async (message: NokorDmMessage) => {
+      const supabase = getSupabase();
+      if (!supabase) return;
+      await supabase
+        .from("nokor_dm_messages")
+        .update({
+          deleted_at: new Date().toISOString(),
+          body: "",
+          attachment_path: null,
+          attachment_name: null,
+          attachment_size: null,
+          attachment_mime: null,
+          duration_ms: null,
+          kind: "text",
+        })
+        .eq("id", message.id);
+      if (message.attachment_path) await removeAttachment(supabase, message.attachment_path);
+      void load();
+    },
+    [load],
+  );
+
+  const toggleReaction = useCallback(
+    async (messageId: string, emoji: string) => {
+      const supabase = getSupabase();
+      if (!supabase || !meId) return;
+      const mine = reactions.some(
+        (r) => r.message_id === messageId && r.user_id === meId && r.emoji === emoji,
+      );
+      if (mine) {
+        await supabase
+          .from("nokor_dm_reactions")
+          .delete()
+          .eq("message_id", messageId)
+          .eq("user_id", meId)
+          .eq("emoji", emoji);
+      } else {
+        await supabase
+          .from("nokor_dm_reactions")
+          .insert({ message_id: messageId, user_id: meId, emoji });
+      }
+      void load();
+    },
+    [meId, reactions, load],
+  );
+
+  /** Stamp my read marker; the other side's bubbles show "seen" past it. */
+  const markRead = useCallback(async () => {
+    const supabase = getSupabase();
+    if (!supabase || !threadId || !meId) return;
+    await supabase
+      .from("nokor_dm_reads")
+      .upsert(
+        { thread_id: threadId, user_id: meId, last_read_at: new Date().toISOString() },
+        { onConflict: "thread_id,user_id" },
+      );
+  }, [threadId, meId]);
+
+  return {
+    messages,
+    reactions,
+    otherReadAt,
+    otherTyping,
+    loaded,
+    error,
+    send,
+    editMessage,
+    deleteMessage,
+    toggleReaction,
+    markRead,
+    pingTyping,
+  };
 }

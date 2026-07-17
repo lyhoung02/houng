@@ -4,12 +4,25 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabase } from "./client";
 import type { NokorAuthor, NokorFeedPost } from "./useNokor";
 import { nokorPostImages } from "./useNokor";
+import type { Gender, Relationship } from "./types";
+
+const PROFILE_COLUMNS =
+  "username, avatar_path, bio, work, education, hometown, current_city, relationship, website, birthday, gender, phone";
 
 export type NokorUserProfile = {
   userId: string;
   username: string | null;
   avatar_path: string | null;
   bio: string | null;
+  work: string | null;
+  education: string | null;
+  hometown: string | null;
+  current_city: string | null;
+  relationship: Relationship | null;
+  website: string | null;
+  birthday: string | null;
+  gender: Gender | null;
+  phone: string | null;
   followers: number;
   following: number;
   postCount: number;
@@ -38,7 +51,7 @@ export function useNokorFollow(meId: string | null, userId: string | null) {
     const supabase = getSupabase();
     if (!supabase || !userId) return;
     const [profileRes, followers, following, postRes, mine] = await Promise.all([
-      supabase.from("profiles").select("username, avatar_path, bio").eq("user_id", userId).maybeSingle(),
+      supabase.from("profiles").select(PROFILE_COLUMNS).eq("user_id", userId).maybeSingle(),
       supabase.from("nokor_follows").select("*", { count: "exact", head: true }).eq("following_id", userId),
       supabase.from("nokor_follows").select("*", { count: "exact", head: true }).eq("follower_id", userId),
       supabase.from("nokor_posts").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
@@ -47,11 +60,21 @@ export function useNokorFollow(meId: string | null, userId: string | null) {
         : Promise.resolve({ data: null }),
     ]);
 
+    const row = profileRes.data;
     setProfile({
       userId,
-      username: profileRes.data?.username ?? null,
-      avatar_path: profileRes.data?.avatar_path ?? null,
-      bio: profileRes.data?.bio ?? null,
+      username: row?.username ?? null,
+      avatar_path: row?.avatar_path ?? null,
+      bio: row?.bio ?? null,
+      work: row?.work ?? null,
+      education: row?.education ?? null,
+      hometown: row?.hometown ?? null,
+      current_city: row?.current_city ?? null,
+      relationship: row?.relationship ?? null,
+      website: row?.website ?? null,
+      birthday: row?.birthday ?? null,
+      gender: row?.gender ?? null,
+      phone: row?.phone ?? null,
       followers: followers.count ?? 0,
       following: following.count ?? 0,
       postCount: postRes.data?.length ?? 0,
