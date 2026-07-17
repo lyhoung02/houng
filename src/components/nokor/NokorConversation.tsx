@@ -96,6 +96,8 @@ export default function NokorConversation<M extends ChatMessageLike>({
   senderName,
   onTyping,
   onBack,
+  onTitleClick,
+  headerIcon,
   headerExtra,
 }: {
   meId: string;
@@ -112,6 +114,10 @@ export default function NokorConversation<M extends ChatMessageLike>({
   senderName?: (senderId: string) => string;
   onTyping?: () => void;
   onBack: () => void;
+  /** Rooms open their info screen from the header. */
+  onTitleClick?: () => void;
+  /** Overrides the avatar slot (rooms show their photo). */
+  headerIcon?: React.ReactNode;
   headerExtra?: React.ReactNode;
 }) {
   const t = useT();
@@ -189,17 +195,23 @@ export default function NokorConversation<M extends ChatMessageLike>({
             <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
-        {avatar ? (
-          <Avatar author={avatar.author} userId={avatar.userId} />
-        ) : (
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-500/30 text-sm">
-            #
-          </span>
-        )}
-        <div className="min-w-0 flex-1">
+        {headerIcon ??
+          (avatar ? (
+            <Avatar author={avatar.author} userId={avatar.userId} />
+          ) : (
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-500/30 text-sm">
+              #
+            </span>
+          ))}
+        <button
+          type="button"
+          onClick={onTitleClick}
+          disabled={!onTitleClick}
+          className="min-w-0 flex-1 text-left disabled:cursor-default"
+        >
           <p className="truncate text-sm font-semibold">{title}</p>
           {subtitle && <p className="truncate text-xs text-indigo-400">{subtitle}</p>}
-        </div>
+        </button>
         {headerExtra}
       </header>
 

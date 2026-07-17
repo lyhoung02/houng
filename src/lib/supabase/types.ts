@@ -193,8 +193,17 @@ export type NokorRoom = {
   description: string | null;
   photo_path: string | null;
   owner_id: string;
+  /** Share-link secret; rotating it invalidates old links. */
+  invite_code: string;
   created_at: string;
   last_message_at: string;
+};
+
+export type NokorRoomPreview = {
+  id: string;
+  name: string;
+  kind: NokorRoomKind;
+  member_count: number;
 };
 
 export type NokorRoomMember = {
@@ -707,6 +716,34 @@ export type Database = {
       nokor_nearby_users: {
         Args: { p_radius_km?: number };
         Returns: NokorNearbyUser[];
+      };
+      nokor_add_room_members: {
+        Args: { p_room: string; p_members: string[] };
+        Returns: void;
+      };
+      nokor_set_room_role: {
+        Args: { p_room: string; p_user: string; p_role: "admin" | "member" };
+        Returns: void;
+      };
+      nokor_transfer_room_owner: {
+        Args: { p_room: string; p_user: string };
+        Returns: void;
+      };
+      nokor_remove_room_member: {
+        Args: { p_room: string; p_user: string };
+        Returns: void;
+      };
+      nokor_join_room: {
+        Args: { p_code: string };
+        Returns: string;
+      };
+      nokor_room_preview: {
+        Args: { p_code: string };
+        Returns: NokorRoomPreview[];
+      };
+      nokor_revoke_room_invite: {
+        Args: { p_room: string };
+        Returns: string;
       };
       is_blocked: {
         Args: Record<never, never>;

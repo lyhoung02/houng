@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { nokorAvatarUrl } from "@/lib/supabase/useNokor";
 import { useNokorFollowers } from "@/lib/supabase/useNokorRooms";
 import type { NokorRoomKind } from "@/lib/supabase/types";
@@ -14,10 +14,12 @@ function label(username: string | null, userId: string) {
 export default function NokorCreateRoom({
   meId,
   onCreate,
+  onSetPhoto,
   onClose,
 }: {
   meId: string;
   onCreate: (kind: NokorRoomKind, name: string, description: string, members: string[]) => Promise<string | null>;
+  onSetPhoto: (roomId: string, file: File) => Promise<boolean>;
   onClose: () => void;
 }) {
   const t = useT();
@@ -27,20 +29,36 @@ export default function NokorCreateRoom({
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [members, setMembers] = useState<string[]>([]);
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const photoRef = useRef<HTMLInputElement>(null);
 
   const toggle = (id: string) =>
     setMembers((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+
+  const pickPhoto = (f: File | null) => {
+    if (!f) return;
+    if (preview) URL.revokeObjectURL(preview);
+    setPhoto(f);
+    setPreview(URL.createObjectURL(f));
+  };
 
   const submit = async () => {
     if (!name.trim() || busy) return;
     setBusy(true);
     setError(null);
     const id = await onCreate(kind, name, description, members);
+    // The room must exist before its photo can be attached to it.
+    if (id && photo) await onSetPhoto(id, photo);
     setBusy(false);
-    if (id) onClose();
-    else setError(c.createFailed);
+    if (id) {
+      if (preview) URL.revokeObjectURL(preview);
+      onClose();
+    } else {
+      setError(c.createFailed);
+    }
   };
 
   const field =
@@ -72,13 +90,35 @@ export default function NokorCreateRoom({
         </div>
         <p className="mb-3 text-xs opacity-60">{kind === "group" ? c.groupHint : c.channelHint}</p>
 
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder={c.roomName}
-          maxLength={80}
-          className={field}
-        />
+        {/* Logo + name */}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => photoRef.current?.click()}
+            aria-label={c.changePhoto}
+            className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border border-dashed border-border bg-surface"
+          >
+            {preview ? (
+              <Image src={preview} alt="" fill unoptimized className="object-cover" />
+            ) : (
+              <span className="text-lg opacity-60">📷</span>
+            )}
+          </button>
+          <input
+            ref={photoRef}
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={(e) => pickPhoto(e.target.files?.[0] ?? null)}
+          />
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={c.roomName}
+            maxLength={80}
+            className={field}
+          />
+        </div>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}

@@ -4,9 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { getSupabase } from "./client";
 import { removeAttachment, uploadAttachment, type Draft } from "./attachments";
-import type {
-  NokorAuthor,
-} from "./useNokor";
+import { NOKOR_MEDIA_BUCKET, nokorMediaUrl, type NokorAuthor } from "./useNokor";
 import type {
   NokorRoom,
   NokorRoomKind,
@@ -18,6 +16,13 @@ import type {
 
 const PING_THROTTLE_MS = 1800;
 const TYPING_TTL_MS = 4000;
+
+export const MAX_ROOM_PHOTO_BYTES = 5 * 1024 * 1024;
+
+/** Public URL for a room photo, or null when the room has none. */
+export function nokorRoomPhotoUrl(photoPath: string | null) {
+  return nokorMediaUrl(photoPath);
+}
 
 export type NokorRoomSummary = NokorRoom & {
   role: NokorRoomRole;
@@ -162,17 +167,136 @@ export function useNokorRooms(meId: string | null) {
     [load],
   );
 
+  /** Leaving goes through the RPC so the owner-must-transfer guard applies. */
   const leaveRoom = useCallback(
     async (roomId: string) => {
       const supabase = getSupabase();
-      if (!supabase || !meId) return;
-      await supabase.from("nokor_room_members").delete().eq("room_id", roomId).eq("user_id", meId);
+      if (!supabase || !meId) return null;
+      const { error } = await supabase.rpc("nokor_remove_room_member", {
+        p_room: roomId,
+        p_user: meId,
+      });
       void load();
+      return error ? error.message : null;
     },
     [meId, load],
   );
 
-  return { rooms, loaded, createRoom, leaveRoom };
+  /** Room photos go in the public nokor-media bucket under the uploader's own
+   *  folder, which is what the existing storage policy authorises. */
+  const setRoomPhoto = useCallback(
+    async (roomId: string, file: File) => {
+      const supabase = getSupabase();
+      if (!supabase || !meId) return false;
+      if (file.size > MAX_ROOM_PHOTO_BYTES) return false;
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${meId}/room-${roomId}-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from(NOKOR_MEDIA_BUCKET)
+        .upload(path, file, { contentType: file.type || "image/jpeg" });
+      if (upErr) return false;
+      const { error } = await supabase.from("nokor_rooms").update({ photo_path: path }).eq("id", roomId);
+      if (error) return false;
+      void load();
+      return true;
+    },
+    [meId, load],
+  );
+
+  const addMembers = useCallback(
+    async (roomId: string, members: string[]) => {
+      const supabase = getSupabase();
+      if (!supabase || !members.length) return null;
+      const { error } = await supabase.rpc("nokor_add_room_members", {
+        p_room: roomId,
+        p_members: members,
+      });
+      void load();
+      return error ? error.message : null;
+    },
+    [load],
+  );
+
+  const setRole = useCallback(
+    async (roomId: string, userId: string, role: "admin" | "member") => {
+      const supabase = getSupabase();
+      if (!supabase) return null;
+      const { error } = await supabase.rpc("nokor_set_room_role", {
+        p_room: roomId,
+        p_user: userId,
+        p_role: role,
+      });
+      void load();
+      return error ? error.message : null;
+    },
+    [load],
+  );
+
+  const transferOwner = useCallback(
+    async (roomId: string, userId: string) => {
+      const supabase = getSupabase();
+      if (!supabase) return null;
+      const { error } = await supabase.rpc("nokor_transfer_room_owner", {
+        p_room: roomId,
+        p_user: userId,
+      });
+      void load();
+      return error ? error.message : null;
+    },
+    [load],
+  );
+
+  const removeMember = useCallback(
+    async (roomId: string, userId: string) => {
+      const supabase = getSupabase();
+      if (!supabase) return null;
+      const { error } = await supabase.rpc("nokor_remove_room_member", {
+        p_room: roomId,
+        p_user: userId,
+      });
+      void load();
+      return error ? error.message : null;
+    },
+    [load],
+  );
+
+  const revokeInvite = useCallback(
+    async (roomId: string) => {
+      const supabase = getSupabase();
+      if (!supabase) return null;
+      const { data, error } = await supabase.rpc("nokor_revoke_room_invite", { p_room: roomId });
+      void load();
+      return error ? null : (data as string);
+    },
+    [load],
+  );
+
+  /** Join from a share link. */
+  const joinByCode = useCallback(
+    async (code: string) => {
+      const supabase = getSupabase();
+      if (!supabase) return null;
+      const { data, error } = await supabase.rpc("nokor_join_room", { p_code: code });
+      if (error) return null;
+      await load();
+      return data as string;
+    },
+    [load],
+  );
+
+  return {
+    rooms,
+    loaded,
+    createRoom,
+    leaveRoom,
+    setRoomPhoto,
+    addMembers,
+    setRole,
+    transferOwner,
+    removeMember,
+    revokeInvite,
+    joinByCode,
+  };
 }
 
 export type RoomMemberInfo = NokorRoomMember & { author: NokorAuthor | null };

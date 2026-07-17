@@ -1,6 +1,12 @@
 "use client";
 
-import { useNokorRoomConversation, useNokorRoomMembers, type NokorRoomSummary } from "@/lib/supabase/useNokorRooms";
+import Image from "next/image";
+import {
+  nokorRoomPhotoUrl,
+  useNokorRoomConversation,
+  useNokorRoomMembers,
+  type NokorRoomSummary,
+} from "@/lib/supabase/useNokorRooms";
 import { useProfile } from "@/lib/supabase/useProfile";
 import { useT } from "../providers/LanguageProvider";
 import NokorConversation from "./NokorConversation";
@@ -14,18 +20,19 @@ export default function NokorRoomView({
   meId,
   room,
   onBack,
-  onLeave,
+  onOpenInfo,
 }: {
   meId: string;
   room: NokorRoomSummary;
   onBack: () => void;
-  onLeave: () => void;
+  onOpenInfo: () => void;
 }) {
   const t = useT();
   const c = t.nokor.chat;
   const conv = useNokorRoomConversation(room, meId);
   const { members } = useNokorRoomMembers(room.id);
   const me = useProfile(meId);
+  const photo = nokorRoomPhotoUrl(room.photo_path);
 
   const senderName = (senderId: string) => {
     if (senderId === meId) return c.you;
@@ -44,18 +51,36 @@ export default function NokorRoomView({
       title={room.name}
       subtitle={subtitle}
       avatar={null}
+      headerIcon={
+        photo ? (
+          <Image
+            src={photo}
+            alt=""
+            width={32}
+            height={32}
+            unoptimized
+            className="h-8 w-8 shrink-0 rounded-full object-cover"
+          />
+        ) : (
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-500/25 text-sm">
+            {room.kind === "channel" ? "📢" : "👥"}
+          </span>
+        )
+      }
       canPost={conv.canPost}
       lockedNote={c.readOnly}
       senderName={senderName}
       onTyping={() => conv.pingTyping(shortName(me.profile.username, meId))}
       onBack={onBack}
+      onTitleClick={onOpenInfo}
       headerExtra={
         <button
           type="button"
-          onClick={onLeave}
+          onClick={onOpenInfo}
+          aria-label={c.roomInfo}
           className="shrink-0 rounded-full px-2.5 py-1 text-xs opacity-60 transition hover:bg-surface-strong hover:opacity-100"
         >
-          {c.leave}
+          ⓘ
         </button>
       }
     />
