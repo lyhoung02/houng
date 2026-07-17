@@ -83,6 +83,19 @@ body {
   font-family: var(--font-angkor), var(--font-nokora), var(--font-noto-khmer), sans-serif;
 }
 
+/* Story progress bar fill — one run per story, restarted via React key. */
+@keyframes nokorStoryProgress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+.nokor-story-fill {
+  animation: nokorStoryProgress 5s linear forwards;
+}
+
 /* Metallic gold sheen for the Nokor brand name. */
 .text-gold {
   background-image: linear-gradient(180deg, #fcefbf 0%, #f2cf6b 38%, #d4a017 62%, #a9791c 100%);

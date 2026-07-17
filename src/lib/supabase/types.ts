@@ -96,6 +96,34 @@ export type NokorFollow = {
   created_at: string;
 };
 
+export type NokorStoryKind = "image" | "text";
+
+export type NokorStory = {
+  id: string;
+  user_id: string;
+  /** Null for text stories. */
+  image_path: string | null;
+  /** Image caption, or the body text of a text story. */
+  caption: string | null;
+  kind: NokorStoryKind;
+  /** Background preset key for text stories. */
+  background: string | null;
+  created_at: string;
+  expires_at: string;
+};
+
+export type NokorStoryView = {
+  story_id: string;
+  user_id: string;
+  created_at: string;
+};
+
+export type NokorStoryHidden = {
+  story_id: string;
+  user_id: string;
+  created_at: string;
+};
+
 export type NokorDmThread = {
   id: string;
   user_lo: string;
@@ -401,6 +429,30 @@ export type Database = {
         Row: NokorFollow;
         Insert: Pick<NokorFollow, "follower_id" | "following_id">;
         Update: Partial<NokorFollow>;
+        Relationships: [];
+      };
+      nokor_stories: {
+        Row: NokorStory;
+        Insert: Pick<NokorStory, "user_id"> &
+          Partial<
+            Pick<
+              NokorStory,
+              "id" | "image_path" | "caption" | "kind" | "background" | "expires_at"
+            >
+          >;
+        Update: Partial<NokorStory>;
+        Relationships: [];
+      };
+      nokor_story_views: {
+        Row: NokorStoryView;
+        Insert: Pick<NokorStoryView, "story_id" | "user_id">;
+        Update: Partial<NokorStoryView>;
+        Relationships: [];
+      };
+      nokor_story_hidden: {
+        Row: NokorStoryHidden;
+        Insert: Pick<NokorStoryHidden, "story_id" | "user_id">;
+        Update: Partial<NokorStoryHidden>;
         Relationships: [];
       };
       nokor_dm_threads: {
