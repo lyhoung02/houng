@@ -81,6 +81,28 @@ export default function Nav() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <Link
+            href="/nokor"
+            aria-label={t.nokor.title}
+            title={t.nokor.title}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white/75 transition hover:border-white/20 hover:bg-white/10 hover:text-white"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <circle cx="9" cy="8" r="3.2" stroke="currentColor" strokeWidth="2" />
+              <path
+                d="M3.5 19c.6-3 2.9-4.5 5.5-4.5s4.9 1.5 5.5 4.5"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <path
+                d="M15.5 5.4a3.2 3.2 0 1 1 1.6 6.1M17.5 14.6c1.9.5 3.3 1.9 3.7 4.4"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          </Link>
           <PreferencesMenu />
           <Link
             href="/contact"

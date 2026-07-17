@@ -58,6 +58,37 @@ export type CommunityMessage = {
   created_at: string;
 };
 
+export type NokorPost = {
+  id: string;
+  user_id: string;
+  body: string;
+  image_path: string | null;
+  image_paths: string[];
+  created_at: string;
+  edited_at: string | null;
+};
+
+export type NokorLike = {
+  post_id: string;
+  user_id: string;
+  created_at: string;
+};
+
+export type NokorComment = {
+  id: string;
+  post_id: string;
+  user_id: string;
+  body: string;
+  reply_to_id: string | null;
+  created_at: string;
+};
+
+export type NokorCommentLike = {
+  comment_id: string;
+  user_id: string;
+  created_at: string;
+};
+
 export type Conversation = {
   id: string;
   visitor_id: string | null;
@@ -315,6 +346,32 @@ export type Database = {
             >
           >;
         Update: Partial<CommunityMessage>;
+        Relationships: [];
+      };
+      nokor_posts: {
+        Row: NokorPost;
+        Insert: Pick<NokorPost, "user_id"> &
+          Partial<Pick<NokorPost, "id" | "body" | "image_path" | "image_paths">>;
+        Update: Partial<NokorPost>;
+        Relationships: [];
+      };
+      nokor_likes: {
+        Row: NokorLike;
+        Insert: Pick<NokorLike, "post_id" | "user_id">;
+        Update: Partial<NokorLike>;
+        Relationships: [];
+      };
+      nokor_comments: {
+        Row: NokorComment;
+        Insert: Pick<NokorComment, "post_id" | "user_id" | "body"> &
+          Partial<Pick<NokorComment, "id" | "reply_to_id">>;
+        Update: Partial<NokorComment>;
+        Relationships: [];
+      };
+      nokor_comment_likes: {
+        Row: NokorCommentLike;
+        Insert: Pick<NokorCommentLike, "comment_id" | "user_id">;
+        Update: Partial<NokorCommentLike>;
         Relationships: [];
       };
     };

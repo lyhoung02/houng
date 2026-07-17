@@ -78,6 +78,20 @@ body {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
 }
 
+/* Decorative Angkor Khmer font for the Nokor (នគរ) brand name. */
+.font-nokor {
+  font-family: var(--font-angkor), var(--font-nokora), var(--font-noto-khmer), sans-serif;
+}
+
+/* Metallic gold sheen for the Nokor brand name. */
+.text-gold {
+  background-image: linear-gradient(180deg, #fcefbf 0%, #f2cf6b 38%, #d4a017 62%, #a9791c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
 /* Horizontally scrollable rows (chat suggestion chips) keep the gesture but
    drop the bar, which would otherwise sit across the chips. */
 .no-scrollbar {

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Noto_Sans_Khmer } from "next/font/google";
+import { Geist, Geist_Mono, Noto_Sans_Khmer, Nokora, Angkor } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider, themeBootScript } from "@/components/providers/ThemeProvider";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
@@ -17,6 +17,21 @@ const geistMono = Geist_Mono({
 const notoKhmer = Noto_Sans_Khmer({
   variable: "--font-noto-khmer",
   subsets: ["khmer"],
+  display: "swap",
+});
+
+const nokora = Nokora({
+  variable: "--font-nokora",
+  subsets: ["khmer"],
+  weight: ["400", "700", "900"],
+  display: "swap",
+});
+
+// Decorative Angkor font for the Nokor (នគរ) brand name.
+const angkor = Angkor({
+  variable: "--font-angkor",
+  subsets: ["khmer"],
+  weight: "400",
   display: "swap",
 });
 
@@ -51,7 +66,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${notoKhmer.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${notoKhmer.variable} ${nokora.variable} ${angkor.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
