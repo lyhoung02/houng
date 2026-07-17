@@ -13,6 +13,7 @@ const en = {
       resume: "Resume",
       hire: "Hire Me",
       menu: "Menu",
+      dashboard: "Dashboard",
     },
     hero: {
       availability: "Available for hire · Remote / Phnom Penh",
@@ -173,6 +174,31 @@ const en = {
     footer: {
       built: "Built with Next.js & Tailwind CSS.",
       from: "Designed & shipped from",
+      pin: {
+        title: "Enter PIN",
+        hint: "This area is for the site owner.",
+        wrong: "Wrong PIN. Try again.",
+        cancel: "Cancel",
+        unlock: "Unlock",
+      },
+    },
+    dashboard: {
+      eyebrow: "Admin",
+      title: "Portfolio Dashboard",
+      description:
+        "Manage all portfolio content — add, edit, or delete rows. Changes go live on next page load.",
+      signOut: "Sign out",
+      add: "Add new",
+      edit: "Edit",
+      delete: "Delete",
+      save: "Save",
+      saving: "Saving…",
+      cancel: "Cancel",
+      confirmDelete: "Delete this row? This cannot be undone.",
+      empty: "No rows yet.",
+      saved: "Saved.",
+      upload: "Upload image",
+      uploading: "Uploading…",
     },
     resume: {
       title: "Résumé",
@@ -368,6 +394,7 @@ const km: Messages = {
       resume: "ប្រវត្តិរូប",
       hire: "ជួលខ្ញុំ",
       menu: "ម៉ឺនុយ",
+      dashboard: "ផ្ទាំងគ្រប់គ្រង",
     },
     hero: {
       availability: "បើកទទួលការងារ · ពីចម្ងាយ / ភ្នំពេញ",
@@ -528,6 +555,31 @@ const km: Messages = {
     footer: {
       built: "បង្កើតជាមួយ Next.js & Tailwind CSS។",
       from: "រចនា & ប្រគល់ពី",
+      pin: {
+        title: "បញ្ចូល PIN",
+        hint: "តំបន់នេះសម្រាប់ម្ចាស់គេហទំព័រ។",
+        wrong: "PIN មិនត្រឹមត្រូវ។ សូមព្យាយាមម្តងទៀត។",
+        cancel: "បោះបង់",
+        unlock: "ដោះសោ",
+      },
+    },
+    dashboard: {
+      eyebrow: "អ្នកគ្រប់គ្រង",
+      title: "ផ្ទាំងគ្រប់គ្រង Portfolio",
+      description:
+        "គ្រប់គ្រងមាតិកា Portfolio ទាំងអស់ — បន្ថែម កែប្រែ ឬលុប។ ការផ្លាស់ប្តូរនឹងបង្ហាញនៅពេលផ្ទុកទំព័រថ្មី។",
+      signOut: "ចាកចេញ",
+      add: "បន្ថែមថ្មី",
+      edit: "កែប្រែ",
+      delete: "លុប",
+      save: "រក្សាទុក",
+      saving: "កំពុងរក្សាទុក…",
+      cancel: "បោះបង់",
+      confirmDelete: "លុបជួរនេះមែនទេ? មិនអាចត្រឡប់វិញបានទេ។",
+      empty: "មិនទាន់មានទិន្នន័យទេ។",
+      saved: "បានរក្សាទុក។",
+      upload: "បញ្ចូលរូបភាព",
+      uploading: "កំពុងបញ្ចូល…",
     },
     resume: {
       title: "ប្រវត្តិរូបសង្ខេប",

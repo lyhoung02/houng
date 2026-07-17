@@ -62,6 +62,12 @@ function orStatic<T>(rows: T[] | null | undefined, fallback: T[]): T[] {
 let cached: Content | null = null;
 let inflight: Promise<Content> | null = null;
 
+/** Drop the cache so the next mount refetches (used after dashboard edits). */
+export function invalidatePortfolioContent() {
+  cached = null;
+  inflight = null;
+}
+
 async function fetchContent(
   supabase: NonNullable<ReturnType<typeof getSupabase>>,
 ): Promise<Content> {

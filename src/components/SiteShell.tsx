@@ -6,7 +6,13 @@ import ChatWidget from "@/components/ChatWidget";
 import ScrollToTop from "@/components/ScrollToTop";
 import { usePathname } from "next/navigation";
 
-export default function SiteShell({ children }: { children: React.ReactNode }) {
+export default function SiteShell({
+  children,
+  hideFooter = false,
+}: {
+  children: React.ReactNode;
+  hideFooter?: boolean;
+}) {
   const pathname = usePathname();
 
   return (
@@ -15,7 +21,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
       <main key={pathname} className="page-enter flex-1">
         {children}
       </main>
-      <Footer />
+      {!hideFooter && <Footer />}
       <ScrollToTop />
       <ChatWidget />
     </>

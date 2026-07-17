@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useT } from "./providers/LanguageProvider";
+import { useDashboardUnlocked } from "@/lib/dashboardGate";
 import PreferencesMenu from "./PreferencesMenu";
 
 export default function Nav() {
@@ -14,8 +15,12 @@ export default function Nav() {
     pathname.length > 1 ? pathname.replace(/\/$/, "") : pathname;
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const dashboardUnlocked = useDashboardUnlocked();
 
   const links = [
+    ...(dashboardUnlocked
+      ? [{ href: "/dashboard", label: t.nav.dashboard }]
+      : []),
     { href: "/", label: t.nav.about },
     { href: "/experience", label: t.nav.experience },
     { href: "/projects", label: t.nav.projects },
