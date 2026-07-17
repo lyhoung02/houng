@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { experience, education } from "@/lib/portfolio-data";
+import { usePortfolioContent } from "@/lib/supabase/usePortfolioContent";
 import { SectionHeader } from "./About";
 import { useT } from "./providers/LanguageProvider";
 
 export default function Experience() {
   const t = useT();
+  const { experience, education } = usePortfolioContent();
 
   return (
     <section id="experience" className="py-20 sm:py-28">

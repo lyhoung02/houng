@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { profile } from "@/lib/portfolio-data";
+import { usePortfolioContent } from "@/lib/supabase/usePortfolioContent";
 import { useT } from "./providers/LanguageProvider";
 
 export default function Footer() {
   const t = useT();
+  const { profile } = usePortfolioContent();
   const primaryPhone = profile.phones[0];
   const phoneHref = `tel:${primaryPhone.replace(/\s/g, "")}`;
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { archive } from "@/lib/portfolio-data";
+import { usePortfolioContent } from "@/lib/supabase/usePortfolioContent";
 import { SectionHeader } from "./About";
 import { useT } from "./providers/LanguageProvider";
 
@@ -13,6 +13,7 @@ const kindTone: Record<string, string> = {
 
 export default function Archive() {
   const t = useT();
+  const { archive } = usePortfolioContent();
   return (
     <section id="archive" className="py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">

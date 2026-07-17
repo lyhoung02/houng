@@ -1,11 +1,12 @@
 "use client";
 
-import { skillGroups } from "@/lib/portfolio-data";
+import { usePortfolioContent } from "@/lib/supabase/usePortfolioContent";
 import { SectionHeader } from "./About";
 import { useT } from "./providers/LanguageProvider";
 
 export default function Skills() {
   const t = useT();
+  const { skillGroups } = usePortfolioContent();
   type GroupKey = keyof typeof t.skills.groups;
   return (
     <section id="skills" className="py-20 sm:py-28">

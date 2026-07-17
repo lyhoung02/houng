@@ -1,6 +1,6 @@
 "use client";
 
-import { internalProjects } from "@/lib/portfolio-data";
+import { usePortfolioContent } from "@/lib/supabase/usePortfolioContent";
 import { SectionHeader } from "./About";
 import { useT } from "./providers/LanguageProvider";
 
@@ -12,6 +12,7 @@ const difficultyTone: Record<string, string> = {
 
 export default function InternalWork() {
   const t = useT();
+  const { internalProjects } = usePortfolioContent();
   return (
     <section id="internal" className="py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">

@@ -134,6 +134,152 @@ export type Database = {
         Update: Partial<{ user_id: string }>;
         Relationships: [];
       };
+      services: {
+        Row: {
+          id: string;
+          sort_order: number;
+          key: string;
+          title_en: string;
+          title_km: string;
+          desc_en: string;
+          desc_km: string;
+        };
+        Insert: Record<string, unknown>;
+        Update: Record<string, unknown>;
+        Relationships: [];
+      };
+      site_profile: {
+        Row: {
+          id: number;
+          name: string;
+          initials: string;
+          age: number | null;
+          title: string;
+          subtitle: string;
+          location: string;
+          email: string;
+          work_email: string;
+          phones: string[];
+          address: string;
+          pitch: string;
+          long_pitch: string;
+          stats: { label: string; value: string }[];
+        };
+        Insert: Record<string, unknown>;
+        Update: Record<string, unknown>;
+        Relationships: [];
+      };
+      projects: {
+        Row: {
+          id: string;
+          sort_order: number;
+          slug: string;
+          name: string;
+          tagline: string;
+          description: string;
+          roles: ("Backend" | "Frontend" | "Maintenance")[];
+          stack: string[];
+          logo: string;
+          accent: string;
+          highlights: string[];
+        };
+        Insert: Record<string, unknown>;
+        Update: Record<string, unknown>;
+        Relationships: [];
+      };
+      personal_projects: {
+        Row: {
+          id: string;
+          sort_order: number;
+          slug: string;
+          name: string;
+          tagline: string;
+          description: string;
+          stack: string[];
+          logo: string;
+          accent: string;
+          status: "Research" | "Active" | "Shipped";
+          highlights: string[];
+        };
+        Insert: Record<string, unknown>;
+        Update: Record<string, unknown>;
+        Relationships: [];
+      };
+      internal_projects: {
+        Row: {
+          id: string;
+          sort_order: number;
+          slug: string;
+          period: string;
+          name: string;
+          tagline: string;
+          description: string;
+          stack: string[];
+          difficulty: "Challenging" | "Hard" | "Foundational";
+          accent: string;
+        };
+        Insert: Record<string, unknown>;
+        Update: Record<string, unknown>;
+        Relationships: [];
+      };
+      skill_groups: {
+        Row: { id: string; sort_order: number; title: string; items: string[] };
+        Insert: Record<string, unknown>;
+        Update: Record<string, unknown>;
+        Relationships: [];
+      };
+      archive_items: {
+        Row: {
+          id: string;
+          sort_order: number;
+          slug: string;
+          title: string;
+          issuer: string;
+          date: string;
+          kind: "Transcript" | "Degree" | "Certificate";
+          logo: string;
+          image: string | null;
+          href: string | null;
+        };
+        Insert: Record<string, unknown>;
+        Update: Record<string, unknown>;
+        Relationships: [];
+      };
+      experiences: {
+        Row: {
+          id: string;
+          sort_order: number;
+          role: string;
+          company: string;
+          period: string;
+          location: string;
+          logo: string;
+          logo_mode: "image" | "wordmark";
+          bullets: string[];
+          created_at: string;
+        };
+        Insert: Record<string, unknown>;
+        Update: Record<string, unknown>;
+        Relationships: [];
+      };
+      education_items: {
+        Row: {
+          id: string;
+          sort_order: number;
+          title: string;
+          org: string;
+          period: string;
+          detail: string;
+          logo: string;
+          major: string | null;
+          result: string | null;
+          courses: string[] | null;
+          created_at: string;
+        };
+        Insert: Record<string, unknown>;
+        Update: Record<string, unknown>;
+        Relationships: [];
+      };
       blocked_users: {
         Row: { user_id: string; reason: "blocked" | "removed"; created_at: string };
         Insert: { user_id: string; reason?: "blocked" | "removed" };

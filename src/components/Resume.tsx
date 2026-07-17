@@ -1,19 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import {
-  profile,
-  experience,
-  education,
-  projects,
-  internalProjects,
-  personalProjects,
-  skillGroups,
-} from "@/lib/portfolio-data";
+import { usePortfolioContent } from "@/lib/supabase/usePortfolioContent";
 import { useT } from "./providers/LanguageProvider";
 
 export default function Resume() {
   const t = useT();
+  const {
+    profile,
+    experience,
+    education,
+    projects,
+    internalProjects,
+    personalProjects,
+    skillGroups,
+  } = usePortfolioContent();
   const coursework = education.find((e) => e.courses)?.courses;
 
   return (

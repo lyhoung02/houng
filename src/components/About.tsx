@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { profile } from "@/lib/portfolio-data";
-import { useT } from "./providers/LanguageProvider";
+import { usePortfolioContent } from "@/lib/supabase/usePortfolioContent";
+import { useLanguage } from "./providers/LanguageProvider";
 
 const icons: Record<string, React.ReactNode> = {
   backend: (
@@ -67,17 +67,26 @@ const popDelayClasses = [
 ];
 
 export default function About() {
-  const t = useT();
+  const { t, lang } = useLanguage();
+  const { profile, services: dbServices } = usePortfolioContent();
   const sectionRef = useRef<HTMLElement | null>(null);
   const [animateCards, setAnimateCards] = useState(false);
-  const services = [
-    { key: "backend", ...t.about.services.backend },
-    { key: "frontend", ...t.about.services.frontend },
-    { key: "mobile", ...t.about.services.mobile },
-    { key: "devops", ...t.about.services.devops },
-    { key: "ai", ...t.about.services.ai },
-    { key: "leadership", ...t.about.services.leadership },
-  ];
+  // DB rows win (bilingual columns, picked by the visitor's language);
+  // the i18n bundle stands in until they arrive.
+  const services = dbServices
+    ? dbServices.map((s) => ({
+        key: s.key,
+        title: lang === "km" ? s.title_km : s.title_en,
+        desc: lang === "km" ? s.desc_km : s.desc_en,
+      }))
+    : [
+        { key: "backend", ...t.about.services.backend },
+        { key: "frontend", ...t.about.services.frontend },
+        { key: "mobile", ...t.about.services.mobile },
+        { key: "devops", ...t.about.services.devops },
+        { key: "ai", ...t.about.services.ai },
+        { key: "leadership", ...t.about.services.leadership },
+      ];
 
   useEffect(() => {
     const section = sectionRef.current;

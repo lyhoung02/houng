@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { profile } from "@/lib/portfolio-data";
+import { usePortfolioContent } from "@/lib/supabase/usePortfolioContent";
 import { useT } from "./providers/LanguageProvider";
 import { NeuralCanvas } from "./NeuralCanvas";
 
@@ -26,6 +26,7 @@ const heroSkillCloud = [
 
 export default function Hero() {
   const t = useT();
+  const { profile } = usePortfolioContent();
   const stats = [
     { label: t.hero.stats.projects, value: "6+" },
     { label: t.hero.stats.years, value: "4+" },

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { personalProjects } from "@/lib/portfolio-data";
+import { usePortfolioContent } from "@/lib/supabase/usePortfolioContent";
 import { SectionHeader } from "./About";
 import { useT } from "./providers/LanguageProvider";
 
@@ -13,6 +13,7 @@ const statusTone: Record<string, string> = {
 
 export default function PersonalProjects() {
   const t = useT();
+  const { personalProjects } = usePortfolioContent();
   return (
     <section id="personal" className="py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">

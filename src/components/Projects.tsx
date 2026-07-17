@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { projects } from "@/lib/portfolio-data";
+import { usePortfolioContent } from "@/lib/supabase/usePortfolioContent";
 import { SectionHeader } from "./About";
 import { useT } from "./providers/LanguageProvider";
 
 export default function Projects() {
   const t = useT();
+  const { projects } = usePortfolioContent();
   return (
     <section id="projects" className="py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">

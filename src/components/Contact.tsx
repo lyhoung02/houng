@@ -1,11 +1,12 @@
 "use client";
 
-import { profile } from "@/lib/portfolio-data";
+import { usePortfolioContent } from "@/lib/supabase/usePortfolioContent";
 import { SectionHeader } from "./About";
 import { useT } from "./providers/LanguageProvider";
 
 export default function Contact() {
   const t = useT();
+  const { profile } = usePortfolioContent();
   const phoneHref = (n: string) => `tel:${n.replace(/[^+\d]/g, "")}`;
 
   return (
