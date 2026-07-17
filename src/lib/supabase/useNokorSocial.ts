@@ -1,0 +1,207 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import { getSupabase } from "./client";
+import type { NokorAuthor, NokorFeedPost } from "./useNokor";
+import { nokorPostImages } from "./useNokor";
+
+export type NokorUserProfile = {
+  userId: string;
+  username: string | null;
+  avatar_path: string | null;
+  bio: string | null;
+  followers: number;
+  following: number;
+  postCount: number;
+  isFollowedByMe: boolean;
+};
+
+export type NokorActivityKind = "like" | "comment" | "follow";
+
+export type NokorActivityItem = {
+  key: string;
+  kind: NokorActivityKind;
+  actorId: string;
+  actor: NokorAuthor | null;
+  postId: string | null;
+  preview: string | null;
+  createdAt: string;
+};
+
+/** Follow state + counts for one user relative to the signed-in viewer. */
+export function useNokorFollow(meId: string | null, userId: string | null) {
+  const [profile, setProfile] = useState<NokorUserProfile | null>(null);
+  const [posts, setPosts] = useState<NokorFeedPost[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  const load = useCallback(async () => {
+    const supabase = getSupabase();
+    if (!supabase || !userId) return;
+    const [profileRes, followers, following, postRes, mine] = await Promise.all([
+      supabase.from("profiles").select("username, avatar_path, bio").eq("user_id", userId).maybeSingle(),
+      supabase.from("nokor_follows").select("*", { count: "exact", head: true }).eq("following_id", userId),
+      supabase.from("nokor_follows").select("*", { count: "exact", head: true }).eq("follower_id", userId),
+      supabase.from("nokor_posts").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
+      meId
+        ? supabase.from("nokor_follows").select("follower_id").eq("follower_id", meId).eq("following_id", userId).maybeSingle()
+        : Promise.resolve({ data: null }),
+    ]);
+
+    setProfile({
+      userId,
+      username: profileRes.data?.username ?? null,
+      avatar_path: profileRes.data?.avatar_path ?? null,
+      bio: profileRes.data?.bio ?? null,
+      followers: followers.count ?? 0,
+      following: following.count ?? 0,
+      postCount: postRes.data?.length ?? 0,
+      isFollowedByMe: Boolean(mine.data),
+    });
+
+    const author: NokorAuthor = {
+      username: profileRes.data?.username ?? null,
+      avatar_path: profileRes.data?.avatar_path ?? null,
+    };
+    setPosts(
+      (postRes.data ?? []).map((p) => ({
+        ...p,
+        author,
+        likeCount: 0,
+        likedByMe: false,
+        comments: [],
+      })),
+    );
+    setLoaded(true);
+  }, [meId, userId]);
+
+  const loadRef = useRef(load);
+  useEffect(() => {
+    loadRef.current = load;
+  });
+  useEffect(() => {
+    void loadRef.current();
+  }, [userId, meId]);
+
+  const toggleFollow = useCallback(async () => {
+    const supabase = getSupabase();
+    if (!supabase || !meId || !userId || meId === userId || !profile) return;
+    const now = profile.isFollowedByMe;
+    // Optimistic.
+    setProfile((p) =>
+      p ? { ...p, isFollowedByMe: !now, followers: p.followers + (now ? -1 : 1) } : p,
+    );
+    if (now) {
+      await supabase.from("nokor_follows").delete().eq("follower_id", meId).eq("following_id", userId);
+    } else {
+      await supabase.from("nokor_follows").insert({ follower_id: meId, following_id: userId });
+    }
+  }, [meId, userId, profile]);
+
+  return { profile, posts, loaded, reload: load, toggleFollow };
+}
+
+/** Notifications for the signed-in user: likes and comments on their posts,
+ *  plus new followers — merged and sorted, derived from the base tables. */
+export function useNokorActivity(meId: string | null) {
+  const [items, setItems] = useState<NokorActivityItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  const load = useCallback(async () => {
+    const supabase = getSupabase();
+    if (!supabase || !meId) return;
+
+    const { data: myPosts } = await supabase.from("nokor_posts").select("id").eq("user_id", meId);
+    const myPostIds = (myPosts ?? []).map((p) => p.id);
+
+    const [likesRes, commentsRes, followsRes] = await Promise.all([
+      myPostIds.length
+        ? supabase.from("nokor_likes").select("post_id, user_id, created_at").in("post_id", myPostIds)
+        : Promise.resolve({ data: [] }),
+      myPostIds.length
+        ? supabase.from("nokor_comments").select("id, post_id, user_id, body, created_at").in("post_id", myPostIds)
+        : Promise.resolve({ data: [] }),
+      supabase.from("nokor_follows").select("follower_id, created_at").eq("following_id", meId),
+    ]);
+
+    const likes = (likesRes.data ?? []).filter((l) => l.user_id !== meId);
+    const comments = (commentsRes.data ?? []).filter((c) => c.user_id !== meId);
+    const follows = followsRes.data ?? [];
+
+    const actorIds = [
+      ...new Set([
+        ...likes.map((l) => l.user_id),
+        ...comments.map((c) => c.user_id),
+        ...follows.map((f) => f.follower_id),
+      ]),
+    ];
+    const { data: profileRows } = actorIds.length
+      ? await supabase.from("profiles").select("user_id, username, avatar_path").in("user_id", actorIds)
+      : { data: [] };
+    const authors = new Map(
+      (profileRows ?? []).map((p) => [p.user_id, { username: p.username, avatar_path: p.avatar_path }]),
+    );
+
+    const merged: NokorActivityItem[] = [
+      ...likes.map((l) => ({
+        key: `like-${l.post_id}-${l.user_id}`,
+        kind: "like" as const,
+        actorId: l.user_id,
+        actor: authors.get(l.user_id) ?? null,
+        postId: l.post_id,
+        preview: null,
+        createdAt: l.created_at,
+      })),
+      ...comments.map((c) => ({
+        key: `comment-${c.id}`,
+        kind: "comment" as const,
+        actorId: c.user_id,
+        actor: authors.get(c.user_id) ?? null,
+        postId: c.post_id,
+        preview: c.body,
+        createdAt: c.created_at,
+      })),
+      ...follows.map((f) => ({
+        key: `follow-${f.follower_id}`,
+        kind: "follow" as const,
+        actorId: f.follower_id,
+        actor: authors.get(f.follower_id) ?? null,
+        postId: null,
+        preview: null,
+        createdAt: f.created_at,
+      })),
+    ].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+    setItems(merged);
+    setLoaded(true);
+  }, [meId]);
+
+  const loadRef = useRef(load);
+  useEffect(() => {
+    loadRef.current = load;
+  });
+  useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase || !meId) return;
+    void loadRef.current();
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const schedule = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => void loadRef.current(), 400);
+    };
+    const channel = supabase
+      .channel("nokor-activity")
+      .on("postgres_changes", { event: "*", schema: "public", table: "nokor_likes" }, schedule)
+      .on("postgres_changes", { event: "*", schema: "public", table: "nokor_comments" }, schedule)
+      .on("postgres_changes", { event: "*", schema: "public", table: "nokor_follows" }, schedule)
+      .subscribe();
+    return () => {
+      if (timer) clearTimeout(timer);
+      void supabase.removeChannel(channel);
+    };
+  }, [meId]);
+
+  return { items, loaded };
+}
+
+/** Images helper re-export kept close to profile grids that use it. */
+export { nokorPostImages };

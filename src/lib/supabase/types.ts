@@ -35,6 +35,7 @@ export type Profile = {
   username: string | null;
   phone: string | null;
   avatar_path: string | null;
+  bio: string | null;
   updated_at: string;
 };
 
@@ -86,6 +87,28 @@ export type NokorComment = {
 export type NokorCommentLike = {
   comment_id: string;
   user_id: string;
+  created_at: string;
+};
+
+export type NokorFollow = {
+  follower_id: string;
+  following_id: string;
+  created_at: string;
+};
+
+export type NokorDmThread = {
+  id: string;
+  user_lo: string;
+  user_hi: string;
+  created_at: string;
+  last_message_at: string;
+};
+
+export type NokorDmMessage = {
+  id: string;
+  thread_id: string;
+  sender_id: string;
+  body: string;
   created_at: string;
 };
 
@@ -374,6 +397,25 @@ export type Database = {
         Update: Partial<NokorCommentLike>;
         Relationships: [];
       };
+      nokor_follows: {
+        Row: NokorFollow;
+        Insert: Pick<NokorFollow, "follower_id" | "following_id">;
+        Update: Partial<NokorFollow>;
+        Relationships: [];
+      };
+      nokor_dm_threads: {
+        Row: NokorDmThread;
+        Insert: Partial<NokorDmThread>;
+        Update: Partial<NokorDmThread>;
+        Relationships: [];
+      };
+      nokor_dm_messages: {
+        Row: NokorDmMessage;
+        Insert: Pick<NokorDmMessage, "thread_id" | "sender_id" | "body"> &
+          Partial<Pick<NokorDmMessage, "id">>;
+        Update: Partial<NokorDmMessage>;
+        Relationships: [];
+      };
     };
     Views: Record<never, never>;
     Functions: {
@@ -408,6 +450,10 @@ export type Database = {
       is_community_member: {
         Args: Record<never, never>;
         Returns: boolean;
+      };
+      nokor_open_dm: {
+        Args: { p_other: string };
+        Returns: string;
       };
       is_blocked: {
         Args: Record<never, never>;

@@ -10,6 +10,7 @@ import {
   type NokorFeedPost,
 } from "@/lib/supabase/useNokor";
 import { useT } from "../providers/LanguageProvider";
+import { useNokorNav } from "./useNokorNav";
 
 type FeedStrings = ReturnType<typeof useT>["nokor"]["feed"];
 
@@ -231,6 +232,7 @@ export default function PostCard({
   onDeleteComment: (commentId: string) => void;
 }) {
   const t = useT();
+  const nav = useNokorNav();
   const feed = t.nokor.feed;
   const [showComments, setShowComments] = useState(false);
   const [draft, setDraft] = useState("");
@@ -316,16 +318,22 @@ export default function PostCard({
   return (
     <article id={`post-${post.id}`} className="glass rounded-2xl p-4 sm:p-5">
       <header className="flex items-center gap-3">
-        <Avatar author={post.author} userId={post.user_id} />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold">
-            {authorName(post.author, post.user_id)}
-          </p>
-          <p className="text-xs opacity-60">
-            {timeAgo(post.created_at, feed)}
-            {post.edited_at && <span> · {feed.edited}</span>}
-          </p>
-        </div>
+        <button
+          type="button"
+          onClick={() => nav?.openProfile(post.user_id)}
+          className="flex min-w-0 flex-1 items-center gap-3 text-left"
+        >
+          <Avatar author={post.author} userId={post.user_id} />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold hover:underline">
+              {authorName(post.author, post.user_id)}
+            </p>
+            <p className="text-xs opacity-60">
+              {timeAgo(post.created_at, feed)}
+              {post.edited_at && <span> · {feed.edited}</span>}
+            </p>
+          </div>
+        </button>
 
         <div ref={menuRef} className="relative">
           <button

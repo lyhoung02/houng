@@ -5,9 +5,11 @@ import { getSupabase } from "./client";
 import { AVATAR_BUCKET, avatarUrl, MAX_AVATAR_BYTES } from "./attachments";
 import type { Profile } from "./types";
 
-export type ProfileState = Pick<Profile, "username" | "phone" | "avatar_path">;
+export type ProfileState = Pick<Profile, "username" | "phone" | "avatar_path"> & {
+  bio?: string | null;
+};
 
-const EMPTY: ProfileState = { username: null, phone: null, avatar_path: null };
+const EMPTY: ProfileState = { username: null, phone: null, avatar_path: null, bio: null };
 
 /** Display name for chat: username if set, otherwise an anonymised user tag. */
 export function displayName(p: ProfileState | undefined, userId: string | null) {
@@ -29,7 +31,7 @@ export function useProfile(userId: string | null) {
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("username, phone, avatar_path")
+        .select("username, phone, avatar_path, bio")
         .eq("user_id", userId)
         .maybeSingle();
       if (!cancelled) {
@@ -54,6 +56,7 @@ export function useProfile(userId: string | null) {
         username: next.username?.trim() || null,
         phone: next.phone?.trim() || null,
         avatar_path: next.avatar_path,
+        bio: next.bio?.trim() || null,
       });
       setSaving(false);
       if (upErr) {
