@@ -6,6 +6,7 @@ import { nokorAvatarUrl, nokorPostImages } from "@/lib/supabase/useNokor";
 import { useNokorFollow } from "@/lib/supabase/useNokorSocial";
 import { useProfile } from "@/lib/supabase/useProfile";
 import { useT } from "../providers/LanguageProvider";
+import NokorBadge from "./NokorBadge";
 import { NokorAbout, NokorAboutForm, type AboutFields } from "./NokorProfileAbout";
 import NokorReportSheet, { type NokorReportTarget } from "./NokorReportSheet";
 import { useNokorNav } from "./useNokorNav";
@@ -125,7 +126,10 @@ export default function NokorProfile({ meId, userId }: { meId: string | null; us
           />
         ) : (
           <div className="mt-4">
-            <p className="font-semibold">{name(profile.username, profile.userId)}</p>
+            <p className="flex items-center gap-1.5 font-semibold">
+              <span>{name(profile.username, profile.userId)}</span>
+              <NokorBadge kind={profile.badge} size={18} />
+            </p>
             {profile.bio && <p className="mt-1 text-sm opacity-80 whitespace-pre-wrap">{profile.bio}</p>}
 
             <div className="mt-4 flex gap-2">

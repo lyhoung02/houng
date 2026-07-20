@@ -4,7 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database, MessageKind } from "./types";
 
 export const BUCKET = "chat-attachments";
-export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024; // keep in sync with the bucket limit
+export const MAX_UPLOAD_BYTES = 50 * 1024 * 1024; // keep in sync with the bucket limit
 
 /**
  * Executable/script formats rejected on upload. This is the UX check — the

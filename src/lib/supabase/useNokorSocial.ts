@@ -4,10 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabase } from "./client";
 import type { NokorAuthor, NokorFeedPost } from "./useNokor";
 import { nokorPostImages } from "./useNokor";
-import type { Gender, Relationship } from "./types";
+import type { Gender, NokorBadgeKind, Relationship } from "./types";
 
 const PROFILE_COLUMNS =
-  "username, avatar_path, bio, work, education, hometown, current_city, relationship, website, birthday, gender, phone";
+  "username, avatar_path, bio, work, education, hometown, current_city, relationship, website, birthday, gender, phone, badge";
 
 export type NokorUserProfile = {
   userId: string;
@@ -23,6 +23,7 @@ export type NokorUserProfile = {
   birthday: string | null;
   gender: Gender | null;
   phone: string | null;
+  badge: NokorBadgeKind | null;
   followers: number;
   following: number;
   postCount: number;
@@ -79,6 +80,7 @@ export function useNokorFollow(meId: string | null, userId: string | null) {
       birthday: row?.birthday ?? null,
       gender: row?.gender ?? null,
       phone: row?.phone ?? null,
+      badge: row?.badge ?? null,
       followers: stats?.follower_count ?? 0,
       following: stats?.following_count ?? 0,
       postCount: stats?.post_count ?? 0,
@@ -88,6 +90,7 @@ export function useNokorFollow(meId: string | null, userId: string | null) {
     const author: NokorAuthor = {
       username: profileRes.data?.username ?? null,
       avatar_path: profileRes.data?.avatar_path ?? null,
+      badge: profileRes.data?.badge ?? null,
     };
     setPosts(
       (postRes.data ?? []).map((p) => ({
@@ -163,10 +166,13 @@ export function useNokorActivity(meId: string | null) {
       ]),
     ];
     const { data: profileRows } = actorIds.length
-      ? await supabase.from("profiles").select("user_id, username, avatar_path").in("user_id", actorIds)
+      ? await supabase.from("profiles").select("user_id, username, avatar_path, badge").in("user_id", actorIds)
       : { data: [] };
     const authors = new Map(
-      (profileRows ?? []).map((p) => [p.user_id, { username: p.username, avatar_path: p.avatar_path }]),
+      (profileRows ?? []).map((p) => [
+        p.user_id,
+        { username: p.username, avatar_path: p.avatar_path, badge: p.badge },
+      ]),
     );
 
     const merged: NokorActivityItem[] = [

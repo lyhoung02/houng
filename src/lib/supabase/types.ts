@@ -40,6 +40,9 @@ export type Relationship =
 
 export type Gender = "female" | "male" | "other" | "private";
 
+/** Admin-granted profile badge (migration 0031). */
+export type NokorBadgeKind = "verified" | "creator";
+
 export type Profile = {
   user_id: string;
   username: string | null;
@@ -56,6 +59,7 @@ export type Profile = {
   birthday: string | null;
   gender: Gender | null;
   languages: string[] | null;
+  badge: NokorBadgeKind | null;
   created_at: string;
   updated_at: string;
 };
@@ -86,6 +90,8 @@ export type NokorPost = {
   body: string;
   image_path: string | null;
   image_paths: string[];
+  /** A short video post (migration 0032); mutually exclusive with images. */
+  video_path: string | null;
   /** Trigger-maintained counters (migration 0026). */
   like_count: number;
   comment_count: number;
@@ -570,7 +576,7 @@ export type Database = {
       nokor_posts: {
         Row: NokorPost;
         Insert: Pick<NokorPost, "user_id"> &
-          Partial<Pick<NokorPost, "id" | "body" | "image_path" | "image_paths">>;
+          Partial<Pick<NokorPost, "id" | "body" | "image_path" | "image_paths" | "video_path">>;
         Update: Partial<NokorPost>;
         Relationships: [];
       };

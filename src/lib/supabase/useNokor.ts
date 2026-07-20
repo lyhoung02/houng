@@ -3,17 +3,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabase, isSupabaseConfigured } from "./client";
 import { avatarUrl } from "./attachments";
-import type { NokorComment, NokorPost } from "./types";
+import type { NokorBadgeKind, NokorComment, NokorPost } from "./types";
 
 export const NOKOR_MEDIA_BUCKET = "nokor-media";
 export const MAX_POST_IMAGE_BYTES = 5 * 1024 * 1024; // keep in sync with the bucket limit
 export const MAX_POST_IMAGES = 6;
+export const MAX_POST_VIDEO_BYTES = 50 * 1024 * 1024; // matches the raised bucket limit
 
 const FEED_LIMIT = 50;
 
 export type NokorAuthor = {
   username: string | null;
   avatar_path: string | null;
+  badge?: NokorBadgeKind | null;
 };
 
 export type NokorFeedComment = NokorComment & {
@@ -153,13 +155,13 @@ export function useNokor() {
     const { data: profileRows } = authorIds.length
       ? await supabase
           .from("profiles")
-          .select("user_id, username, avatar_path")
+          .select("user_id, username, avatar_path, badge")
           .in("user_id", authorIds)
       : { data: [] };
     const authors = new Map(
       (profileRows ?? []).map((p) => [
         p.user_id,
-        { username: p.username, avatar_path: p.avatar_path },
+        { username: p.username, avatar_path: p.avatar_path, badge: p.badge },
       ]),
     );
 
@@ -218,9 +220,45 @@ export function useNokor() {
   // Actions ---------------------------------------------------------------
 
   const createPost = useCallback(
-    async (body: string, images: File[] = []) => {
+    async (body: string, images: File[] = [], video: File | null = null) => {
       const supabase = getSupabase();
       if (!supabase || !userId) return false;
+
+      // A video post (mutually exclusive with images).
+      if (video) {
+        if (video.size > MAX_POST_VIDEO_BYTES) {
+          setError("video-too-large");
+          return false;
+        }
+        setBusy(true);
+        setError(null);
+        const ext = video.name.split(".").pop()?.toLowerCase() || "mp4";
+        const path = `${userId}/post-vid-${Date.now()}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from(NOKOR_MEDIA_BUCKET)
+          .upload(path, video, { contentType: video.type || "video/mp4" });
+        if (upErr) {
+          setBusy(false);
+          setError(upErr.message);
+          return false;
+        }
+        const { error: insErr } = await supabase
+          .from("nokor_posts")
+          .insert({ user_id: userId, body: body.trim(), video_path: path });
+        setBusy(false);
+        if (insErr) {
+          try {
+            await supabase.storage.from(NOKOR_MEDIA_BUCKET).remove([path]);
+          } catch {
+            /* best-effort cleanup */
+          }
+          setError(insErr.message);
+          return false;
+        }
+        void refresh();
+        return true;
+      }
+
       const files = images.slice(0, MAX_POST_IMAGES);
       if (files.some((f) => f.size > MAX_POST_IMAGE_BYTES)) {
         setError("image-too-large");
@@ -292,6 +330,7 @@ export function useNokor() {
       const paths = [
         ...(post.image_paths ?? []),
         ...(post.image_path ? [post.image_path] : []),
+        ...(post.video_path ? [post.video_path] : []),
       ];
       if (paths.length && post.user_id === userId) {
         // Best-effort: orphaned images are harmless.

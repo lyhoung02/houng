@@ -2,10 +2,15 @@
 
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { MAX_POST_IMAGE_BYTES, MAX_POST_IMAGES } from "@/lib/supabase/useNokor";
+import {
+  MAX_POST_IMAGE_BYTES,
+  MAX_POST_IMAGES,
+  MAX_POST_VIDEO_BYTES,
+} from "@/lib/supabase/useNokor";
 import { useT } from "../providers/LanguageProvider";
 
 type ImagePick = { file: File; url: string };
+type VideoPick = { file: File; url: string };
 
 export default function NokorComposer({
   busy,
@@ -14,20 +19,46 @@ export default function NokorComposer({
   autoFocus,
 }: {
   busy: boolean;
-  onPost: (body: string, images: File[]) => Promise<boolean>;
+  onPost: (body: string, images: File[], video: File | null) => Promise<boolean>;
   onDone?: () => void;
   autoFocus?: boolean;
 }) {
   const t = useT();
   const [body, setBody] = useState("");
   const [picks, setPicks] = useState<ImagePick[]>([]);
+  const [video, setVideo] = useState<VideoPick | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLInputElement>(null);
 
   const clearAll = () => {
     picks.forEach((p) => URL.revokeObjectURL(p.url));
     setPicks([]);
+    if (video) URL.revokeObjectURL(video.url);
+    setVideo(null);
     if (fileRef.current) fileRef.current.value = "";
+    if (videoRef.current) videoRef.current.value = "";
+  };
+
+  const addVideo = (files: FileList | null) => {
+    setLocalError(null);
+    const file = files?.[0];
+    if (!file) return;
+    if (file.size > MAX_POST_VIDEO_BYTES) {
+      setLocalError(t.nokor.composer.videoTooLarge);
+      return;
+    }
+    // A post is images OR one video, not both.
+    picks.forEach((p) => URL.revokeObjectURL(p.url));
+    setPicks([]);
+    if (video) URL.revokeObjectURL(video.url);
+    setVideo({ file, url: URL.createObjectURL(file) });
+    if (videoRef.current) videoRef.current.value = "";
+  };
+
+  const removeVideo = () => {
+    if (video) URL.revokeObjectURL(video.url);
+    setVideo(null);
   };
 
   const addFiles = (files: FileList | null) => {
@@ -38,6 +69,7 @@ export default function NokorComposer({
       setLocalError(t.nokor.composer.imageTooLarge);
       return;
     }
+    if (video) removeVideo();
     setPicks((prev) => {
       const room = MAX_POST_IMAGES - prev.length;
       if (room <= 0) {
@@ -65,10 +97,11 @@ export default function NokorComposer({
   };
 
   const submit = async () => {
-    if (busy || (!body.trim() && !picks.length)) return;
+    if (busy || (!body.trim() && !picks.length && !video)) return;
     const ok = await onPost(
       body,
       picks.map((p) => p.file),
+      video?.file ?? null,
     );
     if (ok) {
       setBody("");
@@ -78,6 +111,7 @@ export default function NokorComposer({
   };
 
   const atMax = picks.length >= MAX_POST_IMAGES;
+  const empty = !body.trim() && !picks.length && !video;
 
   return (
     <form
@@ -116,8 +150,21 @@ export default function NokorComposer({
           ))}
         </div>
       )}
+      {video && (
+        <div className="relative mt-3 overflow-hidden rounded-xl border border-border">
+          <video src={video.url} controls playsInline className="max-h-72 w-full bg-black" />
+          <button
+            type="button"
+            onClick={removeVideo}
+            aria-label={t.nokor.composer.removeVideo}
+            className="absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-xs text-white"
+          >
+            ✕
+          </button>
+        </div>
+      )}
       {localError && <p className="mt-2 text-sm text-rose-400">{localError}</p>}
-      <div className="mt-3 flex items-center justify-between">
+      <div className="mt-3 flex items-center justify-between gap-2">
         <input
           ref={fileRef}
           type="file"
@@ -126,27 +173,48 @@ export default function NokorComposer({
           hidden
           onChange={(e) => addFiles(e.target.files)}
         />
-        <button
-          type="button"
-          onClick={() => fileRef.current?.click()}
-          disabled={atMax}
-          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm opacity-70 transition hover:bg-surface-strong hover:opacity-100 disabled:opacity-40"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.6" />
-            <circle cx="9" cy="10" r="1.6" fill="currentColor" />
-            <path d="M5 17l4.5-4.5 3 3L16 12l3 3" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-          </svg>
-          {t.nokor.composer.addPhoto}
-          {picks.length > 0 && (
-            <span className="opacity-60">
-              {picks.length}/{MAX_POST_IMAGES}
-            </span>
-          )}
-        </button>
+        <input
+          ref={videoRef}
+          type="file"
+          accept="video/*"
+          hidden
+          onChange={(e) => addVideo(e.target.files)}
+        />
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={atMax || Boolean(video)}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm opacity-70 transition hover:bg-surface-strong hover:opacity-100 disabled:opacity-40"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.6" />
+              <circle cx="9" cy="10" r="1.6" fill="currentColor" />
+              <path d="M5 17l4.5-4.5 3 3L16 12l3 3" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+            </svg>
+            {t.nokor.composer.addPhoto}
+            {picks.length > 0 && (
+              <span className="opacity-60">
+                {picks.length}/{MAX_POST_IMAGES}
+              </span>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => videoRef.current?.click()}
+            disabled={picks.length > 0 || Boolean(video)}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm opacity-70 transition hover:bg-surface-strong hover:opacity-100 disabled:opacity-40"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="6" width="13" height="12" rx="2" stroke="currentColor" strokeWidth="1.6" />
+              <path d="M16 10l5-3v10l-5-3z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+            </svg>
+            {t.nokor.composer.addVideo}
+          </button>
+        </div>
         <button
           type="submit"
-          disabled={busy || (!body.trim() && !picks.length)}
+          disabled={busy || empty}
           className="rounded-full bg-indigo-500 px-5 py-2 text-sm font-medium text-white transition hover:bg-indigo-400 disabled:opacity-40"
         >
           {busy ? t.nokor.composer.posting : t.nokor.composer.post}

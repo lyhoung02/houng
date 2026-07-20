@@ -77,14 +77,18 @@ export function Attachment({ message }: { message: AttachmentLike }) {
   }
 
   if (message.kind === "video") {
-    return (
-      // Round, like the recorder preview — this is a Telegram-style video note.
+    // Recorded notes (video-<ts>.webm) show round like Telegram; an attached
+    // video file shows as a normal rectangular player.
+    const isNote = message.attachment_name?.startsWith("video-") ?? false;
+    return isNote ? (
       <video
         src={url}
         controls
         playsInline
         className="h-44 w-44 rounded-full object-cover bg-black"
       />
+    ) : (
+      <video src={url} controls playsInline className="max-h-72 max-w-full rounded-lg bg-black" />
     );
   }
 

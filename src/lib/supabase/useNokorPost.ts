@@ -62,10 +62,13 @@ export function useNokorPost(postId: string | null, meId: string | null) {
     const authorIds = [...new Set([base.user_id, ...comments.map((c) => c.user_id)])];
     const { data: profileRows } = await supabase
       .from("profiles")
-      .select("user_id, username, avatar_path")
+      .select("user_id, username, avatar_path, badge")
       .in("user_id", authorIds);
     const authors = new Map(
-      (profileRows ?? []).map((p) => [p.user_id, { username: p.username, avatar_path: p.avatar_path }]),
+      (profileRows ?? []).map((p) => [
+        p.user_id,
+        { username: p.username, avatar_path: p.avatar_path, badge: p.badge },
+      ]),
     );
 
     setPost({

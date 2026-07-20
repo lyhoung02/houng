@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import {
   nokorAvatarUrl,
+  nokorMediaUrl,
   nokorPostImages,
   type NokorAuthor,
   type NokorFeedComment,
@@ -11,6 +12,7 @@ import {
 } from "@/lib/supabase/useNokor";
 import { useT } from "../providers/LanguageProvider";
 import { useNokorNav } from "./useNokorNav";
+import NokorBadge from "./NokorBadge";
 import NokorReportSheet, { type NokorReportTarget } from "./NokorReportSheet";
 
 type FeedStrings = ReturnType<typeof useT>["nokor"]["feed"];
@@ -174,9 +176,10 @@ function CommentItem({
       <Avatar author={comment.author} userId={comment.user_id} size={isReply ? 24 : 30} />
       <div className="min-w-0 flex-1">
         <div className="rounded-xl bg-surface px-3 py-2">
-          <p className="text-xs font-semibold">
-            {authorName(comment.author, comment.user_id)}
-            <span className="ml-2 font-normal opacity-50">
+          <p className="flex items-center gap-1 text-xs font-semibold">
+            <span className="truncate">{authorName(comment.author, comment.user_id)}</span>
+            <NokorBadge kind={comment.author?.badge} size={13} />
+            <span className="ml-1 font-normal opacity-50">
               {timeAgo(comment.created_at, t)}
             </span>
           </p>
@@ -339,8 +342,11 @@ export default function PostCard({
         >
           <Avatar author={post.author} userId={post.user_id} />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold hover:underline">
-              {authorName(post.author, post.user_id)}
+            <p className="flex items-center gap-1 text-sm font-semibold">
+              <span className="truncate hover:underline">
+                {authorName(post.author, post.user_id)}
+              </span>
+              <NokorBadge kind={post.author?.badge} />
             </p>
             <p className="text-xs opacity-60">
               {timeAgo(post.created_at, feed)}
@@ -462,7 +468,17 @@ export default function PostCard({
         )
       )}
 
-      <Gallery images={images} />
+      {post.video_path ? (
+        <video
+          src={nokorMediaUrl(post.video_path) ?? undefined}
+          controls
+          playsInline
+          preload="metadata"
+          className="mt-3 max-h-[70vh] w-full rounded-xl bg-black"
+        />
+      ) : (
+        <Gallery images={images} />
+      )}
 
       <div className="mt-3 flex items-center gap-2 border-t border-border pt-3">
         <button
@@ -512,46 +528,71 @@ export default function PostCard({
 
       {showComments && (
         <div className="mt-3 space-y-3">
-          {topLevel.map((c) => (
-            <div key={c.id} className="space-y-2">
-              <CommentItem
-                comment={c}
-                userId={userId}
-                t={feed}
-                onToggleLike={() => onToggleCommentLike(c)}
-                onReply={() => startReply(c)}
-                onDelete={() => onDeleteComment(c.id)}
-                onReport={() =>
-                  setReportTarget({
-                    kind: "comment",
-                    id: c.id,
-                    userId: c.user_id,
-                    snapshot: c.body,
-                  })
-                }
-              />
-              {(repliesByRoot.get(c.id) ?? []).map((r) => (
-                <CommentItem
-                  key={r.id}
-                  comment={r}
-                  userId={userId}
-                  t={feed}
-                  isReply
-                  onToggleLike={() => onToggleCommentLike(r)}
-                  onReply={() => startReply(r)}
-                  onDelete={() => onDeleteComment(r.id)}
-                  onReport={() =>
-                    setReportTarget({
-                      kind: "comment",
-                      id: r.id,
-                      userId: r.user_id,
-                      snapshot: r.body,
-                    })
-                  }
-                />
-              ))}
-            </div>
-          ))}
+          {topLevel.map((c) => {
+            const replies = repliesByRoot.get(c.id) ?? [];
+            return (
+              <div key={c.id}>
+                <div className={replies.length > 0 ? "relative pb-2" : "relative"}>
+                  {/* Thread trunk running down from the parent avatar. */}
+                  {replies.length > 0 && (
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute top-[30px] bottom-0 left-[14px] w-0 border-l border-border"
+                    />
+                  )}
+                  <CommentItem
+                    comment={c}
+                    userId={userId}
+                    t={feed}
+                    onToggleLike={() => onToggleCommentLike(c)}
+                    onReply={() => startReply(c)}
+                    onDelete={() => onDeleteComment(c.id)}
+                    onReport={() =>
+                      setReportTarget({
+                        kind: "comment",
+                        id: c.id,
+                        userId: c.user_id,
+                        snapshot: c.body,
+                      })
+                    }
+                  />
+                </div>
+                {replies.map((r, i) => (
+                  <div key={r.id} className="relative pb-2 last:pb-0">
+                    {/* Curved elbow from the trunk to this reply's avatar. */}
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute top-0 left-[14px] h-[13px] w-[22px] rounded-bl-[10px] border-b border-l border-border"
+                    />
+                    {/* Continue the trunk to the next reply. */}
+                    {i < replies.length - 1 && (
+                      <span
+                        aria-hidden
+                        className="pointer-events-none absolute top-[13px] bottom-0 left-[14px] w-0 border-l border-border"
+                      />
+                    )}
+                    <CommentItem
+                      comment={r}
+                      userId={userId}
+                      t={feed}
+                      isReply
+                      onToggleLike={() => onToggleCommentLike(r)}
+                      onReply={() => startReply(r)}
+                      onDelete={() => onDeleteComment(r.id)}
+                      onReport={() =>
+                        setReportTarget({
+                          kind: "comment",
+                          id: r.id,
+                          userId: r.user_id,
+                          snapshot: r.body,
+                        })
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+            );
+          })}
 
           {replyTo && (
             <div className="flex items-center justify-between rounded-lg bg-surface px-3 py-1.5 text-xs">
