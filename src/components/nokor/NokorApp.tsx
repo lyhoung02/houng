@@ -147,20 +147,17 @@ export default function NokorApp() {
   return (
     <NokorNavProvider value={nav}>
       <div className="mx-auto min-h-dvh w-full max-w-2xl px-4 pb-24 sm:px-6">
-        <header className="sticky top-0 z-20 -mx-4 mb-6 border-b border-border bg-background/80 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
+        <header className="sticky top-0 z-20 -mx-4 mb-6 border-b border-border bg-background/80 px-4 py-0 backdrop-blur sm:-mx-6 sm:px-6">
           <div className="flex items-center gap-2">
             <Image
               src="/nokor.png"
               alt={t.nokor.title}
-              width={56}
-              height={36}
+              width={128}
+              height={108}
               unoptimized
               priority
-              className="h-9 w-14 shrink-0 rounded-lg object-contain ring-1 ring-border"
+              className="h-20 w-28 shrink-0 object-contain"
             />
-            <h1 className="font-nokor text-gold pb-0.5 text-3xl font-bold leading-tight sm:text-4xl">
-              {t.nokor.title}
-            </h1>
             <div className="ml-auto flex items-center gap-2">
               <NokorPrefs />
               {fk.userId && (

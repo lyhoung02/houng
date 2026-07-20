@@ -40,6 +40,12 @@ export type Relationship =
 
 export type Gender = "female" | "male" | "other" | "private";
 
+/** Cambodia geo gazetteer rows (migration 0033). */
+export type KhProvince = { code: string; name_km: string; name_en: string; type: string | null };
+export type KhDistrict = KhProvince & { province_code: string };
+export type KhCommune = KhDistrict & { district_code: string };
+export type KhVillage = KhCommune & { commune_code: string };
+
 /** Admin-granted profile badge (migration 0031). */
 export type NokorBadgeKind = "verified" | "creator";
 
@@ -53,6 +59,16 @@ export type Profile = {
   education: string | null;
   hometown: string | null;
   current_city: string | null;
+  /** Structured Cambodia address codes (migration 0033). current_city/hometown
+   *  hold the denormalised display string; these re-select the dropdowns. */
+  current_province_code: string | null;
+  current_district_code: string | null;
+  current_commune_code: string | null;
+  current_village_code: string | null;
+  home_province_code: string | null;
+  home_district_code: string | null;
+  home_commune_code: string | null;
+  home_village_code: string | null;
   relationship: Relationship | null;
   website: string | null;
   /** ISO date (yyyy-mm-dd). */
@@ -95,8 +111,16 @@ export type NokorPost = {
   /** Trigger-maintained counters (migration 0026). */
   like_count: number;
   comment_count: number;
+  /** Trigger-maintained unique-viewer count (migration 0034). */
+  view_count: number;
   created_at: string;
   edited_at: string | null;
+};
+
+export type NokorPostView = {
+  post_id: string;
+  user_id: string;
+  created_at: string;
 };
 
 export type NokorLike = {
@@ -586,6 +610,12 @@ export type Database = {
         Update: Partial<NokorLike>;
         Relationships: [];
       };
+      nokor_post_views: {
+        Row: NokorPostView;
+        Insert: Pick<NokorPostView, "post_id" | "user_id">;
+        Update: never;
+        Relationships: [];
+      };
       nokor_comments: {
         Row: NokorComment;
         Insert: Pick<NokorComment, "post_id" | "user_id" | "body"> &
@@ -733,6 +763,30 @@ export type Database = {
         Row: NokorUserLocation;
         Insert: Pick<NokorUserLocation, "user_id" | "lat" | "lng">;
         Update: Partial<NokorUserLocation>;
+        Relationships: [];
+      };
+      kh_provinces: {
+        Row: KhProvince;
+        Insert: KhProvince;
+        Update: Partial<KhProvince>;
+        Relationships: [];
+      };
+      kh_districts: {
+        Row: KhDistrict;
+        Insert: KhDistrict;
+        Update: Partial<KhDistrict>;
+        Relationships: [];
+      };
+      kh_communes: {
+        Row: KhCommune;
+        Insert: KhCommune;
+        Update: Partial<KhCommune>;
+        Relationships: [];
+      };
+      kh_villages: {
+        Row: KhVillage;
+        Insert: KhVillage;
+        Update: Partial<KhVillage>;
         Relationships: [];
       };
     };

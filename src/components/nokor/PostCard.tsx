@@ -6,6 +6,7 @@ import {
   nokorAvatarUrl,
   nokorMediaUrl,
   nokorPostImages,
+  nokorRecordView,
   type NokorAuthor,
   type NokorFeedComment,
   type NokorFeedPost,
@@ -20,6 +21,13 @@ type FeedStrings = ReturnType<typeof useT>["nokor"]["feed"];
 /** Username if set, otherwise the same anonymised tag chat uses. */
 function authorName(author: NokorAuthor | null, userId: string) {
   return author?.username?.trim() || `user-${userId.slice(0, 4) || "anon"}`;
+}
+
+/** 1234 -> "1.2K", 1_500_000 -> "1.5M" (TikTok-style view counts). */
+function compactCount(n: number) {
+  if (n < 1000) return String(n);
+  if (n < 1_000_000) return `${(n / 1000).toFixed(n < 10_000 ? 1 : 0)}K`.replace(".0", "");
+  return `${(n / 1_000_000).toFixed(1)}M`.replace(".0", "");
 }
 
 function timeAgo(iso: string, t: FeedStrings) {
@@ -259,9 +267,29 @@ export default function PostCard({
   const [reportTarget, setReportTarget] = useState<NokorReportTarget | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const commentInputRef = useRef<HTMLInputElement>(null);
+  const articleRef = useRef<HTMLElement>(null);
 
   const images = nokorPostImages(post);
   const own = post.user_id === userId;
+
+  // Count a view the first time this post is actually scrolled into view — one
+  // per (post, viewer), and never for the author's own posts.
+  useEffect(() => {
+    const el = articleRef.current;
+    if (!el || own || typeof IntersectionObserver === "undefined") return;
+    let recorded = false;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (recorded || !entries.some((e) => e.isIntersecting)) return;
+        recorded = true;
+        io.disconnect();
+        void nokorRecordView(post.id, userId);
+      },
+      { threshold: 0.5 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [post.id, userId, own]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -333,7 +361,7 @@ export default function PostCard({
   }
 
   return (
-    <article id={`post-${post.id}`} className="glass rounded-2xl p-4 sm:p-5">
+    <article ref={articleRef} id={`post-${post.id}`} className="glass rounded-2xl p-4 sm:p-5">
       <header className="flex items-center gap-3">
         <button
           type="button"
@@ -351,6 +379,12 @@ export default function PostCard({
             <p className="text-xs opacity-60">
               {timeAgo(post.created_at, feed)}
               {post.edited_at && <span> · {feed.edited}</span>}
+              {post.view_count > 0 && (
+                <span>
+                  {" "}
+                  · {compactCount(post.view_count)} {feed.views}
+                </span>
+              )}
             </p>
           </div>
         </button>

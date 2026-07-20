@@ -7,7 +7,7 @@ import { nokorPostImages } from "./useNokor";
 import type { Gender, NokorBadgeKind, Relationship } from "./types";
 
 const PROFILE_COLUMNS =
-  "username, avatar_path, bio, work, education, hometown, current_city, relationship, website, birthday, gender, phone, badge";
+  "username, avatar_path, bio, work, education, hometown, current_city, current_province_code, current_district_code, current_commune_code, current_village_code, home_province_code, home_district_code, home_commune_code, home_village_code, relationship, website, birthday, gender, phone, badge";
 
 export type NokorUserProfile = {
   userId: string;
@@ -18,6 +18,14 @@ export type NokorUserProfile = {
   education: string | null;
   hometown: string | null;
   current_city: string | null;
+  current_province_code: string | null;
+  current_district_code: string | null;
+  current_commune_code: string | null;
+  current_village_code: string | null;
+  home_province_code: string | null;
+  home_district_code: string | null;
+  home_commune_code: string | null;
+  home_village_code: string | null;
   relationship: Relationship | null;
   website: string | null;
   birthday: string | null;
@@ -75,6 +83,14 @@ export function useNokorFollow(meId: string | null, userId: string | null) {
       education: row?.education ?? null,
       hometown: row?.hometown ?? null,
       current_city: row?.current_city ?? null,
+      current_province_code: row?.current_province_code ?? null,
+      current_district_code: row?.current_district_code ?? null,
+      current_commune_code: row?.current_commune_code ?? null,
+      current_village_code: row?.current_village_code ?? null,
+      home_province_code: row?.home_province_code ?? null,
+      home_district_code: row?.home_district_code ?? null,
+      home_commune_code: row?.home_commune_code ?? null,
+      home_village_code: row?.home_village_code ?? null,
       relationship: row?.relationship ?? null,
       website: row?.website ?? null,
       birthday: row?.birthday ?? null,
@@ -235,6 +251,79 @@ export function useNokorActivity(meId: string | null) {
   }, [meId]);
 
   return { items, loaded };
+}
+
+export type NokorSuggestion = {
+  userId: string;
+  username: string | null;
+  avatar_path: string | null;
+  badge: NokorBadgeKind | null;
+  followers: number;
+  posts: number;
+};
+
+/** "Who to follow" — users the signed-in viewer isn't following yet, ranked by
+ *  follower count then post count so new accounts have people to discover. */
+export function useNokorSuggestions(meId: string | null) {
+  const [items, setItems] = useState<NokorSuggestion[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  const load = useCallback(async () => {
+    const supabase = getSupabase();
+    if (!supabase || !meId) return;
+
+    const [followsRes, profRes, statsRes] = await Promise.all([
+      supabase.from("nokor_follows").select("following_id").eq("follower_id", meId),
+      supabase.from("profiles").select("user_id, username, avatar_path, badge").neq("user_id", meId).limit(100),
+      supabase.from("nokor_user_stats").select("user_id, follower_count, post_count"),
+    ]);
+
+    const followed = new Set((followsRes.data ?? []).map((f) => f.following_id));
+    const stats = new Map(
+      (statsRes.data ?? []).map((s) => [s.user_id, { followers: s.follower_count, posts: s.post_count }]),
+    );
+
+    const next: NokorSuggestion[] = (profRes.data ?? [])
+      .filter((r) => !followed.has(r.user_id))
+      .map((r) => ({
+        userId: r.user_id,
+        username: r.username,
+        avatar_path: r.avatar_path,
+        badge: r.badge,
+        followers: stats.get(r.user_id)?.followers ?? 0,
+        posts: stats.get(r.user_id)?.posts ?? 0,
+      }))
+      .sort((a, b) => b.followers - a.followers || b.posts - a.posts)
+      .slice(0, 10);
+
+    setItems(next);
+    setLoaded(true);
+  }, [meId]);
+
+  const loadRef = useRef(load);
+  useEffect(() => {
+    loadRef.current = load;
+  });
+  useEffect(() => {
+    void loadRef.current();
+  }, [meId]);
+
+  const follow = useCallback(
+    async (userId: string) => {
+      const supabase = getSupabase();
+      if (!supabase || !meId || userId === meId) return;
+      setItems((list) => list.filter((s) => s.userId !== userId));
+      const { error } = await supabase.from("nokor_follows").insert({ follower_id: meId, following_id: userId });
+      if (error) void loadRef.current();
+    },
+    [meId],
+  );
+
+  const dismiss = useCallback((userId: string) => {
+    setItems((list) => list.filter((s) => s.userId !== userId));
+  }, []);
+
+  return { items, loaded, follow, dismiss };
 }
 
 /** Images helper re-export kept close to profile grids that use it. */

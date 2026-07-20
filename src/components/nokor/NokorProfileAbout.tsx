@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { ProfileState } from "@/lib/supabase/useProfile";
 import type { Gender, Relationship } from "@/lib/supabase/types";
 import { useT } from "../providers/LanguageProvider";
+import NokorAddressSelect, { type AddressValue } from "./NokorAddressSelect";
 
 const RELATIONSHIPS: Relationship[] = [
   "single",
@@ -22,6 +23,14 @@ export type AboutFields = Pick<
   | "education"
   | "hometown"
   | "current_city"
+  | "current_province_code"
+  | "current_district_code"
+  | "current_commune_code"
+  | "current_village_code"
+  | "home_province_code"
+  | "home_district_code"
+  | "home_commune_code"
+  | "home_village_code"
   | "relationship"
   | "website"
   | "birthday"
@@ -140,19 +149,45 @@ export function NokorAboutForm({
         maxLength={120}
         className={field}
       />
-      <input
-        value={f.current_city ?? ""}
-        onChange={(e) => set("current_city", e.target.value)}
-        placeholder={p.currentCityPlaceholder}
-        maxLength={80}
-        className={field}
+      <NokorAddressSelect
+        title={p.currentCityPlaceholder}
+        labels={p.address}
+        value={{
+          province_code: f.current_province_code ?? null,
+          district_code: f.current_district_code ?? null,
+          commune_code: f.current_commune_code ?? null,
+          village_code: f.current_village_code ?? null,
+        }}
+        onChange={(v: AddressValue, display) =>
+          setF((prev) => ({
+            ...prev,
+            current_province_code: v.province_code,
+            current_district_code: v.district_code,
+            current_commune_code: v.commune_code,
+            current_village_code: v.village_code,
+            current_city: display || null,
+          }))
+        }
       />
-      <input
-        value={f.hometown ?? ""}
-        onChange={(e) => set("hometown", e.target.value)}
-        placeholder={p.hometownPlaceholder}
-        maxLength={80}
-        className={field}
+      <NokorAddressSelect
+        title={p.hometownPlaceholder}
+        labels={p.address}
+        value={{
+          province_code: f.home_province_code ?? null,
+          district_code: f.home_district_code ?? null,
+          commune_code: f.home_commune_code ?? null,
+          village_code: f.home_village_code ?? null,
+        }}
+        onChange={(v: AddressValue, display) =>
+          setF((prev) => ({
+            ...prev,
+            home_province_code: v.province_code,
+            home_district_code: v.district_code,
+            home_commune_code: v.commune_code,
+            home_village_code: v.village_code,
+            hometown: display || null,
+          }))
+        }
       />
       <input
         value={f.website ?? ""}

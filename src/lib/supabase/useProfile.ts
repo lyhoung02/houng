@@ -16,6 +16,14 @@ export type ProfileState = Pick<Profile, "username" | "phone" | "avatar_path"> &
       | "education"
       | "hometown"
       | "current_city"
+      | "current_province_code"
+      | "current_district_code"
+      | "current_commune_code"
+      | "current_village_code"
+      | "home_province_code"
+      | "home_district_code"
+      | "home_commune_code"
+      | "home_village_code"
       | "relationship"
       | "website"
       | "birthday"
@@ -26,7 +34,7 @@ export type ProfileState = Pick<Profile, "username" | "phone" | "avatar_path"> &
 const EMPTY: ProfileState = { username: null, phone: null, avatar_path: null, bio: null };
 
 const EDITABLE_COLUMNS =
-  "username, phone, avatar_path, bio, work, education, hometown, current_city, relationship, website, birthday, gender";
+  "username, phone, avatar_path, bio, work, education, hometown, current_city, current_province_code, current_district_code, current_commune_code, current_village_code, home_province_code, home_district_code, home_commune_code, home_village_code, relationship, website, birthday, gender";
 
 /** Display name for chat: username if set, otherwise an anonymised user tag. */
 export function displayName(p: ProfileState | undefined, userId: string | null) {
@@ -79,6 +87,14 @@ export function useProfile(userId: string | null) {
         education: text(next.education),
         hometown: text(next.hometown),
         current_city: text(next.current_city),
+        current_province_code: next.current_province_code ?? null,
+        current_district_code: next.current_district_code ?? null,
+        current_commune_code: next.current_commune_code ?? null,
+        current_village_code: next.current_village_code ?? null,
+        home_province_code: next.home_province_code ?? null,
+        home_district_code: next.home_district_code ?? null,
+        home_commune_code: next.home_commune_code ?? null,
+        home_village_code: next.home_village_code ?? null,
         relationship: next.relationship ?? null,
         website: text(next.website),
         // An empty date input yields "", which Postgres rejects for a date.

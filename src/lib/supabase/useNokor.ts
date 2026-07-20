@@ -53,6 +53,17 @@ export function nokorAvatarUrl(author: NokorAuthor | null) {
   return avatarUrl(supabase, author?.avatar_path ?? null);
 }
 
+/** Record that `userId` has seen `postId`. Idempotent per (post, user): the
+ *  primary key + ignoreDuplicates means repeat views never inflate the count,
+ *  and a DB trigger bumps nokor_posts.view_count on the first insert only. */
+export async function nokorRecordView(postId: string, userId: string | null) {
+  const supabase = getSupabase();
+  if (!supabase || !userId) return;
+  await supabase
+    .from("nokor_post_views")
+    .upsert({ post_id: postId, user_id: userId }, { ignoreDuplicates: true });
+}
+
 export function useNokor() {
   const [userId, setUserId] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);

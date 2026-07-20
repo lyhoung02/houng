@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { nokorAvatarUrl, nokorPostImages } from "@/lib/supabase/useNokor";
+import { nokorAvatarUrl, nokorMediaUrl, nokorPostImages } from "@/lib/supabase/useNokor";
 import { useNokorFollow } from "@/lib/supabase/useNokorSocial";
 import { useProfile } from "@/lib/supabase/useProfile";
 import { useT } from "../providers/LanguageProvider";
@@ -13,6 +13,13 @@ import { useNokorNav } from "./useNokorNav";
 
 function name(username: string | null, userId: string) {
   return username?.trim() || `user-${userId.slice(0, 4) || "anon"}`;
+}
+
+/** 1234 -> "1.2K", 1_500_000 -> "1.5M" (TikTok-style view counts). */
+function compactCount(n: number) {
+  if (n < 1000) return String(n);
+  if (n < 1_000_000) return `${(n / 1000).toFixed(n < 10_000 ? 1 : 0)}K`.replace(".0", "");
+  return `${(n / 1_000_000).toFixed(1)}M`.replace(".0", "");
 }
 
 function Stat({ value, label }: { value: number; label: string }) {
@@ -114,6 +121,14 @@ export default function NokorProfile({ meId, userId }: { meId: string | null; us
               education: profile.education,
               hometown: profile.hometown,
               current_city: profile.current_city,
+              current_province_code: profile.current_province_code,
+              current_district_code: profile.current_district_code,
+              current_commune_code: profile.current_commune_code,
+              current_village_code: profile.current_village_code,
+              home_province_code: profile.home_province_code,
+              home_district_code: profile.home_district_code,
+              home_commune_code: profile.home_commune_code,
+              home_village_code: profile.home_village_code,
               relationship: profile.relationship,
               website: profile.website,
               birthday: profile.birthday,
@@ -202,6 +217,19 @@ export default function NokorProfile({ meId, userId }: { meId: string | null; us
               >
                 {imgs.length ? (
                   <Image src={imgs[0]} alt="" fill unoptimized className="object-cover" />
+                ) : post.video_path ? (
+                  <>
+                    <video
+                      src={nokorMediaUrl(post.video_path) ?? undefined}
+                      muted
+                      playsInline
+                      preload="metadata"
+                      className="h-full w-full object-cover"
+                    />
+                    <span className="absolute top-1 right-1 rounded bg-black/60 px-1 text-[10px] text-white">
+                      ▶
+                    </span>
+                  </>
                 ) : (
                   <p className="line-clamp-5 p-2 text-xs opacity-70">{post.body}</p>
                 )}
@@ -210,6 +238,12 @@ export default function NokorProfile({ meId, userId }: { meId: string | null; us
                     ×{imgs.length}
                   </span>
                 )}
+                <span className="absolute bottom-1 left-1 flex items-center gap-0.5 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                  <svg viewBox="0 0 24 24" className="h-3 w-3" fill="currentColor" aria-hidden>
+                    <path d="M12 5c-5 0-9 4.5-10 7 1 2.5 5 7 10 7s9-4.5 10-7c-1-2.5-5-7-10-7zm0 11a4 4 0 110-8 4 4 0 010 8zm0-2a2 2 0 100-4 2 2 0 000 4z" />
+                  </svg>
+                  {compactCount(post.view_count)}
+                </span>
               </div>
             );
           })}

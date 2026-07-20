@@ -5,6 +5,7 @@ import { nokorErrorText } from "@/lib/supabase/nokorErrors";
 import { useT } from "../providers/LanguageProvider";
 import NokorComposer from "./NokorComposer";
 import NokorStories from "./NokorStories";
+import NokorSuggestions from "./NokorSuggestions";
 import PostCard from "./PostCard";
 
 type Nokor = ReturnType<typeof useNokor>;
@@ -15,6 +16,7 @@ export default function NokorFeed({ fk }: { fk: Nokor }) {
   return (
     <div className="space-y-4">
       <NokorStories meId={fk.userId} />
+      <NokorSuggestions meId={fk.userId} />
       <NokorComposer busy={fk.busy} onPost={fk.createPost} />
       {fk.error && (
         <p className="text-sm text-rose-400">{nokorErrorText(fk.error, t.nokor.errors)}</p>
