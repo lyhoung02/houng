@@ -7,6 +7,7 @@ import { useNokorFollow } from "@/lib/supabase/useNokorSocial";
 import { useProfile } from "@/lib/supabase/useProfile";
 import { useT } from "../providers/LanguageProvider";
 import { NokorAbout, NokorAboutForm, type AboutFields } from "./NokorProfileAbout";
+import NokorReportSheet, { type NokorReportTarget } from "./NokorReportSheet";
 import { useNokorNav } from "./useNokorNav";
 
 function name(username: string | null, userId: string) {
@@ -31,6 +32,7 @@ export default function NokorProfile({ meId, userId }: { meId: string | null; us
   const editable = useProfile(own ? meId : null);
 
   const [editing, setEditing] = useState(false);
+  const [reportTarget, setReportTarget] = useState<NokorReportTarget | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const saveEdit = async (fields: AboutFields & { username: string | null }) => {
@@ -155,6 +157,24 @@ export default function NokorProfile({ meId, userId }: { meId: string | null; us
                   >
                     {p.message}
                   </button>
+                  {meId && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setReportTarget({
+                          kind: "profile",
+                          id: profile.userId,
+                          userId: profile.userId,
+                          snapshot: profile.bio,
+                        })
+                      }
+                      aria-label={t.nokor.report.action}
+                      title={t.nokor.report.action}
+                      className="rounded-full border border-border px-3 py-2 text-sm opacity-70 transition hover:bg-surface-strong hover:opacity-100"
+                    >
+                      ⚑
+                    </button>
+                  )}
                 </>
               )}
             </div>
@@ -190,6 +210,14 @@ export default function NokorProfile({ meId, userId }: { meId: string | null; us
             );
           })}
         </div>
+      )}
+
+      {reportTarget && meId && (
+        <NokorReportSheet
+          meId={meId}
+          target={reportTarget}
+          onClose={() => setReportTarget(null)}
+        />
       )}
     </div>
   );

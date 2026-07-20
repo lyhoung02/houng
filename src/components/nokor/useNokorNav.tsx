@@ -7,6 +7,7 @@ import { createContext, useContext } from "react";
 export type NokorNav = {
   openProfile: (userId: string) => void;
   openChat: (userId: string) => void;
+  openPost: (postId: string) => void;
 };
 
 const NokorNavContext = createContext<NokorNav | null>(null);

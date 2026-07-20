@@ -86,6 +86,9 @@ export type NokorPost = {
   body: string;
   image_path: string | null;
   image_paths: string[];
+  /** Trigger-maintained counters (migration 0026). */
+  like_count: number;
+  comment_count: number;
   created_at: string;
   edited_at: string | null;
 };
@@ -102,6 +105,8 @@ export type NokorComment = {
   user_id: string;
   body: string;
   reply_to_id: string | null;
+  /** Trigger-maintained counter (migration 0026). */
+  like_count: number;
   created_at: string;
 };
 
@@ -114,6 +119,48 @@ export type NokorCommentLike = {
 export type NokorFollow = {
   follower_id: string;
   following_id: string;
+  created_at: string;
+};
+
+/** Trigger-maintained per-user aggregates (migration 0026). */
+export type NokorUserStats = {
+  user_id: string;
+  post_count: number;
+  follower_count: number;
+  following_count: number;
+};
+
+export type NokorReportKind =
+  | "post"
+  | "comment"
+  | "dm_message"
+  | "room_message"
+  | "story"
+  | "profile";
+export type NokorReportReason =
+  | "spam"
+  | "harassment"
+  | "nudity"
+  | "violence"
+  | "hate"
+  | "scam"
+  | "other";
+
+/** A user (or auto) report on a piece of content (migration 0030). */
+export type NokorReport = {
+  id: string;
+  reporter_id: string | null;
+  target_kind: NokorReportKind;
+  target_id: string;
+  target_user_id: string | null;
+  reason: NokorReportReason;
+  note: string | null;
+  snapshot: string | null;
+  source: "user" | "auto";
+  status: "open" | "resolved" | "dismissed";
+  resolution: string | null;
+  resolved_by: string | null;
+  resolved_at: string | null;
   created_at: string;
 };
 
@@ -550,6 +597,23 @@ export type Database = {
         Row: NokorFollow;
         Insert: Pick<NokorFollow, "follower_id" | "following_id">;
         Update: Partial<NokorFollow>;
+        Relationships: [];
+      };
+      nokor_user_stats: {
+        Row: NokorUserStats;
+        // Rows are written only by SECURITY DEFINER triggers, never the client.
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      nokor_reports: {
+        Row: NokorReport;
+        Insert: Pick<
+          NokorReport,
+          "reporter_id" | "target_kind" | "target_id" | "target_user_id" | "reason"
+        > &
+          Partial<Pick<NokorReport, "note" | "snapshot" | "source">>;
+        Update: Partial<NokorReport>;
         Relationships: [];
       };
       nokor_stories: {

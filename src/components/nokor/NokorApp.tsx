@@ -10,11 +10,13 @@ import NokorActivity from "./NokorActivity";
 import NokorChat from "./NokorChat";
 import NokorComposer from "./NokorComposer";
 import NokorFeed from "./NokorFeed";
+import NokorPostDetail from "./NokorPostDetail";
 import NokorPrefs from "./NokorPrefs";
 import NokorProfile from "./NokorProfile";
 import NokorProfileMenu from "./NokorProfileMenu";
 import NokorTabBar, { type NokorTab } from "./NokorTabBar";
 import { NokorNavProvider } from "./useNokorNav";
+import { useNokorRoute } from "./useNokorRoute";
 
 function AuthPanel({
   signIn,
@@ -104,20 +106,41 @@ function AuthPanel({
 export default function NokorApp() {
   const t = useT();
   const fk = useNokor();
-  const [tab, setTab] = useState<NokorTab>("home");
-  const [profileUserId, setProfileUserId] = useState<string | null>(null);
+  const { route, navigate } = useNokorRoute();
   const [chatUserId, setChatUserId] = useState<string | null>(null);
   const [composeOpen, setComposeOpen] = useState(false);
 
-  const openProfile = useCallback((userId: string) => {
-    setProfileUserId(userId);
-    setTab("profile");
-  }, []);
-  const openChat = useCallback((userId: string) => {
-    setChatUserId(userId);
-    setTab("chat");
-  }, []);
-  const nav = useMemo(() => ({ openProfile, openChat }), [openProfile, openChat]);
+  const openProfile = useCallback(
+    (userId: string) => navigate({ name: "profile", userId }),
+    [navigate],
+  );
+  const openChat = useCallback(
+    (userId: string) => {
+      setChatUserId(userId);
+      navigate({ name: "chat" });
+    },
+    [navigate],
+  );
+  const openPost = useCallback(
+    (postId: string) => navigate({ name: "post", postId }),
+    [navigate],
+  );
+  const nav = useMemo(
+    () => ({ openProfile, openChat, openPost }),
+    [openProfile, openChat, openPost],
+  );
+
+  // Which bottom-tab is highlighted for the current route (post detail keeps
+  // Home lit since it opens from the feed).
+  const activeTab: NokorTab =
+    route.name === "profile"
+      ? "profile"
+      : route.name === "chat"
+        ? "chat"
+        : route.name === "activity"
+          ? "activity"
+          : "home";
+  const profileUserId = route.name === "profile" ? route.userId : null;
 
   const signedIn = isSupabaseConfigured && fk.userId;
 
@@ -157,20 +180,28 @@ export default function NokorApp() {
           <AuthPanel signIn={fk.signIn} signUp={fk.signUp} />
         ) : (
           <>
-            {tab === "home" && <NokorFeed fk={fk} />}
-            {tab === "activity" && <NokorActivity meId={fk.userId} />}
-            {tab === "chat" && (
+            {route.name === "home" && <NokorFeed fk={fk} />}
+            {route.name === "activity" && <NokorActivity meId={fk.userId} />}
+            {route.name === "chat" && (
               <NokorChat
                 meId={fk.userId}
                 openWithUserId={chatUserId}
                 onConsumed={() => setChatUserId(null)}
               />
             )}
-            {tab === "profile" && (
+            {route.name === "profile" && (
               <NokorProfile
                 key={profileUserId ?? fk.userId}
                 meId={fk.userId}
                 userId={profileUserId ?? fk.userId}
+              />
+            )}
+            {route.name === "post" && (
+              <NokorPostDetail
+                key={route.postId}
+                postId={route.postId}
+                meId={fk.userId}
+                onBack={() => navigate({ name: "home" })}
               />
             )}
           </>
@@ -185,10 +216,10 @@ export default function NokorApp() {
 
       {signedIn && (
         <NokorTabBar
-          active={tab}
+          active={activeTab}
           onChange={(next) => {
-            if (next === "profile") setProfileUserId(null);
-            setTab(next);
+            if (next === "profile") navigate({ name: "profile", userId: null });
+            else navigate({ name: next });
           }}
           onNewPost={() => setComposeOpen(true)}
         />

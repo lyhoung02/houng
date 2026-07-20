@@ -83,6 +83,7 @@ export default function NokorRoomView({
           ⓘ
         </button>
       }
+      reportKind="room_message"
     />
   );
 }

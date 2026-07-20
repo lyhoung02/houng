@@ -11,6 +11,7 @@ import {
 } from "@/lib/supabase/useNokor";
 import { useT } from "../providers/LanguageProvider";
 import { useNokorNav } from "./useNokorNav";
+import NokorReportSheet, { type NokorReportTarget } from "./NokorReportSheet";
 
 type FeedStrings = ReturnType<typeof useT>["nokor"]["feed"];
 
@@ -157,6 +158,7 @@ function CommentItem({
   onToggleLike,
   onReply,
   onDelete,
+  onReport,
 }: {
   comment: NokorFeedComment;
   userId: string;
@@ -165,6 +167,7 @@ function CommentItem({
   onToggleLike: () => void;
   onReply: () => void;
   onDelete: () => void;
+  onReport: () => void;
 }) {
   return (
     <div className={`flex items-start gap-2.5 ${isReply ? "ml-9" : ""}`}>
@@ -197,13 +200,21 @@ function CommentItem({
           >
             {t.reply}
           </button>
-          {comment.user_id === userId && (
+          {comment.user_id === userId ? (
             <button
               type="button"
               onClick={onDelete}
               className="opacity-60 transition hover:opacity-100"
             >
               {t.delete}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onReport}
+              className="opacity-60 transition hover:opacity-100"
+            >
+              {t.report}
             </button>
           )}
         </div>
@@ -242,6 +253,7 @@ export default function PostCard({
   const [editing, setEditing] = useState(false);
   const [editDraft, setEditDraft] = useState(post.body);
   const [copied, setCopied] = useState(false);
+  const [reportTarget, setReportTarget] = useState<NokorReportTarget | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const commentInputRef = useRef<HTMLInputElement>(null);
 
@@ -277,7 +289,9 @@ export default function PostCard({
   const share = async () => {
     setMenuOpen(false);
     const url =
-      typeof window !== "undefined" ? `${window.location.origin}/nokor#post-${post.id}` : "";
+      typeof window !== "undefined"
+        ? `${window.location.origin}/nokor/#/post/${post.id}`
+        : "";
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
@@ -363,6 +377,24 @@ export default function PostCard({
               >
                 {feed.share}
               </button>
+              {!own && (
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setReportTarget({
+                      kind: "post",
+                      id: post.id,
+                      userId: post.user_id,
+                      snapshot: post.body,
+                    });
+                  }}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-rose-400 transition hover:bg-surface-strong"
+                >
+                  {t.nokor.report.action}
+                </button>
+              )}
               {own && (
                 <button
                   type="button"
@@ -489,6 +521,14 @@ export default function PostCard({
                 onToggleLike={() => onToggleCommentLike(c)}
                 onReply={() => startReply(c)}
                 onDelete={() => onDeleteComment(c.id)}
+                onReport={() =>
+                  setReportTarget({
+                    kind: "comment",
+                    id: c.id,
+                    userId: c.user_id,
+                    snapshot: c.body,
+                  })
+                }
               />
               {(repliesByRoot.get(c.id) ?? []).map((r) => (
                 <CommentItem
@@ -500,6 +540,14 @@ export default function PostCard({
                   onToggleLike={() => onToggleCommentLike(r)}
                   onReply={() => startReply(r)}
                   onDelete={() => onDeleteComment(r.id)}
+                  onReport={() =>
+                    setReportTarget({
+                      kind: "comment",
+                      id: r.id,
+                      userId: r.user_id,
+                      snapshot: r.body,
+                    })
+                  }
                 />
               ))}
             </div>
@@ -544,6 +592,14 @@ export default function PostCard({
             </button>
           </form>
         </div>
+      )}
+
+      {reportTarget && (
+        <NokorReportSheet
+          meId={userId}
+          target={reportTarget}
+          onClose={() => setReportTarget(null)}
+        />
       )}
     </article>
   );

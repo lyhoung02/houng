@@ -32,6 +32,7 @@ export default function NokorDmView({
       seenAt={conv.otherReadAt}
       onTyping={conv.pingTyping}
       onBack={onBack}
+      reportKind="dm_message"
     />
   );
 }

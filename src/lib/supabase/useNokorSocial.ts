@@ -50,10 +50,13 @@ export function useNokorFollow(meId: string | null, userId: string | null) {
   const load = useCallback(async () => {
     const supabase = getSupabase();
     if (!supabase || !userId) return;
-    const [profileRes, followers, following, postRes, mine] = await Promise.all([
+    const [profileRes, statsRes, postRes, mine] = await Promise.all([
       supabase.from("profiles").select(PROFILE_COLUMNS).eq("user_id", userId).maybeSingle(),
-      supabase.from("nokor_follows").select("*", { count: "exact", head: true }).eq("following_id", userId),
-      supabase.from("nokor_follows").select("*", { count: "exact", head: true }).eq("follower_id", userId),
+      supabase
+        .from("nokor_user_stats")
+        .select("post_count, follower_count, following_count")
+        .eq("user_id", userId)
+        .maybeSingle(),
       supabase.from("nokor_posts").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
       meId
         ? supabase.from("nokor_follows").select("follower_id").eq("follower_id", meId).eq("following_id", userId).maybeSingle()
@@ -61,6 +64,7 @@ export function useNokorFollow(meId: string | null, userId: string | null) {
     ]);
 
     const row = profileRes.data;
+    const stats = statsRes.data;
     setProfile({
       userId,
       username: row?.username ?? null,
@@ -75,9 +79,9 @@ export function useNokorFollow(meId: string | null, userId: string | null) {
       birthday: row?.birthday ?? null,
       gender: row?.gender ?? null,
       phone: row?.phone ?? null,
-      followers: followers.count ?? 0,
-      following: following.count ?? 0,
-      postCount: postRes.data?.length ?? 0,
+      followers: stats?.follower_count ?? 0,
+      following: stats?.following_count ?? 0,
+      postCount: stats?.post_count ?? 0,
       isFollowedByMe: Boolean(mine.data),
     });
 
@@ -109,15 +113,16 @@ export function useNokorFollow(meId: string | null, userId: string | null) {
     const supabase = getSupabase();
     if (!supabase || !meId || !userId || meId === userId || !profile) return;
     const now = profile.isFollowedByMe;
-    // Optimistic.
-    setProfile((p) =>
-      p ? { ...p, isFollowedByMe: !now, followers: p.followers + (now ? -1 : 1) } : p,
-    );
-    if (now) {
-      await supabase.from("nokor_follows").delete().eq("follower_id", meId).eq("following_id", userId);
-    } else {
-      await supabase.from("nokor_follows").insert({ follower_id: meId, following_id: userId });
-    }
+    const set = (followed: boolean) =>
+      setProfile((p) =>
+        p ? { ...p, isFollowedByMe: followed, followers: p.followers + (followed ? 1 : -1) } : p,
+      );
+    // Optimistic; roll back if the write fails.
+    set(!now);
+    const { error: mutErr } = now
+      ? await supabase.from("nokor_follows").delete().eq("follower_id", meId).eq("following_id", userId)
+      : await supabase.from("nokor_follows").insert({ follower_id: meId, following_id: userId });
+    if (mutErr) set(now);
   }, [meId, userId, profile]);
 
   return { profile, posts, loaded, reload: load, toggleFollow };

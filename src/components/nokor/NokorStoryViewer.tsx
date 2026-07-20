@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { nokorAvatarUrl } from "@/lib/supabase/useNokor";
 import { nokorStoryUrl, storyBgClass, type NokorStoryGroup } from "@/lib/supabase/useNokorStories";
 import { useT } from "../providers/LanguageProvider";
+import NokorReportSheet, { type NokorReportTarget } from "./NokorReportSheet";
 
 const STORY_MS = 5000; // keep in sync with .nokor-story-fill animation duration
 
@@ -43,8 +44,10 @@ export default function NokorStoryViewer({
 }) {
   const t = useT();
   const [gi, setGi] = useState(startIndex);
-  const [si, setSi] = useState(0);
+  // Open at the first story the viewer hasn't seen yet, not always the first one.
+  const [si, setSi] = useState(() => groups[startIndex]?.firstUnseen ?? 0);
   const [paused, setPaused] = useState(false);
+  const [reportTarget, setReportTarget] = useState<NokorReportTarget | null>(null);
 
   const group = groups[gi];
   const story = group?.stories[si];
@@ -63,6 +66,8 @@ export default function NokorStoryViewer({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Don't steal keys while the report dialog is open over the viewer.
+      if (reportTarget) return;
       if (e.key === "Escape") onClose();
       if (e.key === "ArrowRight") next();
       if (e.key === "ArrowLeft") prev();
@@ -70,7 +75,7 @@ export default function NokorStoryViewer({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gi, si]);
+  }, [gi, si, reportTarget]);
 
   if (!group || !story) return null;
 
@@ -78,8 +83,9 @@ export default function NokorStoryViewer({
     if (si < group.stories.length - 1) {
       setSi((v) => v + 1);
     } else if (gi < groups.length - 1) {
+      // Entering the next author's group: start at their first unseen story.
       setGi((v) => v + 1);
-      setSi(0);
+      setSi(groups[gi + 1]?.firstUnseen ?? 0);
     } else {
       onClose();
     }
@@ -127,7 +133,7 @@ export default function NokorStoryViewer({
             <p className="truncate text-sm font-semibold">{name(group.author?.username ?? null, group.userId)}</p>
             <p className="text-xs opacity-70">{timeAgo(story.created_at, t.nokor.feed)}</p>
           </div>
-          {own && (
+          {own ? (
             <button
               type="button"
               onClick={() => {
@@ -138,6 +144,24 @@ export default function NokorStoryViewer({
             >
               {t.nokor.feed.delete}
             </button>
+          ) : (
+            meId && (
+              <button
+                type="button"
+                onClick={() => {
+                  setPaused(true);
+                  setReportTarget({
+                    kind: "story",
+                    id: story.id,
+                    userId: story.user_id,
+                    snapshot: story.caption,
+                  });
+                }}
+                className="rounded-full px-2 py-1 text-xs opacity-80 hover:opacity-100"
+              >
+                {t.nokor.report.action}
+              </button>
+            )
           )}
           <button type="button" onClick={onClose} aria-label={t.nokor.feed.cancel} className="rounded-full px-2 py-1 text-lg leading-none opacity-80 hover:opacity-100">
             ✕
@@ -187,6 +211,17 @@ export default function NokorStoryViewer({
           </div>
         )}
       </div>
+
+      {reportTarget && meId && (
+        <NokorReportSheet
+          meId={meId}
+          target={reportTarget}
+          onClose={() => {
+            setReportTarget(null);
+            setPaused(false);
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { type useNokor } from "@/lib/supabase/useNokor";
+import { nokorErrorText } from "@/lib/supabase/nokorErrors";
 import { useT } from "../providers/LanguageProvider";
 import NokorComposer from "./NokorComposer";
 import NokorStories from "./NokorStories";
@@ -15,7 +16,9 @@ export default function NokorFeed({ fk }: { fk: Nokor }) {
     <div className="space-y-4">
       <NokorStories meId={fk.userId} />
       <NokorComposer busy={fk.busy} onPost={fk.createPost} />
-      {fk.error && <p className="text-sm text-rose-400">{fk.error}</p>}
+      {fk.error && (
+        <p className="text-sm text-rose-400">{nokorErrorText(fk.error, t.nokor.errors)}</p>
+      )}
       {!fk.feedLoaded ? (
         <p className="py-10 text-center text-sm opacity-60">{t.nokor.feed.loading}</p>
       ) : fk.posts.length === 0 ? (

@@ -5,6 +5,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { kindForMime, isAllowedFileName, type Draft } from "@/lib/supabase/attachments";
 import { useRecorder, recorderSupported } from "@/lib/media/useRecorder";
 import { nokorAvatarUrl, type NokorAuthor } from "@/lib/supabase/useNokor";
+import { nokorErrorText } from "@/lib/supabase/nokorErrors";
+import NokorReportSheet, { type NokorReportTarget } from "./NokorReportSheet";
 import type { Draft as AttachmentDraft } from "@/lib/supabase/attachments";
 import { Attachment } from "../chat/Attachment";
 import { EmojiPicker } from "../chat/EmojiPicker";
@@ -99,6 +101,7 @@ export default function NokorConversation<M extends ChatMessageLike>({
   onTitleClick,
   headerIcon,
   headerExtra,
+  reportKind,
 }: {
   meId: string;
   conv: ChatSource<M>;
@@ -119,10 +122,13 @@ export default function NokorConversation<M extends ChatMessageLike>({
   /** Overrides the avatar slot (rooms show their photo). */
   headerIcon?: React.ReactNode;
   headerExtra?: React.ReactNode;
+  /** When set, non-own messages can be reported as this kind. */
+  reportKind?: "dm_message" | "room_message";
 }) {
   const t = useT();
   const c = t.nokor.chat;
   const [draft, setDraft] = useState("");
+  const [reportTarget, setReportTarget] = useState<NokorReportTarget | null>(null);
   const [replyTo, setReplyTo] = useState<M | null>(null);
   const [editing, setEditing] = useState<M | null>(null);
   const [pending, setPending] = useState<Draft | null>(null);
@@ -312,6 +318,21 @@ export default function NokorConversation<M extends ChatMessageLike>({
                       {t.nokor.feed.delete}
                     </button>
                   )}
+                  {!mine && reportKind && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setReportTarget({
+                          kind: reportKind,
+                          id: m.id,
+                          userId: m.sender_id,
+                          snapshot: m.body || null,
+                        })
+                      }
+                    >
+                      {t.nokor.feed.report}
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -369,7 +390,11 @@ export default function NokorConversation<M extends ChatMessageLike>({
         </div>
       )}
 
-      {conv.error && <p className="px-3 pb-1 text-xs text-rose-400">{conv.error}</p>}
+      {conv.error && (
+        <p className="px-3 pb-1 text-xs text-rose-400">
+          {nokorErrorText(conv.error, t.nokor.errors)}
+        </p>
+      )}
 
       {!canPost ? (
         <p className="border-t border-border p-3 text-center text-xs opacity-60">
@@ -473,6 +498,14 @@ export default function NokorConversation<M extends ChatMessageLike>({
           onClose={() => setShowVideo(false)}
           cancelLabel={t.nokor.feed.cancel}
           sendLabel={t.nokor.feed.send}
+        />
+      )}
+
+      {reportTarget && (
+        <NokorReportSheet
+          meId={meId}
+          target={reportTarget}
+          onClose={() => setReportTarget(null)}
         />
       )}
     </div>

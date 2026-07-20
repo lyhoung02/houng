@@ -30,6 +30,8 @@ export type NokorStoryGroup = {
   author: NokorAuthor | null;
   stories: NokorStory[];
   hasUnseen: boolean;
+  /** Index of the first story the viewer hasn't seen, or 0 when all are seen. */
+  firstUnseen: number;
 };
 
 export type NokorFollower = {
@@ -99,12 +101,16 @@ export function useNokorStories(meId: string | null) {
       list.push(s);
       byUser.set(s.user_id, list);
     }
-    const list: NokorStoryGroup[] = [...byUser.entries()].map(([userId, userStories]) => ({
-      userId,
-      author: authors.get(userId) ?? null,
-      stories: userStories,
-      hasUnseen: userStories.some((s) => !seenByMe.has(s.id)),
-    }));
+    const list: NokorStoryGroup[] = [...byUser.entries()].map(([userId, userStories]) => {
+      const firstUnseen = userStories.findIndex((s) => !seenByMe.has(s.id));
+      return {
+        userId,
+        author: authors.get(userId) ?? null,
+        stories: userStories,
+        hasUnseen: firstUnseen !== -1,
+        firstUnseen: firstUnseen === -1 ? 0 : firstUnseen,
+      };
+    });
     list.sort((a, b) => {
       if (a.userId === meId) return -1;
       if (b.userId === meId) return 1;

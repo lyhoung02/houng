@@ -109,8 +109,8 @@ export default function NokorChat({
     (async () => {
       const roomId = await joinRef.current(code);
       if (!cancelled && roomId) setOpen({ type: "room", roomId });
-      // Drop the code so a refresh doesn't rejoin.
-      window.history.replaceState({}, "", window.location.pathname);
+      // Drop the code so a refresh doesn't rejoin (preserve any hash route).
+      window.history.replaceState({}, "", window.location.pathname + window.location.hash);
     })();
     return () => {
       cancelled = true;
