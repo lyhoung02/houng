@@ -3,11 +3,12 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { nokorAvatarUrl } from "@/lib/supabase/useNokor";
-import { nokorStoryUrl, storyBgClass, type NokorStoryGroup } from "@/lib/supabase/useNokorStories";
+import { nokorReplyToStory, nokorStoryUrl, storyBgClass, type NokorStoryGroup } from "@/lib/supabase/useNokorStories";
 import { useT } from "../providers/LanguageProvider";
 import NokorReportSheet, { type NokorReportTarget } from "./NokorReportSheet";
 
 const STORY_MS = 5000; // keep in sync with .nokor-story-fill animation duration
+const STORY_QUICK_REACTIONS = ["❤️", "😂", "😮", "😢", "👏", "🔥"];
 
 function name(username: string | null, userId: string) {
   return username?.trim() || `user-${userId.slice(0, 4) || "anon"}`;
@@ -48,6 +49,9 @@ export default function NokorStoryViewer({
   const [si, setSi] = useState(() => groups[startIndex]?.firstUnseen ?? 0);
   const [paused, setPaused] = useState(false);
   const [reportTarget, setReportTarget] = useState<NokorReportTarget | null>(null);
+  const [reply, setReply] = useState("");
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
 
   const group = groups[gi];
   const story = group?.stories[si];
@@ -76,6 +80,19 @@ export default function NokorStoryViewer({
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gi, si, reportTarget]);
+
+  async function sendReply(override?: string) {
+    const textToSend = (override ?? reply).trim();
+    if (!story || !meId || !textToSend || sending) return;
+    setSending(true);
+    const ok = await nokorReplyToStory(meId, story, textToSend);
+    setSending(false);
+    if (ok) {
+      if (!override) setReply("");
+      setSent(true);
+      setTimeout(() => setSent(false), 2000);
+    }
+  }
 
   if (!group || !story) return null;
 
@@ -106,8 +123,12 @@ export default function NokorStoryViewer({
   const own = story.user_id === meId;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90">
-      <div className="relative flex h-full w-full max-w-md flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 sm:p-4">
+      <div className="relative flex h-dvh w-full max-w-md flex-col overflow-hidden bg-black sm:h-[92vh] sm:max-h-[900px] sm:rounded-2xl">
+        {/* Readability scrims behind the header and the reply bar */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-28 bg-gradient-to-b from-black/70 via-black/25 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-32 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+
         {/* Progress bars */}
         <div className="absolute inset-x-0 top-0 z-10 flex gap-1 p-3">
           {group.stories.map((s, i) => (
@@ -205,10 +226,60 @@ export default function NokorStoryViewer({
           />
         </div>
 
-        {own && (
-          <div className="absolute inset-x-0 bottom-4 z-10 text-center text-xs text-white/80">
-            👁 {viewCounts[story.id] ?? 0}
+        {own ? (
+          <div className="absolute inset-x-0 bottom-5 z-10 flex items-center justify-center gap-1.5 text-sm text-white/90">
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
+              <path d="M12 5c-5 0-9 4.5-10 7 1 2.5 5 7 10 7s9-4.5 10-7c-1-2.5-5-7-10-7zm0 11a4 4 0 110-8 4 4 0 010 8zm0-2a2 2 0 100-4 2 2 0 000 4z" />
+            </svg>
+            {viewCounts[story.id] ?? 0}
           </div>
+        ) : (
+          meId && (
+            <div className="absolute inset-x-0 bottom-0 z-10 space-y-2.5 p-3">
+              {/* Quick emoji reactions */}
+              <div className="flex justify-center gap-2">
+                {STORY_QUICK_REACTIONS.map((emoji) => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    disabled={sending}
+                    onClick={() => void sendReply(emoji)}
+                    className="text-2xl transition hover:scale-125 disabled:opacity-50"
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void sendReply();
+                }}
+                className="flex items-center gap-2"
+              >
+                <input
+                  value={reply}
+                  onChange={(e) => setReply(e.target.value)}
+                  onFocus={() => setPaused(true)}
+                  onBlur={() => setPaused(false)}
+                  placeholder={sent ? t.nokor.stories.replySent : t.nokor.stories.replyPlaceholder.replace("{name}", name(group.author?.username ?? null, group.userId))}
+                  maxLength={500}
+                  className="flex-1 rounded-full border border-white/40 bg-white/10 px-4 py-2.5 text-sm text-white placeholder:text-white/70 outline-none backdrop-blur-sm focus:border-white/80"
+                />
+                <button
+                  type="submit"
+                  disabled={!reply.trim() || sending}
+                  aria-label={t.nokor.stories.replySend}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-white transition hover:bg-indigo-400 disabled:opacity-40"
+                >
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M22 2 11 13" />
+                    <path d="M22 2 15 22l-4-9-9-4 20-7z" />
+                  </svg>
+                </button>
+              </form>
+            </div>
+          )
         )}
       </div>
 

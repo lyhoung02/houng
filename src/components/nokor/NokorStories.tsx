@@ -43,34 +43,28 @@ function StoryCard({ group, onOpen }: { group: NokorStoryGroup; onOpen: () => vo
         </span>
       )}
 
-      {/* Scrim so the name stays readable over any image */}
-      <span className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/70 to-transparent" />
-
-      {/* Stacked author avatar */}
-      <span
-        className={`absolute top-2 left-2 rounded-full p-[2px] ${
-          group.hasUnseen ? "bg-indigo-500" : "bg-white/50"
-        }`}
-      >
-        <span className="block rounded-full bg-background p-[1px]">
-          {avatar ? (
-            <Image src={avatar} alt="" width={28} height={28} unoptimized className="h-7 w-7 rounded-full object-cover" />
-          ) : (
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-500/40 text-[10px] font-semibold uppercase text-white">
-              {label.slice(0, 2)}
-            </span>
-          )}
-        </span>
-      </span>
-
       {group.stories.length > 1 && (
-        <span className="absolute top-2 right-2 rounded-full bg-black/60 px-1.5 text-[10px] text-white">
+        <span className="absolute right-2 bottom-2 rounded-full bg-black/60 px-1.5 text-[10px] text-white">
           {group.stories.length}
         </span>
       )}
 
-      <span className="absolute inset-x-0 bottom-1 truncate px-1.5 text-[11px] font-medium text-white">
-        {label}
+      {/* Author avatar + name together on a readable pill at the top */}
+      <span className="absolute inset-x-1.5 top-1.5 flex items-center gap-1.5 rounded-full bg-black/15 py-0.1 pr-2 pl-0.5 backdrop-blur-sm">
+        <span
+          className={`shrink-0 rounded-full p-[2px] ${group.hasUnseen ? "bg-indigo-500" : "bg-white/50"}`}
+        >
+          <span className="block rounded-full bg-background p-[1px]">
+            {avatar ? (
+              <Image src={avatar} alt="" width={20} height={20} unoptimized className="h-5 w-5 rounded-full object-cover" />
+            ) : (
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-500/40 text-[9px] font-semibold uppercase text-white">
+                {label.slice(0, 2)}
+              </span>
+            )}
+          </span>
+        </span>
+        <span className="truncate text-[11px] font-medium text-white">{label}</span>
       </span>
     </button>
   );
@@ -123,6 +117,7 @@ export default function NokorStories({ meId }: { meId: string | null }) {
         createPortal(
           <NokorAddStory
             busy={stories.busy}
+            avatar={myAvatar}
             followers={stories.followers}
             onAdd={stories.addStory}
             onClose={() => setAdding(false)}

@@ -56,6 +56,35 @@ export function nokorStoryUrl(story: NokorStory) {
   return nokorMediaUrl(story.image_path);
 }
 
+/** Reply to someone's story: opens (or reuses) the DM thread with the author
+ *  and sends a message that quotes the story — like replying on Messenger. */
+export async function nokorReplyToStory(meId: string | null, story: NokorStory, text: string) {
+  const supabase = getSupabase();
+  const body = text.trim();
+  if (!supabase || !meId || !body || story.user_id === meId) return false;
+
+  const { data: threadId, error: openErr } = await supabase.rpc("nokor_open_dm", {
+    p_other: story.user_id,
+  });
+  if (openErr || !threadId) return false;
+
+  const { error } = await supabase.from("nokor_dm_messages").insert({
+    thread_id: threadId as string,
+    sender_id: meId,
+    body,
+    kind: "text",
+    story_id: story.id,
+    story_snapshot: {
+      kind: story.kind === "text" ? "text" : "image",
+      caption: story.caption,
+      image_path: story.image_path,
+      background: story.background,
+      author_id: story.user_id,
+    },
+  });
+  return !error;
+}
+
 export function useNokorStories(meId: string | null) {
   const [groups, setGroups] = useState<NokorStoryGroup[]>([]);
   const [viewCounts, setViewCounts] = useState<Record<string, number>>({});

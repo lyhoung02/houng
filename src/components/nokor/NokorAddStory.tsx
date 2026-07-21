@@ -20,11 +20,13 @@ function followerName(f: NokorFollower) {
 
 export default function NokorAddStory({
   busy,
+  avatar,
   followers,
   onAdd,
   onClose,
 }: {
   busy: boolean;
+  avatar: string | null;
   followers: NokorFollower[];
   onAdd: (input: AddStoryInput) => Promise<boolean>;
   onClose: () => void;
@@ -78,17 +80,18 @@ export default function NokorAddStory({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
-      <div className="glass my-auto w-full max-w-sm rounded-2xl p-4" onClick={(e) => e.stopPropagation()}>
-        <div className="mb-3 flex items-center justify-between">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
+      <div className="glass flex max-h-[88vh] w-full max-w-sm flex-col overflow-hidden rounded-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex shrink-0 items-center justify-between px-4 pt-4 pb-3">
           <h2 className="text-sm font-semibold">{s.add}</h2>
           <button type="button" onClick={onClose} aria-label={t.nokor.feed.cancel} className="text-lg leading-none opacity-70 hover:opacity-100">
             ✕
           </button>
         </div>
 
+        <div className="flex-1 space-y-3 overflow-y-auto px-4">
         {/* Photo / Text switch */}
-        <div className="mb-3 flex rounded-full border border-border p-0.5 text-sm">
+        <div className="flex rounded-full border border-border p-0.5 text-sm">
           {(["photo", "text"] as const).map((m) => (
             <button
               key={m}
@@ -108,21 +111,21 @@ export default function NokorAddStory({
         {/* Preview / editor */}
         {mode === "photo" ? (
           preview ? (
-            <div className="relative aspect-[9/16] max-h-[42vh] overflow-hidden rounded-xl border border-border bg-surface">
+            <div className="relative aspect-[9/16] max-h-[44vh] overflow-hidden rounded-xl border border-border bg-surface">
               <Image src={preview} alt="" fill unoptimized className="object-contain" />
             </div>
           ) : (
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="flex aspect-[9/16] max-h-[42vh] w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-surface text-sm opacity-70"
+              className="flex aspect-[9/16] max-h-[44vh] w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-surface text-sm opacity-70"
             >
               <span className="text-3xl">＋</span>
               {s.pickImage}
             </button>
           )
         ) : (
-          <div className={`relative flex aspect-[9/16] max-h-[42vh] w-full items-center justify-center overflow-hidden rounded-xl ${storyBgClass(background)}`}>
+          <div className={`relative flex aspect-[9/16] max-h-[44vh] w-full items-center justify-center overflow-hidden rounded-xl ${storyBgClass(background)}`}>
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
@@ -140,13 +143,13 @@ export default function NokorAddStory({
             onChange={(e) => setText(e.target.value)}
             placeholder={s.captionPlaceholder}
             maxLength={200}
-            className="mt-3 w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-indigo-400/60"
+            className="w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-indigo-400/60"
           />
         )}
 
         {/* Background swatches for text stories */}
         {mode === "text" && (
-          <div className="mt-3 flex gap-2">
+          <div className="flex gap-2">
             {STORY_BACKGROUNDS.map((bg) => (
               <button
                 key={bg.key}
@@ -162,7 +165,7 @@ export default function NokorAddStory({
         )}
 
         {/* Expiry */}
-        <div className="mt-3 flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2">
           <label htmlFor="story-hours" className="text-sm opacity-70">
             {s.expiresIn}
           </label>
@@ -223,9 +226,12 @@ export default function NokorAddStory({
           </div>
         )}
 
-        {error && <p className="mt-2 text-sm text-rose-400">{error}</p>}
+        {error && <p className="text-sm text-rose-400">{error}</p>}
 
-        <div className="mt-4 flex justify-end gap-2">
+        <div className="h-1" />
+        </div>
+
+        <div className="flex shrink-0 items-center justify-end gap-2 border-t border-border px-4 py-3">
           {mode === "photo" && preview && (
             <button
               type="button"
@@ -235,13 +241,20 @@ export default function NokorAddStory({
               {s.changeImage}
             </button>
           )}
+          {/* iOS-style "Share story" pill with the author's avatar */}
           <button
             type="button"
             onClick={() => void submit()}
             disabled={!canShare || busy}
-            className="rounded-full bg-indigo-500 px-5 py-2 text-sm font-medium text-white transition hover:bg-indigo-400 disabled:opacity-40"
+            className="flex items-center gap-2 rounded-full bg-indigo-500 py-1.5 pr-4 pl-1.5 text-sm font-medium text-white transition hover:bg-indigo-400 disabled:opacity-40"
           >
-            {busy ? t.nokor.composer.posting : s.share}
+            {avatar ? (
+              <Image src={avatar} alt="" width={28} height={28} unoptimized className="h-7 w-7 rounded-full object-cover" />
+            ) : (
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/25 text-xs">🙂</span>
+            )}
+            <span>{busy ? t.nokor.composer.posting : s.share}</span>
+            <span aria-hidden>→</span>
           </button>
         </div>
       </div>

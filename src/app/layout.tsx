@@ -35,8 +35,15 @@ const angkor = Angkor({
   display: "swap",
 });
 
+// The Nokor build (NEXT_PUBLIC_APP=nokor) uses its own favicon; the portfolio
+// keeps the icon.png / apple-icon.png in public/.
+const isNokorRoot = process.env.NEXT_PUBLIC_APP === "nokor";
+
 export const metadata: Metadata = {
   title: "Pov Lyhoung — Software Engineer",
+  icons: isNokorRoot
+    ? { icon: "/nokor-single.png", apple: "/nokor-single.png", shortcut: "/nokor-single.png" }
+    : { icon: "/icon.png", apple: "/apple-icon.png" },
   description:
     "Portfolio of Pov Lyhoung — full-stack & mobile engineer building production apps at E-Power CCL. Backend, frontend, Flutter, Next.js, Node.js, and AI-augmented engineering.",
   keywords: [

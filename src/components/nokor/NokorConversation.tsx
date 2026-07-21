@@ -4,8 +4,10 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { kindForMime, isAllowedFileName, type Draft } from "@/lib/supabase/attachments";
 import { useRecorder, recorderSupported } from "@/lib/media/useRecorder";
-import { nokorAvatarUrl, type NokorAuthor } from "@/lib/supabase/useNokor";
+import { nokorAvatarUrl, nokorMediaUrl, type NokorAuthor } from "@/lib/supabase/useNokor";
+import { storyBgClass } from "@/lib/supabase/useNokorStories";
 import { nokorErrorText } from "@/lib/supabase/nokorErrors";
+import type { NokorStorySnapshot } from "@/lib/supabase/types";
 import NokorReportSheet, { type NokorReportTarget } from "./NokorReportSheet";
 import type { Draft as AttachmentDraft } from "@/lib/supabase/attachments";
 import { Attachment } from "../chat/Attachment";
@@ -27,6 +29,7 @@ export type ChatMessageLike = {
   attachment_size: number | null;
   duration_ms: number | null;
   reply_to_id: string | null;
+  story_snapshot?: NokorStorySnapshot | null;
   edited_at: string | null;
   deleted_at: string | null;
   created_at: string;
@@ -55,6 +58,27 @@ export type ChatSource<M extends ChatMessageLike> = {
 
 function name(username: string | null, userId: string) {
   return username?.trim() || `user-${userId.slice(0, 4) || "anon"}`;
+}
+
+/** The little "replied to a story" quote shown above a story-reply message. */
+function StoryQuote({ snapshot, label }: { snapshot: NokorStorySnapshot; label: string }) {
+  const url = snapshot.image_path ? nokorMediaUrl(snapshot.image_path) : null;
+  return (
+    <div className="mb-1 flex items-center gap-2 opacity-90">
+      <div className="relative h-12 w-8 shrink-0 overflow-hidden rounded-md border border-border">
+        {url ? (
+          <Image src={url} alt="" fill unoptimized className="object-cover" />
+        ) : (
+          <div className={`flex h-full w-full items-center justify-center ${storyBgClass(snapshot.background)}`}>
+            <span className="line-clamp-2 px-0.5 text-center text-[7px] font-semibold text-white">
+              {snapshot.caption}
+            </span>
+          </div>
+        )}
+      </div>
+      <span className="text-[11px] opacity-60">{label}</span>
+    </div>
+  );
 }
 
 function clock(iso: string) {
@@ -239,6 +263,16 @@ export default function NokorConversation<M extends ChatMessageLike>({
                   <span className="mb-0.5 px-1 text-[11px] font-semibold opacity-70">
                     {senderName(m.sender_id)}
                   </span>
+                )}
+                {m.story_snapshot && (
+                  <StoryQuote
+                    snapshot={m.story_snapshot}
+                    label={
+                      m.story_snapshot.author_id === meId
+                        ? t.nokor.stories.repliedToStory
+                        : t.nokor.stories.repliedToTheirStory
+                    }
+                  />
                 )}
                 {parent && (
                   <div className="mb-0.5 max-w-full truncate rounded-lg border-l-2 border-indigo-400 bg-surface px-2 py-1 text-xs opacity-70">

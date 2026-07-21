@@ -230,6 +230,16 @@ export type NokorDmThread = {
   last_message_at: string;
 };
 
+/** A small copy of a story kept on a story-reply DM so the quote still renders
+ *  after the original story expires or is deleted. */
+export type NokorStorySnapshot = {
+  kind: "image" | "text";
+  caption: string | null;
+  image_path: string | null;
+  background: string | null;
+  author_id: string;
+};
+
 export type NokorDmMessage = {
   id: string;
   thread_id: string;
@@ -242,6 +252,8 @@ export type NokorDmMessage = {
   attachment_mime: string | null;
   duration_ms: number | null;
   reply_to_id: string | null;
+  story_id: string | null;
+  story_snapshot: NokorStorySnapshot | null;
   edited_at: string | null;
   deleted_at: string | null;
   created_at: string;
@@ -697,6 +709,8 @@ export type Database = {
               | "attachment_mime"
               | "duration_ms"
               | "reply_to_id"
+              | "story_id"
+              | "story_snapshot"
             >
           >;
         Update: Partial<NokorDmMessage>;

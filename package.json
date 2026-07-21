@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:nokor": "NEXT_PUBLIC_APP=nokor next dev",
     "build": "next build",
+    "build:nokor": "NEXT_PUBLIC_APP=nokor next build",
     "start": "next start",
     "lint": "eslint"
   },

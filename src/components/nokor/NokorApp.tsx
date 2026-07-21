@@ -204,11 +204,16 @@ export default function NokorApp() {
           </>
         )}
 
-        <footer className="mt-12 text-center">
-          <Link href="/" className="text-xs opacity-50 transition hover:opacity-100">
-            ← {t.nokor.backToPortfolio}
-          </Link>
-        </footer>
+        {process.env.NEXT_PUBLIC_APP !== "nokor" && (
+          <footer className="mt-12 text-center">
+            <Link
+              href={process.env.NEXT_PUBLIC_PORTFOLIO_URL || "/"}
+              className="text-xs opacity-50 transition hover:opacity-100"
+            >
+              ← {t.nokor.backToPortfolio}
+            </Link>
+          </footer>
+        )}
       </div>
 
       {signedIn && (
