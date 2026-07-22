@@ -13,6 +13,7 @@ import {
 } from "@/lib/supabase/useNokor";
 import { useT } from "../providers/LanguageProvider";
 import { useNokorNav } from "./useNokorNav";
+import { routeToPath } from "./useNokorRoute";
 import NokorBadge from "./NokorBadge";
 import NokorReportSheet, { type NokorReportTarget } from "./NokorReportSheet";
 
@@ -321,7 +322,7 @@ export default function PostCard({
     setMenuOpen(false);
     const url =
       typeof window !== "undefined"
-        ? `${window.location.origin}/nokor/#/post/${post.id}`
+        ? `${window.location.origin}${routeToPath({ name: "post", postId: post.id })}`
         : "";
     try {
       await navigator.clipboard.writeText(url);
