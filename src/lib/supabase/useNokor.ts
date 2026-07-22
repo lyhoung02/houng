@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabase, isSupabaseConfigured } from "./client";
 import { avatarUrl } from "./attachments";
-import type { NokorBadgeKind, NokorComment, NokorPost } from "./types";
+import type { NokorBadgeKind, NokorComment, NokorPost, NokorSignUpMeta } from "./types";
 
 export const NOKOR_MEDIA_BUCKET = "nokor-media";
 export const MAX_POST_IMAGE_BYTES = 5 * 1024 * 1024; // keep in sync with the bucket limit
@@ -69,6 +69,7 @@ export function useNokor() {
   const [email, setEmail] = useState<string | null>(null);
   // Unconfigured Supabase means there is no auth to wait for.
   const [authLoaded, setAuthLoaded] = useState(!isSupabaseConfigured);
+  const [recovery, setRecovery] = useState(false);
   const [posts, setPosts] = useState<NokorFeedPost[]>([]);
   const [feedLoaded, setFeedLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -79,10 +80,13 @@ export function useNokor() {
   useEffect(() => {
     const supabase = getSupabase();
     if (!supabase) return;
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
       setUserId(session?.user?.id ?? null);
       setEmail(session?.user?.email ?? null);
       setAuthLoaded(true);
+      // A reset-link visit signs the user in and fires this event; the UI
+      // must show the "set new password" form before anything else.
+      if (event === "PASSWORD_RECOVERY") setRecovery(true);
       if (!session) {
         // Signed out: drop the feed so the next sign-in starts clean.
         setPosts([]);
@@ -92,22 +96,98 @@ export function useNokor() {
     return () => data.subscription.unsubscribe();
   }, []);
 
-  const signIn = useCallback(async (emailArg: string, password: string) => {
+  // Sign-in accepts an email or a registered phone number; phones resolve to
+  // the account email via the nokor_email_for_phone RPC (migration 0037).
+  const signIn = useCallback(
+    async (identifier: string, password: string, captchaToken?: string) => {
+      const supabase = getSupabase();
+      if (!supabase) return "unconfigured";
+      let emailArg = identifier.trim();
+      if (!emailArg.includes("@")) {
+        const { data } = await supabase.rpc("nokor_email_for_phone", { phone_arg: emailArg });
+        if (!data) return "Invalid login credentials";
+        emailArg = data as string;
+      }
+      const { error: err } = await supabase.auth.signInWithPassword({
+        email: emailArg,
+        password,
+        options: captchaToken ? { captchaToken } : undefined,
+      });
+      return err ? err.message : null;
+    },
+    [],
+  );
+
+  const signInWithGoogle = useCallback(async () => {
     const supabase = getSupabase();
     if (!supabase) return "unconfigured";
-    const { error: err } = await supabase.auth.signInWithPassword({
-      email: emailArg,
-      password,
+    const { error: err } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo:
+          typeof window !== "undefined"
+            ? window.location.origin + window.location.pathname
+            : undefined,
+      },
     });
     return err ? err.message : null;
   }, []);
 
-  const signUp = useCallback(async (emailArg: string, password: string) => {
+  // WebAuthn passkeys. The SDK runs the full browser ceremony; success fires
+  // onAuthStateChange like any other sign-in.
+  const signInWithPasskey = useCallback(async (captchaToken?: string) => {
     const supabase = getSupabase();
     if (!supabase) return "unconfigured";
-    const { error: err } = await supabase.auth.signUp({ email: emailArg, password });
+    const { error: err } = await supabase.auth.signInWithPasskey(
+      captchaToken ? { options: { captchaToken } } : undefined,
+    );
     return err ? err.message : null;
   }, []);
+
+  const registerPasskey = useCallback(async () => {
+    const supabase = getSupabase();
+    if (!supabase) return "unconfigured";
+    const { error: err } = await supabase.auth.registerPasskey();
+    return err ? err.message : null;
+  }, []);
+
+  const resetPassword = useCallback(async (emailArg: string, captchaToken?: string) => {
+    const supabase = getSupabase();
+    if (!supabase) return "unconfigured";
+    const { error: err } = await supabase.auth.resetPasswordForEmail(emailArg, {
+      redirectTo:
+        typeof window !== "undefined"
+          ? window.location.origin + window.location.pathname
+          : undefined,
+      captchaToken,
+    });
+    return err ? err.message : null;
+  }, []);
+
+  const updatePassword = useCallback(async (password: string) => {
+    const supabase = getSupabase();
+    if (!supabase) return "unconfigured";
+    const { error: err } = await supabase.auth.updateUser({ password });
+    if (!err) setRecovery(false);
+    return err ? err.message : null;
+  }, []);
+
+  const signUp = useCallback(
+    async (emailArg: string, password: string, meta?: NokorSignUpMeta, captchaToken?: string) => {
+      const supabase = getSupabase();
+      if (!supabase) return "unconfigured";
+      // Metadata lands in auth.users.raw_user_meta_data; the DB trigger
+      // (migration 0036) creates the profile row from it — with email
+      // confirmation on there is no session to insert with here.
+      const { error: err } = await supabase.auth.signUp({
+        email: emailArg,
+        password,
+        options: { data: meta, captchaToken },
+      });
+      return err ? err.message : null;
+    },
+    [],
+  );
 
   const signOut = useCallback(async () => {
     const supabase = getSupabase();
@@ -472,8 +552,14 @@ export function useNokor() {
     busy,
     error,
     signIn,
+    signInWithGoogle,
+    signInWithPasskey,
+    registerPasskey,
     signUp,
     signOut,
+    resetPassword,
+    updatePassword,
+    recovery,
     createPost,
     editPost,
     deletePost,

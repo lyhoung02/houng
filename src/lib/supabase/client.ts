@@ -16,7 +16,12 @@ export function getSupabase(): SupabaseClient<Database> | null {
   if (!url || !anonKey) return null;
   if (!client) {
     client = createClient<Database>(url, anonKey, {
-      auth: { persistSession: true, autoRefreshToken: true },
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        // Opt-in for auth.signInWithPasskey() / auth.registerPasskey().
+        experimental: { passkey: true },
+      },
     });
   }
   return client;

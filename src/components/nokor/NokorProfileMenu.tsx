@@ -4,19 +4,24 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { displayName, useProfile } from "@/lib/supabase/useProfile";
 import { useT } from "../providers/LanguageProvider";
+import NokorLoginActivity from "./NokorLoginActivity";
 
 export default function NokorProfileMenu({
   userId,
   email,
   onSignOut,
+  onAddPasskey,
 }: {
   userId: string;
   email: string | null;
   onSignOut: () => void;
+  onAddPasskey?: () => Promise<string | null>;
 }) {
   const t = useT();
   const { profile, avatar } = useProfile(userId);
   const [open, setOpen] = useState(false);
+  const [passkeyState, setPasskeyState] = useState<"idle" | "busy" | "done" | "error">("idle");
+  const [showActivity, setShowActivity] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const name = displayName(profile, userId);
 
@@ -69,6 +74,54 @@ export default function NokorProfileMenu({
             role="menuitem"
             onClick={() => {
               setOpen(false);
+              setShowActivity(true);
+            }}
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition hover:bg-surface-strong"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path
+                d="M12 8v4l3 2 M21 12a9 9 0 1 1-9-9 9 9 0 0 1 9 9z"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            {t.nokor.auth.loginActivity}
+          </button>
+          {onAddPasskey && (
+            <button
+              type="button"
+              role="menuitem"
+              disabled={passkeyState === "busy"}
+              onClick={async () => {
+                setPasskeyState("busy");
+                const err = await onAddPasskey();
+                setPasskeyState(err ? "error" : "done");
+              }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition hover:bg-surface-strong disabled:opacity-50"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path
+                  d="M12 11a4 4 0 1 0-4-4 M12 3a4 4 0 0 1 4 4c0 1.1-.45 2.1-1.17 2.83 M6 21v-1a6 6 0 0 1 8.5-5.45 M17.5 14.5a2.5 2.5 0 0 1 1 4.8V21l1.5 1.5L21.5 21l-1-1 1-1-1.3-1.3a2.5 2.5 0 0 0-2.7-2.2z"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              {passkeyState === "done"
+                ? t.nokor.auth.passkeyAdded
+                : passkeyState === "error"
+                  ? t.nokor.auth.passkeyFailed
+                  : t.nokor.auth.addPasskey}
+            </button>
+          )}
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              setOpen(false);
               onSignOut();
             }}
             className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-rose-400 transition hover:bg-surface-strong"
@@ -86,6 +139,7 @@ export default function NokorProfileMenu({
           </button>
         </div>
       )}
+      {showActivity && <NokorLoginActivity onClose={() => setShowActivity(false)} />}
     </div>
   );
 }

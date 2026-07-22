@@ -49,8 +49,25 @@ export type KhVillage = KhCommune & { commune_code: string };
 /** Admin-granted profile badge (migration 0031). */
 export type NokorBadgeKind = "verified" | "creator";
 
+/** Signup metadata → auth.users.raw_user_meta_data → profile row (trigger,
+ *  migration 0036). Keys must match what handle_new_user() reads. */
+export type NokorSignUpMeta = {
+  first_name: string;
+  last_name: string;
+  gender: Gender | null;
+  phone: string | null;
+  current_province_code: string | null;
+  current_district_code: string | null;
+  current_commune_code: string | null;
+  current_village_code: string | null;
+  /** Denormalised display string for the selected address. */
+  current_city: string | null;
+};
+
 export type Profile = {
   user_id: string;
+  first_name: string | null;
+  last_name: string | null;
   username: string | null;
   phone: string | null;
   avatar_path: string | null;
@@ -806,6 +823,29 @@ export type Database = {
     };
     Views: Record<never, never>;
     Functions: {
+      nokor_email_for_phone: {
+        Args: { phone_arg: string };
+        Returns: string | null;
+      };
+      nokor_my_sessions: {
+        Args: Record<string, never>;
+        Returns: {
+          id: string;
+          created_at: string;
+          updated_at: string;
+          user_agent: string | null;
+          ip: string | null;
+          is_current: boolean;
+        }[];
+      };
+      nokor_my_login_history: {
+        Args: Record<string, never>;
+        Returns: {
+          action: string | null;
+          ip: string | null;
+          created_at: string;
+        }[];
+      };
       start_conversation: {
         Args: { p_name: string; p_email: string; p_lang?: string };
         Returns: { out_conversation_id: string; out_access_token: string }[];
